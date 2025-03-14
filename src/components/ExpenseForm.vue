@@ -10,7 +10,6 @@
         <div class="step" :class="{ active: currentStep >= 3 }">3</div>
       </div>
       <div class="step-title">{{ stepTitle }}</div>
-      <button class="form-close" @click="$emit('close')">&times;</button>
     </div>
 
    
@@ -224,10 +223,9 @@ export default {
 
 .expense-form-container {
   background-color: var(--cardbg);
-  max-width: 32rem;
+  max-width: 70%;
   margin: 0 auto;
   border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   padding: 1.5rem;
   position: relative;
   color: var(--textwhite);

@@ -1,7 +1,7 @@
 <template>
   <header class="topbar">
     <div class="topbar__left">
-      <h1 class="topbar__title">moneyTrack</h1>
+      <h1 class="topbar__title">moneyTRACK</h1>
     </div>
     <div class="topbar__right">
       <button @click="$emit('open-calendar')" class="topbar__button">
