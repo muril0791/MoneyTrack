@@ -1,68 +1,66 @@
 <template>
-  <div class="bg-blue-50 max-w-2xl mx-auto rounded-lg shadow-xl p-8 relative">
+  <div class="bg-cardbg max-w-2xl mx-auto rounded shadow-xl p-6 relative text-textwhite">
     <!-- Barra de Progresso -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-2">
+        <!-- Passo 1 -->
         <div
-          class="flex items-center justify-center w-10 h-10 rounded-full"
-          :class="currentStep >= 1 ? 'bg-primary text-white' : 'bg-blue-200 text-blue-700'"
+          class="flex items-center justify-center w-8 h-8 rounded-full"
+          :class="currentStep >= 1 ? 'bg-greenmain text-white' : 'bg-gray-700 text-gray-400'"
         >
           1
         </div>
-        <div class="w-24 h-1" :class="currentStep >= 2 ? 'bg-primary' : 'bg-blue-200'"></div>
+        <div class="w-16 h-1" :class="currentStep >= 2 ? 'bg-greenmain' : 'bg-gray-700'"></div>
+        <!-- Passo 2 -->
         <div
-          class="flex items-center justify-center w-10 h-10 rounded-full"
-          :class="currentStep >= 2 ? 'bg-primary text-white' : 'bg-blue-200 text-blue-700'"
+          class="flex items-center justify-center w-8 h-8 rounded-full"
+          :class="currentStep >= 2 ? 'bg-greenmain text-white' : 'bg-gray-700 text-gray-400'"
         >
           2
         </div>
-        <div class="w-24 h-1" :class="currentStep >= 3 ? 'bg-primary' : 'bg-blue-200'"></div>
+        <div class="w-16 h-1" :class="currentStep >= 3 ? 'bg-greenmain' : 'bg-gray-700'"></div>
+        <!-- Passo 3 -->
         <div
-          class="flex items-center justify-center w-10 h-10 rounded-full"
-          :class="currentStep >= 3 ? 'bg-primary text-white' : 'bg-blue-200 text-blue-700'"
+          class="flex items-center justify-center w-8 h-8 rounded-full"
+          :class="currentStep >= 3 ? 'bg-greenmain text-white' : 'bg-gray-700 text-gray-400'"
         >
           3
         </div>
       </div>
-      <div class="text-sm font-medium text-blue-900">
+      <div class="text-sm font-medium text-gray-400">
         {{ stepTitle }}
       </div>
       <button
-        class="absolute top-4 right-4 text-blue-400 hover:text-blue-600 text-2xl font-bold"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-200 text-xl font-bold"
         @click="$emit('close')"
       >
         &times;
       </button>
     </div>
 
-    <!-- Formulário Multi-etapas -->
+    <!-- Formulário multi-etapas -->
     <form @submit.prevent="handleSubmit">
       <!-- Passo 1: Tipo, Modalidade e Data -->
       <div v-if="currentStep === 1" class="space-y-4">
-        <h2 class="text-xl font-bold text-blue-900">Tipo, Modalidade e Data</h2>
-        <p class="text-sm text-blue-700">
-          Escolha se é uma Entrada ou Saída, informe a Modalidade e selecione a Data.
-        </p>
-        <!-- Tipo -->
+        <h2 class="text-lg font-bold">Tipo, Modalidade e Data</h2>
         <div>
-          <label class="block mb-1 font-medium text-blue-900">Tipo de Transação</label>
+          <label class="block mb-1 font-medium text-gray-300">Tipo de Transação</label>
           <select
             v-model="form.tipo"
             required
-            class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
           >
             <option disabled value="">Selecione</option>
             <option value="entrada">Entrada</option>
             <option value="saida">Saída</option>
           </select>
         </div>
-        <!-- Modalidade -->
         <div>
-          <label class="block mb-1 font-medium text-blue-900">Modalidade</label>
+          <label class="block mb-1 font-medium text-gray-300">Modalidade</label>
           <select
             v-model="form.modalidade"
             required
-            class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
           >
             <option disabled value="">Selecione</option>
             <option value="avulso">Avulso</option>
@@ -70,65 +68,57 @@
             <option value="parcelado">Parcelado</option>
           </select>
         </div>
-        <!-- Data -->
         <div>
-          <label class="block mb-1 font-medium text-blue-900">Data do Lançamento</label>
+          <label class="block mb-1 font-medium text-gray-300">Data do Lançamento</label>
           <input
             v-model="form.data"
             type="date"
             required
-            class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
           />
         </div>
       </div>
 
       <!-- Passo 2: Detalhes -->
       <div v-if="currentStep === 2" class="space-y-4">
-        <h2 class="text-xl font-bold text-blue-900">Detalhes da Transação</h2>
-        <p class="text-sm text-blue-700">
-          Preencha os campos de acordo com o tipo e a modalidade escolhida.
-        </p>
-        <!-- Valor -->
+        <h2 class="text-lg font-bold">Detalhes da Transação</h2>
         <div>
-          <label class="block mb-1 font-medium text-blue-900">Valor</label>
+          <label class="block mb-1 font-medium text-gray-300">Valor</label>
           <input
             v-model.number="form.valor"
             type="number"
             step="0.01"
             required
-            class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
           />
         </div>
-        <!-- Descrição -->
         <div>
-          <label class="block mb-1 font-medium text-blue-900">Descrição</label>
+          <label class="block mb-1 font-medium text-gray-300">Descrição</label>
           <input
             v-model="form.descricao"
             type="text"
             required
-            class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
           />
         </div>
-        <!-- Se for Entrada -->
         <template v-if="form.tipo === 'entrada'">
           <div>
-            <label class="block mb-1 font-medium text-blue-900">Fonte da Entrada</label>
+            <label class="block mb-1 font-medium text-gray-300">Fonte da Entrada</label>
             <input
               v-model="form.fonteEntrada"
               type="text"
               placeholder="Ex: Salário, Venda, etc."
-              class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
             />
           </div>
         </template>
-        <!-- Se for Saída -->
         <template v-else-if="form.tipo === 'saida'">
           <div>
-            <label class="block mb-1 font-medium text-blue-900">Forma de Pagamento</label>
+            <label class="block mb-1 font-medium text-gray-300">Forma de Pagamento</label>
             <select
               v-model="form.pagamento"
               required
-              class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
             >
               <option disabled value="">Selecione</option>
               <option value="dinheiro">Dinheiro</option>
@@ -137,11 +127,11 @@
             </select>
           </div>
           <div>
-            <label class="block mb-1 font-medium text-blue-900">Categoria</label>
+            <label class="block mb-1 font-medium text-gray-300">Categoria</label>
             <select
               v-model="form.categoria"
               required
-              class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
             >
               <option disabled value="">Selecione</option>
               <option value="alimentacao">Alimentação</option>
@@ -152,13 +142,12 @@
             </select>
           </div>
         </template>
-        <!-- Se for Fixo -->
         <template v-if="form.modalidade === 'fixo'">
           <div>
-            <label class="block mb-1 font-medium text-blue-900">Periodicidade</label>
+            <label class="block mb-1 font-medium text-gray-300">Periodicidade</label>
             <select
               v-model="form.periodicidade"
-              class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
             >
               <option disabled value="">Selecione</option>
               <option value="mensal">Mensal</option>
@@ -167,33 +156,31 @@
             </select>
           </div>
         </template>
-        <!-- Se for Parcelado -->
         <template v-if="form.modalidade === 'parcelado'">
           <div>
-            <label class="block mb-1 font-medium text-blue-900">Número de Parcelas</label>
+            <label class="block mb-1 font-medium text-gray-300">Número de Parcelas</label>
             <input
               v-model.number="form.parcelas"
               type="number"
               min="2"
-              class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
             />
           </div>
           <div>
-            <label class="block mb-1 font-medium text-blue-900">Data da Primeira Parcela</label>
+            <label class="block mb-1 font-medium text-gray-300">Data da Primeira Parcela</label>
             <input
               v-model="form.dataPrimeiraParcela"
               type="date"
-              class="w-full border border-blue-200 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
             />
           </div>
         </template>
       </div>
 
-      <!-- Passo 3: Revisão e Confirmação -->
+      <!-- Passo 3: Revisão Final -->
       <div v-if="currentStep === 3" class="space-y-4">
-        <h2 class="text-xl font-bold text-blue-900">Revisão Final</h2>
-        <p class="text-sm text-blue-700">Confira os dados antes de confirmar o lançamento.</p>
-        <div class="bg-blue-100 p-4 rounded border border-blue-200">
+        <h2 class="text-lg font-bold">Revisão Final</h2>
+        <div class="bg-gray-800 p-4 rounded border border-gray-700 text-sm">
           <p><strong>Tipo:</strong> {{ form.tipo }}</p>
           <p><strong>Modalidade:</strong> {{ form.modalidade }}</p>
           <p><strong>Data:</strong> {{ form.data }}</p>
@@ -217,12 +204,12 @@
       </div>
 
       <!-- Botões de Navegação -->
-      <div class="flex justify-between mt-8">
+      <div class="flex justify-between mt-6">
         <button
           v-if="currentStep > 1"
           type="button"
           @click="prevStep"
-          class="px-4 py-2 bg-gray-200 text-blue-900 rounded hover:bg-gray-300"
+          class="px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600"
         >
           Voltar
         </button>
@@ -230,14 +217,14 @@
           v-if="currentStep < 3"
           type="button"
           @click="nextStep"
-          class="ml-auto px-4 py-2 bg-primary text-white rounded hover:bg-blue-700"
+          class="ml-auto px-4 py-2 bg-greenmain text-white rounded hover:bg-green-600"
         >
           Próximo
         </button>
         <button
           v-if="currentStep === 3"
           type="submit"
-          class="ml-auto px-4 py-2 bg-primary text-white rounded hover:bg-blue-700"
+          class="ml-auto px-4 py-2 bg-greenmain text-white rounded hover:bg-green-600"
         >
           Confirmar
         </button>
@@ -247,55 +234,55 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed } from "vue";
 
 export default {
-  name: 'ExpenseForm',
-  emits: ['add-expense', 'close'],
+  name: "ExpenseForm",
+  emits: ["add-expense", "close"],
   setup(_, { emit }) {
-    const currentStep = ref(1)
+    const currentStep = ref(1);
     const form = reactive({
-      tipo: '',
-      modalidade: '',
-      data: '',
+      tipo: "",
+      modalidade: "",
+      data: "",
       valor: null,
-      descricao: '',
-      fonteEntrada: '',
-      pagamento: '',
-      categoria: '',
-      periodicidade: '',
+      descricao: "",
+      fonteEntrada: "",
+      pagamento: "",
+      categoria: "",
+      periodicidade: "",
       parcelas: null,
-      dataPrimeiraParcela: ''
-    })
+      dataPrimeiraParcela: ""
+    });
     const stepTitle = computed(() => {
-      if (currentStep.value === 1) return 'Tipo, Modalidade e Data'
-      if (currentStep.value === 2) return 'Detalhes da Transação'
-      if (currentStep.value === 3) return 'Revisão e Confirmação'
-      return ''
-    })
+      if (currentStep.value === 1) return "Tipo, Modalidade e Data";
+      if (currentStep.value === 2) return "Detalhes da Transação";
+      if (currentStep.value === 3) return "Revisão Final";
+      return "";
+    });
     const nextStep = () => {
-      if (currentStep.value < 3) currentStep.value++
-    }
+      if (currentStep.value < 3) currentStep.value++;
+    };
     const prevStep = () => {
-      if (currentStep.value > 1) currentStep.value--
-    }
+      if (currentStep.value > 1) currentStep.value--;
+    };
     const handleSubmit = () => {
-      emit('add-expense', { ...form })
-      currentStep.value = 1
+      emit("add-expense", { ...form });
+      currentStep.value = 1;
       Object.assign(form, {
-        tipo: '',
-        modalidade: '',
-        data: '',
+        tipo: "",
+        modalidade: "",
+        data: "",
         valor: null,
-        descricao: '',
-        fonteEntrada: '',
-        pagamento: '',
-        categoria: '',
-        periodicidade: '',
+        descricao: "",
+        fonteEntrada: "",
+        pagamento: "",
+        categoria: "",
+        periodicidade: "",
         parcelas: null,
-        dataPrimeiraParcela: ''
-      })
-    }
+        dataPrimeiraParcela: ""
+      });
+    };
     return {
       currentStep,
       form,
@@ -303,7 +290,7 @@ export default {
       nextStep,
       prevStep,
       handleSubmit
-    }
+    };
   }
-}
+};
 </script>

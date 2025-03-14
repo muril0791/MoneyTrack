@@ -4,7 +4,8 @@
 
 @import "tailwindcss";
 
-body.dark {
-    background-color: #111827;
-    color: #f3f4f6;
+body {
+    background-color: #0f0e11;
+    color: #c2c3c2;
+    font-family: 'Roboto', sans-serif;
 }

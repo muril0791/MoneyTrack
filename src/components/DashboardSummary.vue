@@ -1,29 +1,34 @@
 <template>
-  <div class="space-y-8">
-    <!-- Totais -->
-    <div class="flex flex-row-reverse space-x-4 space-x-reverse">
-      <div class="bg-white p-4 rounded-lg shadow-md">
-        <h3 class="text-lg font-bold text-black">Total Entradas</h3>
-        <p class="text-2xl font-semibold text-green-700">
+  <div class="space-y-8 bg-green-900"> <button
+      @click="$emit('open-modal')"
+      class="bg-greenmain hover:bg-green-600 text-white px-4 py-2 rounded-md"
+    >
+      Novo Lançamento
+    </button>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-cardbg rounded p-4 shadow">
+        <h3 class="text-sm font-bold text-textgray">Saldo</h3>
+        <p class="text-2xl font-semibold text-greenmain">
           R$ {{ totalEntradas.toFixed(2) }}
         </p>
       </div>
-      <div class="bg-white p-4 rounded-lg shadow-md">
-        <h3 class="text-lg font-bold text-black">Total Saídas</h3>
-        <p class="text-2xl font-semibold text-red-700">
+      <div class="bg-cardbg rounded p-4 shadow">
+        <h3 class="text-sm font-bold text-textgray">Despesas</h3>
+        <p class="text-2xl font-semibold text-redmain">
           R$ {{ totalSaidas.toFixed(2) }}
         </p>
       </div>
     </div>
 
-    <!-- Seções do Dashboard -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div>
-        <h3 class="text-xl font-bold mb-4 text-white">Gráfico de Transações</h3>
+        <h3 class="text-lg font-bold text-textgray mb-4">
+          Gastos por categoria
+        </h3>
         <ExpensePieChart :expenses="expenses" />
       </div>
       <div>
-        <h3 class="text-xl font-bold mb-4 text-white">Lista de Lançamentos</h3>
+        <h3 class="text-lg font-bold text-textgray mb-4">Transações</h3>
         <ExpenseList
           :expenses="expenses"
           @edit-expense="handleEditExpense"

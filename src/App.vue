@@ -1,40 +1,29 @@
 <template>
-  <div class="min-h-screen bg-gray-800">
-    <!-- TopBar sem dark mode -->
-    <TopBar @open-modal="showModal = true" />
+  <div class="min-h-screen">
+    <!-- TopBar: Nome do projeto, placeholder de perfil e botão para abrir o calendário -->
+    <TopBar @open-modal="showModal = true" @open-calendar="showCalendar = true" />
 
-    <!-- Dashboard -->
-    <section class="p-6">
-      <DashboardSummary :expenses="expenses" />
-      <div class="mt-8 text-center">
-        <button
-          @click="showCalendar = true"
-          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow"
-        >
-          Ver Calendário
-        </button>
+    <!-- Conteúdo Principal: Dashboard com duas colunas -->
+    <main class="main-container">
+      <div class="two-columns">
+        <!-- Coluna 1: DashboardLeft com saldo, gráfico, percentuais e top categorias -->
+        <DashboardLeft :expenses="expenses" @open-add="showModal = true" />
+        <!-- Coluna 2: Lista simples de transações -->
+        <SimpleTransactionList :expenses="expenses" @view-more="viewMoreTransactions" />
       </div>
-    </section>
+    </main>
 
     <!-- Modal de Lançamento -->
     <transition name="modal">
       <div
         v-if="showModal"
-        class="fixed inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm z-50"
+        class="modal-overlay"
         @click.self="showModal = false"
       >
-        <div
-          class="bg-white rounded-lg p-6 w-1/2 shadow-xl relative"
-          @click.stop
-        >
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">Novo Lançamento</h2>
-            <button
-              @click="showModal = false"
-              class="text-gray-600 hover:text-gray-800"
-            >
-              &times;
-            </button>
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h2 class="modal-title">Novo Lançamento</h2>
+            <button @click="showModal = false" class="modal-close">&times;</button>
           </div>
           <ExpenseForm @add-expense="handleAddExpense" @close="showModal = false" />
         </div>
@@ -45,21 +34,13 @@
     <transition name="modal">
       <div
         v-if="showCalendar"
-        class="fixed inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm z-50"
+        class="modal-overlay"
         @click.self="showCalendar = false"
       >
-        <div
-          class="bg-white rounded-lg p-6 w-1/2 shadow-xl relative"
-          @click.stop
-        >
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">Calendário</h2>
-            <button
-              @click="showCalendar = false"
-              class="text-gray-600 hover:text-gray-800"
-            >
-              &times;
-            </button>
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h2 class="modal-title">Calendário</h2>
+            <button @click="showCalendar = false" class="modal-close">&times;</button>
           </div>
           <ExpenseCalendar :expenses="expenses" />
         </div>
@@ -69,73 +50,150 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import TopBar from './components/TopBar.vue'
-import DashboardSummary from './components/DashboardSummary.vue'
-import ExpenseForm from './components/ExpenseForm.vue'
-import ExpenseCalendar from './components/ExpenseCalendar.vue'
+import { ref } from "vue";
+import TopBar from "./components/TopBar.vue";
+import DashboardLeft from "./components/DashboardLeft.vue";
+import SimpleTransactionList from "./components/SimpleTransactionList.vue";
+import ExpenseForm from "./components/ExpenseForm.vue";
+import ExpenseCalendar from "./components/ExpenseCalendar.vue";
 
 export default {
-  name: 'App',
-  components: { TopBar, DashboardSummary, ExpenseForm, ExpenseCalendar },
+  name: "App",
+  components: {
+    TopBar,
+    DashboardLeft,
+    SimpleTransactionList,
+    ExpenseForm,
+    ExpenseCalendar
+  },
   setup() {
-    const expenses = ref([])
-    const showModal = ref(false)
-    const showCalendar = ref(false)
+    const expenses = ref([]);
+    const showModal = ref(false);
+    const showCalendar = ref(false);
 
     const handleAddExpense = (expense) => {
-      // Lógica de parcelado
-      if (expense.modalidade === 'parcelado' && expense.parcelas && expense.dataPrimeiraParcela) {
-        const total = Number(expense.valor)
-        const parcelas = Number(expense.parcelas)
-        const valorParcela = total / parcelas
-        const startDate = new Date(expense.dataPrimeiraParcela)
+      // Lógica para transação parcelada ou única
+      if (expense.modalidade === "parcelado" && expense.parcelas && expense.dataPrimeiraParcela) {
+        const total = Number(expense.valor);
+        const parcelas = Number(expense.parcelas);
+        const valorParcela = total / parcelas;
+        const startDate = new Date(expense.dataPrimeiraParcela);
         for (let i = 0; i < parcelas; i++) {
-          const parcelaDate = new Date(startDate)
-          parcelaDate.setMonth(startDate.getMonth() + i)
-          const yyyy = parcelaDate.getFullYear()
-          const mm = (parcelaDate.getMonth() + 1).toString().padStart(2, '0')
-          const dd = parcelaDate.getDate().toString().padStart(2, '0')
+          const parcelaDate = new Date(startDate);
+          parcelaDate.setMonth(startDate.getMonth() + i);
+          const yyyy = parcelaDate.getFullYear();
+          const mm = (parcelaDate.getMonth() + 1).toString().padStart(2, "0");
+          const dd = parcelaDate.getDate().toString().padStart(2, "0");
           expenses.value.push({
             ...expense,
             valor: valorParcela,
             data: `${yyyy}-${mm}-${dd}`,
             parcela: i + 1,
             totalParcelas: parcelas
-          })
+          });
         }
       } else {
-        expenses.value.push(expense)
+        expenses.value.push(expense);
       }
-      showModal.value = false
-    }
+      showModal.value = false;
+    };
 
-    return {
-      expenses,
-      showModal,
-      showCalendar,
-      handleAddExpense
-    }
-  },
-  methods: {
-  handleEditExpense(expense) {
-    // Abrir modal de edição ou algo similar
-    console.log('Editar', expense)
-  },
-  handleDeleteExpense(expense) {
-    // Confirmar exclusão e remover do array
-    console.log('Excluir', expense)
+    const viewMoreTransactions = () => {
+      console.log("Ver mais transações");
+    };
+
+    return { expenses, showModal, showCalendar, handleAddExpense, viewMoreTransactions };
   }
-}
-
-}
+};
 </script>
 
 <style>
-.modal-enter-active, .modal-leave-active {
+/* Layout básico */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Container principal centralizado */
+.main-container {
+  max-width: 100%;
+  padding: 1.5rem 1rem;
+}
+
+/* Duas colunas (uma em mobile, duas a partir de 768px) */
+.two-columns {
+  display: grid;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .two-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+}
+
+.modal-content {
+  background-color: var(--cardbg);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 50%;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Modal header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--textwhite);
+}
+
+.modal-close {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--textgray);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.modal-close:hover {
+  color: var(--textwhite);
+}
+
+/* Transição do modal */
+.modal-enter-active,
+.modal-leave-active {
   transition: opacity 0.3s;
 }
-.modal-enter-from, .modal-leave-to {
+.modal-enter-from,
+.modal-leave-to {
   opacity: 0;
+}
+
+/* Definição de variáveis de cores */
+:root {
+  --cardbg: #161716;
+  --mainbg: #0f0e11;
+  --greenmain: #3ecf00;
+  --redmain: #e93030;
+  --textwhite: #c2c3c2;
+  --textgray: #aaaaaa;
 }
 </style>

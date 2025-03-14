@@ -7,54 +7,57 @@
 </template>
 
 <script>
-import { onMounted, ref, watch } from 'vue'
-import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js'
-
-
-Chart.register(DoughnutController, ArcElement, Tooltip, Legend)
+import { onMounted, ref, watch } from "vue";
+import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from "chart.js";
+Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 export default {
-  name: 'ExpensePieChart',
+  name: "ExpensePieChart",
   props: { expenses: Array },
   setup(props) {
-    const chartCanvas = ref(null)
-    let chartInstance = null
+    const chartCanvas = ref(null);
+    let chartInstance = null;
 
     const updateChart = () => {
-      if (!chartCanvas.value) return
-      const entradas = props.expenses.filter(e => e.tipo === 'entrada').reduce((acc, e) => acc + Number(e.valor), 0)
-      const saidas = props.expenses.filter(e => e.tipo === 'saida').reduce((acc, e) => acc + Number(e.valor), 0)
+      if (!chartCanvas.value) return;
+      const entradas = props.expenses
+        .filter((e) => e.tipo === "entrada")
+        .reduce((acc, e) => acc + Number(e.valor), 0);
+      const saidas = props.expenses
+        .filter((e) => e.tipo === "saida")
+        .reduce((acc, e) => acc + Number(e.valor), 0);
 
       const data = {
-        labels: ['Entradas', 'Saídas'],
-        datasets: [{
-          data: [entradas, saidas],
-          backgroundColor: ['#17B169', '#CC0000']
-        }]
-      }
+        datasets: [
+          {
+            data: [entradas, saidas],
+            backgroundColor: ["#3ecf00", "#e93030 "]
+          }
+        ]
+      };
 
       if (chartInstance) {
-        chartInstance.data = data
-        chartInstance.update()
+        chartInstance.data = data;
+        chartInstance.update();
       } else {
         chartInstance = new Chart(chartCanvas.value, {
-          type: 'doughnut', 
+          type: "doughnut",
           data,
           options: {
             responsive: true,
             plugins: {
-              legend: { position: 'right' }
+              legend: { position: "bottom", labels: { color: "#c2c3c2" } }
             },
-            cutout: '75%' 
+            cutout: "80%"
           }
-        })
+        });
       }
-    }
+    };
 
-    onMounted(updateChart)
-    watch(() => props.expenses, updateChart, { deep: true })
+    onMounted(updateChart);
+    watch(() => props.expenses, updateChart, { deep: true });
 
-    return { chartCanvas }
+    return { chartCanvas };
   }
-}
+};
 </script>

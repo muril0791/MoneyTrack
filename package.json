@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "@tailwindcss/vite": "^4.0.9",
+    "chart.js": "^4.0.0",
     "vue": "^3.5.13",
-    "chart.js": "^4.0.0"
+    "vuetify": "^3.7.16"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.9",
