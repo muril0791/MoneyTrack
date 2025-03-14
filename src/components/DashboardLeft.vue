@@ -136,7 +136,7 @@ export default {
   gap: 1.5rem;
 }
 
-/* Retângulo Horizontal de Saldo */
+
 .saldo-box {
   background-color: #161716;
   padding: 1rem;
@@ -151,7 +151,7 @@ export default {
   margin: 0;
 }
 .saldo-info p {
-  color: #3ecf00;
+  color: #ffffff;
   font-size: 2rem;
   font-weight: bold;
   margin: 0;
@@ -168,7 +168,7 @@ export default {
   background-color: #36b800;
 }
 
-/* Container para os retângulos verticais lado a lado */
+
 .vertical-container {
   display: flex;
   gap: 1.5rem;
@@ -183,7 +183,7 @@ export default {
   }
 }
 
-/* Blocos Verticais */
+
 .vertical-box {
   background-color: #161716;
   padding: 1rem;
@@ -197,7 +197,7 @@ export default {
   margin-bottom: 0.5rem;
 }
 
-/* Bloco de Gráfico e Percentuais */
+
 .percentages {
   display: flex;
   justify-content: space-around;
@@ -217,7 +217,7 @@ export default {
   margin: 0;
 }
 
-/* Bloco de Totais e Top Categorias */
+
 .totals {
   display: flex;
   gap: 1rem;

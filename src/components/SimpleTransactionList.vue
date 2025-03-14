@@ -63,8 +63,7 @@ export default {
       }).format(valor);
     },
     formatParcelas(expense) {
-      // Mesmo critério: se for "saida" com "cartao-credito" ou "parcelado", exibe expense.parcelas + "x" se > 1
-      // caso contrário, "1x". Se for "entrada", exibe "—" (ou o que preferir).
+    
       if (expense.tipo === "saida") {
         if (expense.pagamento === "cartao-credito" || expense.modalidade === "parcelado") {
           return expense.parcelas && expense.parcelas > 1 ? expense.parcelas + "x" : "1x";
@@ -79,11 +78,11 @@ export default {
 
 <style scoped>
 .transaction-list {
-  background-color: #161716; /* Fundo dos cards */
+  background-color: #161716;
   padding: 0.5rem;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  color: #c2c3c2; /* Fonte */
+  color: #c2c3c2;
 }
 
 .transaction-header {
@@ -125,7 +124,7 @@ export default {
   display: grid;
   grid-template-columns: 2.5rem 1fr auto auto;
   align-items: center;
-  background-color: #0f0e11; /* Fundo dos itens */
+  background-color: #0f0e11;
   padding: 0.75rem;
   border-radius: 4px;
   transition: background-color 0.3s;

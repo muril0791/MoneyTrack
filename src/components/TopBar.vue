@@ -24,8 +24,8 @@ export default {
 
 <style scoped>
 .topbar {
-  background-color: #161716; /* cardbg */
-  color: #c2c3c2; /* fontcolor */
+  background-color: #161716; 
+  color: #c2c3c2; 
   padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@ export default {
 .topbar__title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #3ecf00; /* greenmain */
+  color: #3ecf00; 
   margin: 0;
 }
 
@@ -51,8 +51,8 @@ export default {
 .topbar__button {
   margin-right: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #161716; /* cardbg */
-  color: #ffffff; /* greenmain */
+  background-color: #161716; 
+  color: #ffffff;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }

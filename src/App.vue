@@ -101,51 +101,49 @@ export default {
     const showCalendar = ref(false);
     const showFullList = ref(false);
 
-    // Armazena o item que estamos editando (ou null se for novo)
+   
     const editingExpense = ref(null);
 
-    // Abre o modal para criar um novo item (limpa "editingExpense")
+  
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
     };
 
-    // Fecha o modal do formulário
+    
     const closeFormModal = () => {
       showModal.value = false;
       editingExpense.value = null;
     };
 
-    // Adicionar ou atualizar um item
+    
     const handleAddExpense = (expense) => {
-      // Se for edição, atualiza o item existente
+     
       if (editingExpense.value) {
-        // Acha o index no array
+       
         const index = expenses.value.indexOf(editingExpense.value);
         if (index !== -1) {
-          // Atualiza os campos do item existente
+          
           expenses.value[index] = { ...expense };
         }
       } else {
-        // Adiciona um novo item sem gerar vários objetos
-        // "parcelado" => Armazena 'parcelas', mas 1 item só
+      
         expenses.value.push(expense);
       }
       closeFormModal();
     };
 
-    // Exibe a lista completa
     const viewMoreTransactions = () => {
       showFullList.value = true;
     };
 
-    // Editar item => abre modal com dados do item
+    
     const handleEditExpense = (expense) => {
-      editingExpense.value = expense; // Carrega o item no form
-      showModal.value = true; // Abre o modal
+      editingExpense.value = expense; 
+      showModal.value = true; 
     };
 
-    // Excluir item => remove do array
+    
     const handleDeleteExpense = (expense) => {
       expenses.value = expenses.value.filter((e) => e !== expense);
     };
@@ -168,7 +166,7 @@ export default {
 </script>
 
 <style>
-/* Modal Transitions */
+
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.3s;
@@ -178,7 +176,7 @@ export default {
   opacity: 0;
 }
 
-/* Estilos para os modais e container principal */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -225,7 +223,7 @@ export default {
   color: var(--textwhite);
 }
 
-/* Variáveis de Cores */
+
 :root {
   --cardbg: #161716;
   --mainbg: #0f0e11;
@@ -235,14 +233,14 @@ export default {
   --textgray: #aaaaaa;
 }
 
-/* Container Principal */
+
 .main-container {
   max-width: 96rem;
   margin: 0 auto;
   padding: 1.5rem 1rem;
 }
 
-/* Duas Colunas */
+
 .two-columns {
   display: grid;
   gap: 1.5rem;
