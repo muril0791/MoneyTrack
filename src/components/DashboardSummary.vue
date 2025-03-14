@@ -1,5 +1,6 @@
 <template>
-  <div class="space-y-8 bg-green-900"> <button
+  <div class="space-y-8 bg-green-900">
+    <button
       @click="$emit('open-modal')"
       class="bg-greenmain hover:bg-green-600 text-white px-4 py-2 rounded-md"
     >

@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard-left">
-    
     <div class="saldo-box">
       <div class="saldo-info">
         <h3>Saldo</h3>
@@ -9,9 +8,7 @@
       <button @click="$emit('open-add')">Adicionar Transação</button>
     </div>
 
-   
     <div class="vertical-container">
-      
       <div class="vertical-box vertical-box-1">
         <h3>Gastos por Categoria</h3>
         <ExpensePieChart :expenses="expenses" />
@@ -31,7 +28,6 @@
         </div>
       </div>
 
-      
       <div class="vertical-box vertical-box-2">
         <div class="totals">
           <div class="total-box">
@@ -136,7 +132,6 @@ export default {
   gap: 1.5rem;
 }
 
-
 .saldo-box {
   background-color: #161716;
   padding: 1rem;
@@ -168,7 +163,6 @@ export default {
   background-color: #36b800;
 }
 
-
 .vertical-container {
   display: flex;
   gap: 1.5rem;
@@ -183,7 +177,6 @@ export default {
   }
 }
 
-
 .vertical-box {
   background-color: #161716;
   padding: 1rem;
@@ -196,7 +189,6 @@ export default {
   font-size: 1.125rem;
   margin-bottom: 0.5rem;
 }
-
 
 .percentages {
   display: flex;
@@ -216,7 +208,6 @@ export default {
   font-weight: bold;
   margin: 0;
 }
-
 
 .totals {
   display: flex;

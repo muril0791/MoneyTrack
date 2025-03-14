@@ -17,15 +17,15 @@ export default {
   computed: {
     currentMonth() {
       return new Date().toLocaleString("pt-BR", { month: "long" });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .topbar {
-  background-color: #161716; 
-  color: #c2c3c2; 
+  background-color: #161716;
+  color: #c2c3c2;
   padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@ export default {
 .topbar__title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #3ecf00; 
+  color: #3ecf00;
   margin: 0;
 }
 
@@ -51,14 +51,13 @@ export default {
 .topbar__button {
   margin-right: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #161716; 
+  background-color: #161716;
   color: #ffffff;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
 
 .topbar__button:hover {
-  
   color: #434343;
 }
 </style>

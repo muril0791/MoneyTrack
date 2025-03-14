@@ -1,17 +1,14 @@
 <template>
   <div class="min-h-screen">
- 
     <TopBar
       @open-modal="openNewTransaction"
       @open-calendar="showCalendar = true"
     />
 
-   
     <main class="main-container">
       <div class="two-columns">
-       
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
-        
+
         <SimpleTransactionList
           :expenses="expenses"
           @view-more="showFullList = true"
@@ -19,7 +16,6 @@
       </div>
     </main>
 
-   
     <transition name="modal">
       <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
         <div class="modal-content" @click.stop>
@@ -29,7 +25,7 @@
             </h2>
             <button @click="closeFormModal" class="modal-close">&times;</button>
           </div>
-          
+
           <ExpenseForm
             :editingExpense="editingExpense"
             @add-expense="handleAddExpense"
@@ -39,7 +35,6 @@
       </div>
     </transition>
 
-    
     <transition name="modal">
       <div
         v-if="showCalendar"
@@ -58,7 +53,6 @@
       </div>
     </transition>
 
-    
     <transition name="modal">
       <div
         v-if="showFullList"
@@ -101,33 +95,25 @@ export default {
     const showCalendar = ref(false);
     const showFullList = ref(false);
 
-   
     const editingExpense = ref(null);
 
-  
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
     };
 
-    
     const closeFormModal = () => {
       showModal.value = false;
       editingExpense.value = null;
     };
 
-    
     const handleAddExpense = (expense) => {
-     
       if (editingExpense.value) {
-       
         const index = expenses.value.indexOf(editingExpense.value);
         if (index !== -1) {
-          
           expenses.value[index] = { ...expense };
         }
       } else {
-      
         expenses.value.push(expense);
       }
       closeFormModal();
@@ -137,13 +123,11 @@ export default {
       showFullList.value = true;
     };
 
-    
     const handleEditExpense = (expense) => {
-      editingExpense.value = expense; 
-      showModal.value = true; 
+      editingExpense.value = expense;
+      showModal.value = true;
     };
 
-    
     const handleDeleteExpense = (expense) => {
       expenses.value = expenses.value.filter((e) => e !== expense);
     };
@@ -166,7 +150,6 @@ export default {
 </script>
 
 <style>
-
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.3s;
@@ -175,7 +158,6 @@ export default {
 .modal-leave-to {
   opacity: 0;
 }
-
 
 .modal-overlay {
   position: fixed;
@@ -223,7 +205,6 @@ export default {
   color: var(--textwhite);
 }
 
-
 :root {
   --cardbg: #161716;
   --mainbg: #0f0e11;
@@ -233,13 +214,11 @@ export default {
   --textgray: #aaaaaa;
 }
 
-
 .main-container {
   max-width: 96rem;
   margin: 0 auto;
   padding: 1.5rem 1rem;
 }
-
 
 .two-columns {
   display: grid;

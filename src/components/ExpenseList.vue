@@ -1,6 +1,5 @@
 <template>
   <div class="finance-list-container">
-   
     <div class="finance-list-header">
       <h2 class="finance-list-title">Transações</h2>
       <button class="finance-add-button" @click="$emit('add-transaction')">
@@ -8,7 +7,6 @@
       </button>
     </div>
 
-    
     <div class="finance-table-wrapper">
       <table class="finance-table">
         <thead>
@@ -27,55 +25,49 @@
         </thead>
         <tbody>
           <tr v-for="(expense, index) in expenses" :key="index">
-           
             <td>{{ formatData(expense.data) }}</td>
-            
-            
+
             <td>
               <span
                 :class="{
                   'tipo-entrada': expense.tipo === 'entrada',
-                  'tipo-saida': expense.tipo === 'saida'
+                  'tipo-saida': expense.tipo === 'saida',
                 }"
               >
                 {{ formatTipo(expense.tipo) }}
               </span>
             </td>
-            
-           
+
             <td class="capitalize">{{ expense.modalidade }}</td>
-            
-           
+
             <td>{{ formatParcelas(expense) }}</td>
-            
-           
+
             <td>{{ formatValor(expense.valor) }}</td>
-            
-           
+
             <td>{{ expense.descricao }}</td>
-            
-           
+
             <td>{{ expense.pagamento }}</td>
-            
-           
+
             <td>{{ expense.categoria }}</td>
-            
-            
+
             <td>
               <span
                 :class="{
                   'status-positive': expense.tipo === 'entrada',
-                  'status-negative': expense.tipo === 'saida'
+                  'status-negative': expense.tipo === 'saida',
                 }"
               >
-                {{ expense.tipo === 'entrada' ? 'Completed' : 'Pending' }}
+                {{ expense.tipo === "entrada" ? "Completed" : "Pending" }}
               </span>
             </td>
-            
-           
+
             <td class="finance-actions">
-              <button class="edit-btn" @click="editExpense(expense)">Editar</button>
-              <button class="delete-btn" @click="deleteExpense(expense)">Excluir</button>
+              <button class="edit-btn" @click="editExpense(expense)">
+                Editar
+              </button>
+              <button class="delete-btn" @click="deleteExpense(expense)">
+                Excluir
+              </button>
             </td>
           </tr>
         </tbody>
@@ -90,57 +82,60 @@ export default {
   props: {
     expenses: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ["add-transaction", "edit-expense", "delete-expense"],
   methods: {
-   
     editExpense(expense) {
       this.$emit("edit-expense", expense);
     },
-    
+
     deleteExpense(expense) {
       this.$emit("delete-expense", expense);
     },
-   
+
     formatTipo(tipo) {
       if (tipo === "entrada") return "Entrada";
       if (tipo === "saida") return "Saída";
       return tipo;
     },
-    
+
     formatData(dataStr) {
       if (!dataStr) return "";
       const dataObj = new Date(dataStr);
       return dataObj.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
-        year: "numeric"
+        year: "numeric",
       });
     },
-  
+
     formatValor(valor) {
       if (!valor) return "";
       return new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL"
+        currency: "BRL",
       }).format(valor);
     },
-    
+
     formatParcelas(expense) {
-   
       if (expense.tipo === "saida") {
-        if (expense.pagamento === "cartao-credito" || expense.modalidade === "parcelado") {
-          return expense.parcelas && expense.parcelas > 1 ? expense.parcelas + "x" : "1x";
+        if (
+          expense.pagamento === "cartao-credito" ||
+          expense.modalidade === "parcelado"
+        ) {
+          return expense.parcelas && expense.parcelas > 1
+            ? expense.parcelas + "x"
+            : "1x";
         }
-       
+
         return "1x";
       }
-     
+
       return "—";
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -154,16 +149,14 @@ export default {
   --text-gray: #aaaaaa;
 }
 
-
 .finance-list-container {
   background-color: var(--card-dark);
   padding: 1rem;
   border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   color: var(--text-white);
   font-family: Roboto, sans-serif;
 }
-
 
 .finance-list-header {
   display: flex;
@@ -190,7 +183,6 @@ export default {
   background-color: #36b800;
 }
 
-
 .finance-table-wrapper {
   overflow-x: auto;
 }
@@ -214,7 +206,6 @@ export default {
   background-color: var(--bg-main);
 }
 
-
 .tipo-entrada {
   color: var(--green);
   font-weight: bold;
@@ -224,9 +215,8 @@ export default {
   font-weight: bold;
 }
 
-
 .status-positive {
-  background-color: rgba(62,207,0,0.2);
+  background-color: rgba(62, 207, 0, 0.2);
   color: var(--green);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -234,14 +224,13 @@ export default {
   font-weight: bold;
 }
 .status-negative {
-  background-color: rgba(233,48,48,0.2);
+  background-color: rgba(233, 48, 48, 0.2);
   color: var(--red);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: bold;
 }
-
 
 .finance-actions {
   white-space: nowrap;
@@ -266,7 +255,6 @@ export default {
 .delete-btn:hover {
   color: #d32f2f;
 }
-
 
 .capitalize {
   text-transform: capitalize;

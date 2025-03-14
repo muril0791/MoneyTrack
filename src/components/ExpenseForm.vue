@@ -1,6 +1,5 @@
 <template>
   <div class="expense-form-container">
-   
     <div class="form-progress">
       <div class="steps">
         <div class="step" :class="{ active: currentStep >= 1 }">1</div>
@@ -12,9 +11,7 @@
       <div class="step-title">{{ stepTitle }}</div>
     </div>
 
-   
     <form @submit.prevent="handleSubmit">
-     
       <div v-if="currentStep === 1" class="form-step">
         <h2 class="form-heading">Tipo, Modalidade e Data</h2>
         <div class="form-group">
@@ -40,16 +37,26 @@
         </div>
       </div>
 
-      
       <div v-if="currentStep === 2" class="form-step">
         <h2 class="form-heading">Detalhes da Transação</h2>
         <div class="form-group">
           <label class="form-label">Valor</label>
-          <input v-model.number="form.valor" type="number" step="0.01" required class="form-input" />
+          <input
+            v-model.number="form.valor"
+            type="number"
+            step="0.01"
+            required
+            class="form-input"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">Descrição</label>
-          <input v-model="form.descricao" type="text" required class="form-input" />
+          <input
+            v-model="form.descricao"
+            type="text"
+            required
+            class="form-input"
+          />
         </div>
         <template v-if="form.tipo === 'entrada'">
           <div class="form-group">
@@ -98,16 +105,24 @@
         <template v-if="form.modalidade === 'parcelado'">
           <div class="form-group">
             <label class="form-label">Número de Parcelas</label>
-            <input v-model.number="form.parcelas" type="number" min="2" class="form-input" />
+            <input
+              v-model.number="form.parcelas"
+              type="number"
+              min="2"
+              class="form-input"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Data da Primeira Parcela</label>
-            <input v-model="form.dataPrimeiraParcela" type="date" class="form-input" />
+            <input
+              v-model="form.dataPrimeiraParcela"
+              type="date"
+              class="form-input"
+            />
           </div>
         </template>
       </div>
 
-      
       <div v-if="currentStep === 3" class="form-step">
         <h2 class="form-heading">Revisão Final</h2>
         <div class="review-box">
@@ -128,17 +143,29 @@
           </template>
           <template v-if="form.modalidade === 'parcelado'">
             <p><strong>Número de Parcelas:</strong> {{ form.parcelas }}</p>
-            <p><strong>Data Primeira Parcela:</strong> {{ form.dataPrimeiraParcela }}</p>
+            <p>
+              <strong>Data Primeira Parcela:</strong>
+              {{ form.dataPrimeiraParcela }}
+            </p>
           </template>
         </div>
       </div>
 
-      
       <div class="form-buttons">
-        <button v-if="currentStep > 1" type="button" @click="prevStep" class="btn-back">
+        <button
+          v-if="currentStep > 1"
+          type="button"
+          @click="prevStep"
+          class="btn-back"
+        >
           Voltar
         </button>
-        <button v-if="currentStep < 3" type="button" @click="nextStep" class="btn-next">
+        <button
+          v-if="currentStep < 3"
+          type="button"
+          @click="nextStep"
+          class="btn-next"
+        >
           Próximo
         </button>
         <button v-if="currentStep === 3" type="submit" class="btn-confirm">
@@ -168,7 +195,7 @@ export default {
       categoria: "",
       periodicidade: "",
       parcelas: null,
-      dataPrimeiraParcela: ""
+      dataPrimeiraParcela: "",
     });
     const stepTitle = computed(() => {
       if (currentStep.value === 1) return "Tipo, Modalidade e Data";
@@ -196,7 +223,7 @@ export default {
         categoria: "",
         periodicidade: "",
         parcelas: null,
-        dataPrimeiraParcela: ""
+        dataPrimeiraParcela: "",
       });
     };
     return {
@@ -205,9 +232,9 @@ export default {
       stepTitle,
       nextStep,
       prevStep,
-      handleSubmit
+      handleSubmit,
     };
-  }
+  },
 };
 </script>
 

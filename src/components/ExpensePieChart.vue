@@ -8,7 +8,13 @@
 
 <script>
 import { onMounted, ref, watch } from "vue";
-import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart,
+  DoughnutController,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 export default {
@@ -20,8 +26,7 @@ export default {
 
     const updateChart = () => {
       if (!chartCanvas.value) return;
-      
-    
+
       const entradas = props.expenses
         .filter((e) => e.tipo === "entrada")
         .reduce((acc, e) => acc + Number(e.valor), 0);
@@ -31,38 +36,37 @@ export default {
 
       let data, options;
 
-     
       if (entradas === 0 && saidas === 0) {
         data = {
           datasets: [
             {
               data: [1],
-              backgroundColor: ["#ffffff"]
-            }
-          ]
+              backgroundColor: ["#ffffff"],
+            },
+          ],
         };
         options = {
           responsive: true,
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
           },
-          cutout: "80%"
+          cutout: "80%",
         };
       } else {
         data = {
           datasets: [
             {
               data: [entradas, saidas],
-              backgroundColor: ["#3ecf00", "#e93030"]
-            }
-          ]
+              backgroundColor: ["#3ecf00", "#e93030"],
+            },
+          ],
         };
         options = {
           responsive: true,
           plugins: {
-            legend: { position: "bottom", labels: { color: "#c2c3c2" } }
+            legend: { position: "bottom", labels: { color: "#c2c3c2" } },
           },
-          cutout: "80%"
+          cutout: "80%",
         };
       }
 
@@ -74,7 +78,7 @@ export default {
         chartInstance = new Chart(chartCanvas.value, {
           type: "doughnut",
           data,
-          options
+          options,
         });
       }
     };
@@ -83,6 +87,6 @@ export default {
     watch(() => props.expenses, updateChart, { deep: true });
 
     return { chartCanvas };
-  }
+  },
 };
 </script>

@@ -17,14 +17,16 @@
           <span v-else class="icon-negative">↓</span>
         </div>
         <div class="transaction-info">
-          <p class="transaction-description">{{ expense.descricao || formatTipo(expense.tipo) }}</p>
+          <p class="transaction-description">
+            {{ expense.descricao || formatTipo(expense.tipo) }}
+          </p>
           <p class="transaction-date">{{ formatData(expense.data) }}</p>
         </div>
-       
+
         <div class="transaction-amount">
           {{ formatValor(expense.valor) }}
         </div>
-       
+
         <div class="transaction-parcelas">
           {{ formatParcelas(expense) }}
         </div>
@@ -37,7 +39,7 @@
 export default {
   name: "SimpleTransactionList",
   props: {
-    expenses: { type: Array, required: true }
+    expenses: { type: Array, required: true },
   },
   emits: ["view-more"],
   methods: {
@@ -52,27 +54,31 @@ export default {
       return dataObj.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
-        year: "numeric"
+        year: "numeric",
       });
     },
     formatValor(valor) {
       if (!valor) return "";
       return new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL"
+        currency: "BRL",
       }).format(valor);
     },
     formatParcelas(expense) {
-    
       if (expense.tipo === "saida") {
-        if (expense.pagamento === "cartao-credito" || expense.modalidade === "parcelado") {
-          return expense.parcelas && expense.parcelas > 1 ? expense.parcelas + "x" : "1x";
+        if (
+          expense.pagamento === "cartao-credito" ||
+          expense.modalidade === "parcelado"
+        ) {
+          return expense.parcelas && expense.parcelas > 1
+            ? expense.parcelas + "x"
+            : "1x";
         }
         return "1x";
       }
       return "—";
-    }
-  }
+    },
+  },
 };
 </script>
 

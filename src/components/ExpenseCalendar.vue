@@ -1,14 +1,32 @@
 <template>
   <div class="overflow-x-auto">
     <div class="flex justify-between items-center mb-4">
-      <button @click="prevMonth" class="bg-gray-700 text-gray-200 px-3 py-1 rounded-md">&lt;</button>
-      <h2 class="text-lg font-bold capitalize text-gray-200">{{ monthYear }}</h2>
-      <button @click="nextMonth" class="bg-gray-700 text-gray-200 px-3 py-1 rounded-md">&gt;</button>
+      <button
+        @click="prevMonth"
+        class="bg-gray-700 text-gray-200 px-3 py-1 rounded-md"
+      >
+        &lt;
+      </button>
+      <h2 class="text-lg font-bold capitalize text-gray-200">
+        {{ monthYear }}
+      </h2>
+      <button
+        @click="nextMonth"
+        class="bg-gray-700 text-gray-200 px-3 py-1 rounded-md"
+      >
+        &gt;
+      </button>
     </div>
     <table class="min-w-full table-auto border-collapse">
       <thead>
         <tr class="bg-gray-700 text-gray-200">
-          <th v-for="day in weekDays" :key="day" class="px-2 py-1 border border-gray-600">{{ day }}</th>
+          <th
+            v-for="day in weekDays"
+            :key="day"
+            class="px-2 py-1 border border-gray-600"
+          >
+            {{ day }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -19,12 +37,19 @@
             class="h-20 border border-gray-600 relative p-2 cursor-pointer hover:bg-gray-800"
             @click="openDay(day)"
           >
-            <div v-if="day.date" class="absolute top-1 left-1 text-xs font-semibold text-gray-300">
+            <div
+              v-if="day.date"
+              class="absolute top-1 left-1 text-xs font-semibold text-gray-300"
+            >
               {{ day.date.getDate() }}
             </div>
             <div v-if="day.summary" class="mt-6 text-xs">
-              <div class="text-greenmain" v-if="day.summary.entrada">+{{ day.summary.entrada.toFixed(2) }}</div>
-              <div class="text-redmain" v-if="day.summary.saida">-{{ day.summary.saida.toFixed(2) }}</div>
+              <div class="text-greenmain" v-if="day.summary.entrada">
+                +{{ day.summary.entrada.toFixed(2) }}
+              </div>
+              <div class="text-redmain" v-if="day.summary.saida">
+                -{{ day.summary.saida.toFixed(2) }}
+              </div>
             </div>
           </td>
         </tr>
@@ -40,12 +65,15 @@ export default {
   data() {
     return {
       currentDate: new Date(),
-      weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+      weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
     };
   },
   computed: {
     monthYear() {
-      return this.currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+      return this.currentDate.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      });
     },
     calendar() {
       const year = this.currentDate.getFullYear();
@@ -58,19 +86,23 @@ export default {
       let week = new Array(7).fill({ date: null, summary: null });
       let dayCounter = 1;
 
-     
       for (let i = startDay; i < 7; i++) {
-        week[i] = { date: new Date(year, month, dayCounter), summary: this.getDaySummary(dayCounter) };
+        week[i] = {
+          date: new Date(year, month, dayCounter),
+          summary: this.getDaySummary(dayCounter),
+        };
         dayCounter++;
       }
       weeks.push(week);
 
-      
       while (dayCounter <= totalDays) {
         week = [];
         for (let i = 0; i < 7; i++) {
           if (dayCounter <= totalDays) {
-            week.push({ date: new Date(year, month, dayCounter), summary: this.getDaySummary(dayCounter) });
+            week.push({
+              date: new Date(year, month, dayCounter),
+              summary: this.getDaySummary(dayCounter),
+            });
             dayCounter++;
           } else {
             week.push({ date: null, summary: null });
@@ -79,15 +111,25 @@ export default {
         weeks.push(week);
       }
       return weeks;
-    }
+    },
   },
   methods: {
     getDaySummary(day) {
-      const dateStr = this.formatDate(new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day));
+      const dateStr = this.formatDate(
+        new Date(
+          this.currentDate.getFullYear(),
+          this.currentDate.getMonth(),
+          day
+        )
+      );
       const dayExpenses = this.expenses.filter((e) => e.data === dateStr);
       if (!dayExpenses.length) return null;
-      const entrada = dayExpenses.filter((e) => e.tipo === "entrada").reduce((acc, e) => acc + Number(e.valor), 0);
-      const saida = dayExpenses.filter((e) => e.tipo === "saida").reduce((acc, e) => acc + Number(e.valor), 0);
+      const entrada = dayExpenses
+        .filter((e) => e.tipo === "entrada")
+        .reduce((acc, e) => acc + Number(e.valor), 0);
+      const saida = dayExpenses
+        .filter((e) => e.tipo === "saida")
+        .reduce((acc, e) => acc + Number(e.valor), 0);
       return { entrada, saida };
     },
     formatDate(date) {
@@ -108,7 +150,7 @@ export default {
       if (day.date) {
         this.$emit("open-day", this.formatDate(day.date));
       }
-    }
-  }
+    },
+  },
 };
 </script>
