@@ -1,138 +1,81 @@
 <template>
-  <div class="bg-cardbg max-w-2xl mx-auto rounded shadow-xl p-6 relative text-textwhite">
+  <div class="expense-form-container">
     <!-- Barra de Progresso -->
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center space-x-2">
-        <!-- Passo 1 -->
-        <div
-          class="flex items-center justify-center w-8 h-8 rounded-full"
-          :class="currentStep >= 1 ? 'bg-greenmain text-white' : 'bg-gray-700 text-gray-400'"
-        >
-          1
-        </div>
-        <div class="w-16 h-1" :class="currentStep >= 2 ? 'bg-greenmain' : 'bg-gray-700'"></div>
-        <!-- Passo 2 -->
-        <div
-          class="flex items-center justify-center w-8 h-8 rounded-full"
-          :class="currentStep >= 2 ? 'bg-greenmain text-white' : 'bg-gray-700 text-gray-400'"
-        >
-          2
-        </div>
-        <div class="w-16 h-1" :class="currentStep >= 3 ? 'bg-greenmain' : 'bg-gray-700'"></div>
-        <!-- Passo 3 -->
-        <div
-          class="flex items-center justify-center w-8 h-8 rounded-full"
-          :class="currentStep >= 3 ? 'bg-greenmain text-white' : 'bg-gray-700 text-gray-400'"
-        >
-          3
-        </div>
+    <div class="form-progress">
+      <div class="steps">
+        <div class="step" :class="{ active: currentStep >= 1 }">1</div>
+        <div class="step-line" :class="{ active: currentStep >= 2 }"></div>
+        <div class="step" :class="{ active: currentStep >= 2 }">2</div>
+        <div class="step-line" :class="{ active: currentStep >= 3 }"></div>
+        <div class="step" :class="{ active: currentStep >= 3 }">3</div>
       </div>
-      <div class="text-sm font-medium text-gray-400">
-        {{ stepTitle }}
-      </div>
-      <button
-        class="absolute top-4 right-4 text-gray-400 hover:text-gray-200 text-xl font-bold"
-        @click="$emit('close')"
-      >
-        &times;
-      </button>
+      <div class="step-title">{{ stepTitle }}</div>
+      <button class="form-close" @click="$emit('close')">&times;</button>
     </div>
 
     <!-- Formulário multi-etapas -->
     <form @submit.prevent="handleSubmit">
       <!-- Passo 1: Tipo, Modalidade e Data -->
-      <div v-if="currentStep === 1" class="space-y-4">
-        <h2 class="text-lg font-bold">Tipo, Modalidade e Data</h2>
-        <div>
-          <label class="block mb-1 font-medium text-gray-300">Tipo de Transação</label>
-          <select
-            v-model="form.tipo"
-            required
-            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-          >
+      <div v-if="currentStep === 1" class="form-step">
+        <h2 class="form-heading">Tipo, Modalidade e Data</h2>
+        <div class="form-group">
+          <label class="form-label">Tipo de Transação</label>
+          <select v-model="form.tipo" required class="form-input">
             <option disabled value="">Selecione</option>
             <option value="entrada">Entrada</option>
             <option value="saida">Saída</option>
           </select>
         </div>
-        <div>
-          <label class="block mb-1 font-medium text-gray-300">Modalidade</label>
-          <select
-            v-model="form.modalidade"
-            required
-            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-          >
+        <div class="form-group">
+          <label class="form-label">Modalidade</label>
+          <select v-model="form.modalidade" required class="form-input">
             <option disabled value="">Selecione</option>
             <option value="avulso">Avulso</option>
             <option value="fixo">Fixo</option>
             <option value="parcelado">Parcelado</option>
           </select>
         </div>
-        <div>
-          <label class="block mb-1 font-medium text-gray-300">Data do Lançamento</label>
-          <input
-            v-model="form.data"
-            type="date"
-            required
-            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-          />
+        <div class="form-group">
+          <label class="form-label">Data do Lançamento</label>
+          <input v-model="form.data" type="date" required class="form-input" />
         </div>
       </div>
 
       <!-- Passo 2: Detalhes -->
-      <div v-if="currentStep === 2" class="space-y-4">
-        <h2 class="text-lg font-bold">Detalhes da Transação</h2>
-        <div>
-          <label class="block mb-1 font-medium text-gray-300">Valor</label>
-          <input
-            v-model.number="form.valor"
-            type="number"
-            step="0.01"
-            required
-            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-          />
+      <div v-if="currentStep === 2" class="form-step">
+        <h2 class="form-heading">Detalhes da Transação</h2>
+        <div class="form-group">
+          <label class="form-label">Valor</label>
+          <input v-model.number="form.valor" type="number" step="0.01" required class="form-input" />
         </div>
-        <div>
-          <label class="block mb-1 font-medium text-gray-300">Descrição</label>
-          <input
-            v-model="form.descricao"
-            type="text"
-            required
-            class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-          />
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <input v-model="form.descricao" type="text" required class="form-input" />
         </div>
         <template v-if="form.tipo === 'entrada'">
-          <div>
-            <label class="block mb-1 font-medium text-gray-300">Fonte da Entrada</label>
+          <div class="form-group">
+            <label class="form-label">Fonte da Entrada</label>
             <input
               v-model="form.fonteEntrada"
               type="text"
               placeholder="Ex: Salário, Venda, etc."
-              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
+              class="form-input"
             />
           </div>
         </template>
         <template v-else-if="form.tipo === 'saida'">
-          <div>
-            <label class="block mb-1 font-medium text-gray-300">Forma de Pagamento</label>
-            <select
-              v-model="form.pagamento"
-              required
-              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-            >
+          <div class="form-group">
+            <label class="form-label">Forma de Pagamento</label>
+            <select v-model="form.pagamento" required class="form-input">
               <option disabled value="">Selecione</option>
               <option value="dinheiro">Dinheiro</option>
               <option value="cartao-credito">Cartão de Crédito</option>
               <option value="cartao-debito">Cartão de Débito</option>
             </select>
           </div>
-          <div>
-            <label class="block mb-1 font-medium text-gray-300">Categoria</label>
-            <select
-              v-model="form.categoria"
-              required
-              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-            >
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select v-model="form.categoria" required class="form-input">
               <option disabled value="">Selecione</option>
               <option value="alimentacao">Alimentação</option>
               <option value="transporte">Transporte</option>
@@ -143,12 +86,9 @@
           </div>
         </template>
         <template v-if="form.modalidade === 'fixo'">
-          <div>
-            <label class="block mb-1 font-medium text-gray-300">Periodicidade</label>
-            <select
-              v-model="form.periodicidade"
-              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-            >
+          <div class="form-group">
+            <label class="form-label">Periodicidade</label>
+            <select v-model="form.periodicidade" class="form-input">
               <option disabled value="">Selecione</option>
               <option value="mensal">Mensal</option>
               <option value="semanal">Semanal</option>
@@ -157,30 +97,21 @@
           </div>
         </template>
         <template v-if="form.modalidade === 'parcelado'">
-          <div>
-            <label class="block mb-1 font-medium text-gray-300">Número de Parcelas</label>
-            <input
-              v-model.number="form.parcelas"
-              type="number"
-              min="2"
-              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-            />
+          <div class="form-group">
+            <label class="form-label">Número de Parcelas</label>
+            <input v-model.number="form.parcelas" type="number" min="2" class="form-input" />
           </div>
-          <div>
-            <label class="block mb-1 font-medium text-gray-300">Data da Primeira Parcela</label>
-            <input
-              v-model="form.dataPrimeiraParcela"
-              type="date"
-              class="w-full border border-gray-600 bg-transparent rounded px-3 py-2 text-textwhite focus:outline-none focus:ring-2 focus:ring-greenmain"
-            />
+          <div class="form-group">
+            <label class="form-label">Data da Primeira Parcela</label>
+            <input v-model="form.dataPrimeiraParcela" type="date" class="form-input" />
           </div>
         </template>
       </div>
 
       <!-- Passo 3: Revisão Final -->
-      <div v-if="currentStep === 3" class="space-y-4">
-        <h2 class="text-lg font-bold">Revisão Final</h2>
-        <div class="bg-gray-800 p-4 rounded border border-gray-700 text-sm">
+      <div v-if="currentStep === 3" class="form-step">
+        <h2 class="form-heading">Revisão Final</h2>
+        <div class="review-box">
           <p><strong>Tipo:</strong> {{ form.tipo }}</p>
           <p><strong>Modalidade:</strong> {{ form.modalidade }}</p>
           <p><strong>Data:</strong> {{ form.data }}</p>
@@ -204,28 +135,14 @@
       </div>
 
       <!-- Botões de Navegação -->
-      <div class="flex justify-between mt-6">
-        <button
-          v-if="currentStep > 1"
-          type="button"
-          @click="prevStep"
-          class="px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600"
-        >
+      <div class="form-buttons">
+        <button v-if="currentStep > 1" type="button" @click="prevStep" class="btn-back">
           Voltar
         </button>
-        <button
-          v-if="currentStep < 3"
-          type="button"
-          @click="nextStep"
-          class="ml-auto px-4 py-2 bg-greenmain text-white rounded hover:bg-green-600"
-        >
+        <button v-if="currentStep < 3" type="button" @click="nextStep" class="btn-next">
           Próximo
         </button>
-        <button
-          v-if="currentStep === 3"
-          type="submit"
-          class="ml-auto px-4 py-2 bg-greenmain text-white rounded hover:bg-green-600"
-        >
+        <button v-if="currentStep === 3" type="submit" class="btn-confirm">
           Confirmar
         </button>
       </div>
@@ -294,3 +211,168 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+:root {
+  --cardbg: #161716;
+  --mainbg: #0f0e11;
+  --greenmain: #3ecf00;
+  --redmain: #e93030;
+  --textwhite: #c2c3c2;
+  --textgray: #aaaaaa;
+}
+
+.expense-form-container {
+  background-color: var(--cardbg);
+  max-width: 32rem;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  padding: 1.5rem;
+  position: relative;
+  color: var(--textwhite);
+}
+
+.form-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #444;
+  color: var(--textgray);
+}
+
+.step.active {
+  background-color: var(--greenmain);
+  color: white;
+}
+
+.step-line {
+  width: 4rem;
+  height: 0.25rem;
+  background-color: #444;
+}
+
+.step-line.active {
+  background-color: var(--greenmain);
+}
+
+.step-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--textgray);
+}
+
+.form-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--textgray);
+  cursor: pointer;
+}
+.form-close:hover {
+  color: var(--textwhite);
+}
+
+.form-step {
+  margin-bottom: 1.5rem;
+}
+
+.form-heading {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--textwhite);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--textgray);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--cardbg);
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--textwhite);
+  font-size: 0.875rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--greenmain);
+  box-shadow: 0 0 0 2px rgba(62, 207, 0, 0.3);
+}
+
+.review-box {
+  background-color: var(--mainbg);
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--cardbg);
+  font-size: 0.875rem;
+  color: var(--textwhite);
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.btn-back,
+.btn-next,
+.btn-confirm {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-back {
+  background-color: var(--cardbg);
+  color: var(--textgray);
+}
+.btn-back:hover {
+  background-color: var(--mainbg);
+}
+
+.btn-next,
+.btn-confirm {
+  background-color: var(--greenmain);
+  color: white;
+}
+.btn-next:hover,
+.btn-confirm:hover {
+  background-color: #36b800;
+}
+</style>

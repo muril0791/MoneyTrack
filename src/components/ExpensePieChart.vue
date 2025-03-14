@@ -20,6 +20,8 @@ export default {
 
     const updateChart = () => {
       if (!chartCanvas.value) return;
+      
+      // Calcula o total de entradas e saídas
       const entradas = props.expenses
         .filter((e) => e.tipo === "entrada")
         .reduce((acc, e) => acc + Number(e.valor), 0);
@@ -27,29 +29,52 @@ export default {
         .filter((e) => e.tipo === "saida")
         .reduce((acc, e) => acc + Number(e.valor), 0);
 
-      const data = {
-        datasets: [
-          {
-            data: [entradas, saidas],
-            backgroundColor: ["#3ecf00", "#e93030 "]
-          }
-        ]
-      };
+      let data, options;
+
+      // Se não houver dados, exibe gráfico branco e oculta a legenda
+      if (entradas === 0 && saidas === 0) {
+        data = {
+          datasets: [
+            {
+              data: [1],
+              backgroundColor: ["#ffffff"]
+            }
+          ]
+        };
+        options = {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          cutout: "80%"
+        };
+      } else {
+        data = {
+          datasets: [
+            {
+              data: [entradas, saidas],
+              backgroundColor: ["#3ecf00", "#e93030"]
+            }
+          ]
+        };
+        options = {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom", labels: { color: "#c2c3c2" } }
+          },
+          cutout: "80%"
+        };
+      }
 
       if (chartInstance) {
         chartInstance.data = data;
+        chartInstance.options = options;
         chartInstance.update();
       } else {
         chartInstance = new Chart(chartCanvas.value, {
           type: "doughnut",
           data,
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: "bottom", labels: { color: "#c2c3c2" } }
-            },
-            cutout: "80%"
-          }
+          options
         });
       }
     };

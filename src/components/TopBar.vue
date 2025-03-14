@@ -1,18 +1,11 @@
 <template>
-  <header class="bg-cardbg text-fontcolor px-4 py-3 flex items-center justify-between shadow">
-    <div class="flex items-center space-x-8">
-      <h1 class="text-2xl font-bold text-greenmain">moneyTrack</h1>
-      <!-- Placeholder para ícone de perfil no futuro -->
-      <div class="hidden md:block">
-        <span class="inline-block w-8 h-8 bg-gray-600 rounded-full"></span>
-      </div>
+  <header class="topbar">
+    <div class="topbar__left">
+      <h1 class="topbar__title">moneyTrack</h1>
     </div>
-    <div>
-      <button
-        @click="$emit('open-calendar')"
-        class="mr-4 px-4 py-2 bg-cardbg border border-greenmain text-greenmain rounded-md hover:bg-greenmain hover:text-white"
-      >
-        Calendário
+    <div class="topbar__right">
+      <button @click="$emit('open-calendar')" class="topbar__button">
+        {{ currentMonth }}
       </button>
     </div>
   </header>
@@ -20,6 +13,52 @@
 
 <script>
 export default {
-  name: "TopBar"
+  name: "TopBar",
+  computed: {
+    currentMonth() {
+      return new Date().toLocaleString("pt-BR", { month: "long" });
+    }
+  }
 };
 </script>
+
+<style scoped>
+.topbar {
+  background-color: #161716; /* cardbg */
+  color: #c2c3c2; /* fontcolor */
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.topbar__title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #3ecf00; /* greenmain */
+  margin: 0;
+}
+
+/* .topbar__right {} */
+
+.topbar__button {
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #161716; /* cardbg */
+  color: #ffffff; /* greenmain */
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.topbar__button:hover {
+  
+  color: #434343;
+}
+</style>

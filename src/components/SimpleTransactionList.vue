@@ -17,11 +17,16 @@
           <span v-else class="icon-negative">↓</span>
         </div>
         <div class="transaction-info">
-          <p class="transaction-description">{{ expense.descricao || expense.tipo }}</p>
-          <p class="transaction-date">{{ expense.data }}</p>
+          <p class="transaction-description">{{ expense.descricao || formatTipo(expense.tipo) }}</p>
+          <p class="transaction-date">{{ formatData(expense.data) }}</p>
         </div>
+        <!-- Valor -->
         <div class="transaction-amount">
-          R$ {{ Number(expense.valor).toFixed(2) }}
+          {{ formatValor(expense.valor) }}
+        </div>
+        <!-- Parcelas -->
+        <div class="transaction-parcelas">
+          {{ formatParcelas(expense) }}
         </div>
       </div>
     </div>
@@ -33,6 +38,41 @@ export default {
   name: "SimpleTransactionList",
   props: {
     expenses: { type: Array, required: true }
+  },
+  emits: ["view-more"],
+  methods: {
+    formatTipo(tipo) {
+      if (tipo === "entrada") return "Entrada";
+      if (tipo === "saida") return "Saída";
+      return tipo;
+    },
+    formatData(dataStr) {
+      if (!dataStr) return "";
+      const dataObj = new Date(dataStr);
+      return dataObj.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      });
+    },
+    formatValor(valor) {
+      if (!valor) return "";
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      }).format(valor);
+    },
+    formatParcelas(expense) {
+      // Mesmo critério: se for "saida" com "cartao-credito" ou "parcelado", exibe expense.parcelas + "x" se > 1
+      // caso contrário, "1x". Se for "entrada", exibe "—" (ou o que preferir).
+      if (expense.tipo === "saida") {
+        if (expense.pagamento === "cartao-credito" || expense.modalidade === "parcelado") {
+          return expense.parcelas && expense.parcelas > 1 ? expense.parcelas + "x" : "1x";
+        }
+        return "1x";
+      }
+      return "—";
+    }
   }
 };
 </script>
@@ -51,7 +91,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  border-bottom:2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
 }
 
 .transaction-title {
@@ -62,14 +102,17 @@ export default {
 
 .transaction-view-more {
   font-size: 0.75rem;
-  color: rgb(255, 255, 255);
+  color: #ffffff;
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 8px;
   border-radius: 20px;
+  background-color: transparent;
+  border: 1px solid #c2c3c2;
 }
-
 .transaction-view-more:hover {
-  text-decoration: underline;
+  background-color: #3ecf00;
+  color: #fff;
+  border-color: #3ecf00;
 }
 
 .transaction-items {
@@ -79,7 +122,8 @@ export default {
 }
 
 .transaction-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto auto;
   align-items: center;
   background-color: #0f0e11; /* Fundo dos itens */
   padding: 0.75rem;
@@ -93,12 +137,11 @@ export default {
 }
 
 .transaction-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .icon-positive {
@@ -112,8 +155,7 @@ export default {
 }
 
 .transaction-info {
-  margin-left: 1rem;
-  flex: 1;
+  margin-left: 0.5rem;
 }
 
 .transaction-description {
@@ -133,5 +175,14 @@ export default {
   font-size: 0.875rem;
   font-weight: bold;
   color: #c2c3c2;
+  margin-left: 1rem;
+}
+
+.transaction-parcelas {
+  font-size: 0.75rem;
+  color: #c2c3c2;
+  margin-left: 1rem;
+  text-align: right;
+  font-weight: bold;
 }
 </style>
