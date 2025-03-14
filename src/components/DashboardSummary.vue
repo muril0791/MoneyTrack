@@ -9,7 +9,7 @@
     <div class="grid grid-cols-3 gap-4">
       <div class="bg-cardbg rounded p-4 shadow">
         <h3 class="text-sm font-bold text-textgray">Saldo</h3>
-        <p class="text-2xl font-semibold text-greenmain">
+        <p class="text-2xl font-semibold text-Teko">
           R$ {{ totalEntradas.toFixed(2) }}
         </p>
       </div>

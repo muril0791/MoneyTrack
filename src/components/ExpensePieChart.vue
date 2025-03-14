@@ -41,7 +41,7 @@ export default {
           datasets: [
             {
               data: [1],
-              backgroundColor: ["#ffffff"],
+              backgroundColor: ["transparent"],
             },
           ],
         };

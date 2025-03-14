@@ -148,7 +148,8 @@ export default {
 .saldo-info p {
   color: #ffffff;
   font-size: 2rem;
-  font-weight: bold;
+  font-family: "Teko", sans-serif;
+  font-optical-sizing: auto;
   margin: 0;
 }
 .saldo-box button {
