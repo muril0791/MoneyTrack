@@ -20,11 +20,11 @@
           <p class="transaction-description">{{ expense.descricao || formatTipo(expense.tipo) }}</p>
           <p class="transaction-date">{{ formatData(expense.data) }}</p>
         </div>
-        <!-- Valor -->
+       
         <div class="transaction-amount">
           {{ formatValor(expense.valor) }}
         </div>
-        <!-- Parcelas -->
+       
         <div class="transaction-parcelas">
           {{ formatParcelas(expense) }}
         </div>

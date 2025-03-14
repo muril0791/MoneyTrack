@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-left">
-    <!-- Retângulo Horizontal: Saldo e Botão Adicionar Transação -->
+    
     <div class="saldo-box">
       <div class="saldo-info">
         <h3>Saldo</h3>
@@ -9,9 +9,9 @@
       <button @click="$emit('open-add')">Adicionar Transação</button>
     </div>
 
-    <!-- Container para os dois retângulos verticais lado a lado -->
+   
     <div class="vertical-container">
-      <!-- Retângulo Vertical 1: Gráfico e Percentuais -->
+      
       <div class="vertical-box vertical-box-1">
         <h3>Gastos por Categoria</h3>
         <ExpensePieChart :expenses="expenses" />
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <!-- Retângulo Vertical 2: Totais e Top 5 Categorias -->
+      
       <div class="vertical-box vertical-box-2">
         <div class="totals">
           <div class="total-box">

@@ -21,7 +21,7 @@ export default {
     const updateChart = () => {
       if (!chartCanvas.value) return;
       
-      // Calcula o total de entradas e saídas
+    
       const entradas = props.expenses
         .filter((e) => e.tipo === "entrada")
         .reduce((acc, e) => acc + Number(e.valor), 0);
@@ -31,7 +31,7 @@ export default {
 
       let data, options;
 
-      // Se não houver dados, exibe gráfico branco e oculta a legenda
+     
       if (entradas === 0 && saidas === 0) {
         data = {
           datasets: [

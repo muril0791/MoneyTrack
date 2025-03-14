@@ -1,6 +1,6 @@
 <template>
   <div class="expense-form-container">
-    <!-- Barra de Progresso -->
+   
     <div class="form-progress">
       <div class="steps">
         <div class="step" :class="{ active: currentStep >= 1 }">1</div>
@@ -13,9 +13,9 @@
       <button class="form-close" @click="$emit('close')">&times;</button>
     </div>
 
-    <!-- Formulário multi-etapas -->
+   
     <form @submit.prevent="handleSubmit">
-      <!-- Passo 1: Tipo, Modalidade e Data -->
+     
       <div v-if="currentStep === 1" class="form-step">
         <h2 class="form-heading">Tipo, Modalidade e Data</h2>
         <div class="form-group">
@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <!-- Passo 2: Detalhes -->
+      
       <div v-if="currentStep === 2" class="form-step">
         <h2 class="form-heading">Detalhes da Transação</h2>
         <div class="form-group">
@@ -108,7 +108,7 @@
         </template>
       </div>
 
-      <!-- Passo 3: Revisão Final -->
+      
       <div v-if="currentStep === 3" class="form-step">
         <h2 class="form-heading">Revisão Final</h2>
         <div class="review-box">
@@ -134,7 +134,7 @@
         </div>
       </div>
 
-      <!-- Botões de Navegação -->
+      
       <div class="form-buttons">
         <button v-if="currentStep > 1" type="button" @click="prevStep" class="btn-back">
           Voltar

@@ -58,14 +58,14 @@ export default {
       let week = new Array(7).fill({ date: null, summary: null });
       let dayCounter = 1;
 
-      // Preenche a primeira semana
+     
       for (let i = startDay; i < 7; i++) {
         week[i] = { date: new Date(year, month, dayCounter), summary: this.getDaySummary(dayCounter) };
         dayCounter++;
       }
       weeks.push(week);
 
-      // Preenche as semanas seguintes
+      
       while (dayCounter <= totalDays) {
         week = [];
         for (let i = 0; i < 7; i++) {

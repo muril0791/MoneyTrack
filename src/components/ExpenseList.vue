@@ -1,6 +1,6 @@
 <template>
   <div class="finance-list-container">
-    <!-- Barra Superior: Título + Botão Adicionar -->
+   
     <div class="finance-list-header">
       <h2 class="finance-list-title">Transações</h2>
       <button class="finance-add-button" @click="$emit('add-transaction')">
@@ -8,7 +8,7 @@
       </button>
     </div>
 
-    <!-- Tabela de Lançamentos -->
+    
     <div class="finance-table-wrapper">
       <table class="finance-table">
         <thead>
@@ -27,10 +27,10 @@
         </thead>
         <tbody>
           <tr v-for="(expense, index) in expenses" :key="index">
-            <!-- Data formatada -->
+           
             <td>{{ formatData(expense.data) }}</td>
             
-            <!-- Tipo (Entrada / Saída) -->
+            
             <td>
               <span
                 :class="{
@@ -42,25 +42,25 @@
               </span>
             </td>
             
-            <!-- Modalidade -->
+           
             <td class="capitalize">{{ expense.modalidade }}</td>
             
-            <!-- Parcelas -->
+           
             <td>{{ formatParcelas(expense) }}</td>
             
-            <!-- Valor formatado -->
+           
             <td>{{ formatValor(expense.valor) }}</td>
             
-            <!-- Descrição -->
+           
             <td>{{ expense.descricao }}</td>
             
-            <!-- Pagamento -->
+           
             <td>{{ expense.pagamento }}</td>
             
-            <!-- Categoria -->
+           
             <td>{{ expense.categoria }}</td>
             
-            <!-- Status (Completed / Pending) -->
+            
             <td>
               <span
                 :class="{
@@ -72,7 +72,7 @@
               </span>
             </td>
             
-            <!-- Ações -->
+           
             <td class="finance-actions">
               <button class="edit-btn" @click="editExpense(expense)">Editar</button>
               <button class="delete-btn" @click="deleteExpense(expense)">Excluir</button>
@@ -95,21 +95,21 @@ export default {
   },
   emits: ["add-transaction", "edit-expense", "delete-expense"],
   methods: {
-    // Botão "Editar"
+   
     editExpense(expense) {
       this.$emit("edit-expense", expense);
     },
-    // Botão "Excluir"
+    
     deleteExpense(expense) {
       this.$emit("delete-expense", expense);
     },
-    // Formato do tipo (Entrada / Saída)
+   
     formatTipo(tipo) {
       if (tipo === "entrada") return "Entrada";
       if (tipo === "saida") return "Saída";
       return tipo;
     },
-    // Formato da data (ex.: "28 de março de 2023")
+    
     formatData(dataStr) {
       if (!dataStr) return "";
       const dataObj = new Date(dataStr);
@@ -119,7 +119,7 @@ export default {
         year: "numeric"
       });
     },
-    // Formato do valor (ex.: "R$ 75,00")
+  
     formatValor(valor) {
       if (!valor) return "";
       return new Intl.NumberFormat("pt-BR", {
@@ -127,19 +127,17 @@ export default {
         currency: "BRL"
       }).format(valor);
     },
-    // Formato das parcelas
+    
     formatParcelas(expense) {
-      // Se for "saida" e pagamento "cartao-credito" ou modalidade "parcelado", exibe expense.parcelas + "x" se > 1
-      // Caso contrário, exibe "1x"
+   
       if (expense.tipo === "saida") {
-        // Se for cartão de crédito ou "parcelado"
         if (expense.pagamento === "cartao-credito" || expense.modalidade === "parcelado") {
           return expense.parcelas && expense.parcelas > 1 ? expense.parcelas + "x" : "1x";
         }
-        // Saída sem cartão => "1x"
+       
         return "1x";
       }
-      // Se for entrada, podemos retornar vazio ou "—"
+     
       return "—";
     }
   }
@@ -156,7 +154,7 @@ export default {
   --text-gray: #aaaaaa;
 }
 
-/* Container Principal */
+
 .finance-list-container {
   background-color: var(--card-dark);
   padding: 1rem;
@@ -166,7 +164,7 @@ export default {
   font-family: Roboto, sans-serif;
 }
 
-/* Barra Superior */
+
 .finance-list-header {
   display: flex;
   align-items: center;
@@ -192,7 +190,7 @@ export default {
   background-color: #36b800;
 }
 
-/* Tabela */
+
 .finance-table-wrapper {
   overflow-x: auto;
 }
@@ -216,7 +214,7 @@ export default {
   background-color: var(--bg-main);
 }
 
-/* Tipo (Entrada / Saída) */
+
 .tipo-entrada {
   color: var(--green);
   font-weight: bold;
@@ -226,7 +224,7 @@ export default {
   font-weight: bold;
 }
 
-/* Status (Completed / Pending) */
+
 .status-positive {
   background-color: rgba(62,207,0,0.2);
   color: var(--green);
@@ -244,7 +242,7 @@ export default {
   font-weight: bold;
 }
 
-/* Ações */
+
 .finance-actions {
   white-space: nowrap;
 }
@@ -269,7 +267,7 @@ export default {
   color: #d32f2f;
 }
 
-/* Transformar texto em capitalize (opcional) */
+
 .capitalize {
   text-transform: capitalize;
 }

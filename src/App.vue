@@ -1,17 +1,17 @@
 <template>
   <div class="min-h-screen">
-    <!-- TopBar -->
+ 
     <TopBar
       @open-modal="openNewTransaction"
       @open-calendar="showCalendar = true"
     />
 
-    <!-- Conteúdo Principal: Dashboard (2 colunas) -->
+   
     <main class="main-container">
       <div class="two-columns">
-        <!-- Coluna 1: DashboardLeft -->
+       
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
-        <!-- Coluna 2: Lista simples -->
+        
         <SimpleTransactionList
           :expenses="expenses"
           @view-more="showFullList = true"
@@ -19,7 +19,7 @@
       </div>
     </main>
 
-    <!-- Modal de Lançamento (Adicionar / Editar) -->
+   
     <transition name="modal">
       <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
         <div class="modal-content" @click.stop>
@@ -29,7 +29,7 @@
             </h2>
             <button @click="closeFormModal" class="modal-close">&times;</button>
           </div>
-          <!-- Formulário -->
+          
           <ExpenseForm
             :editingExpense="editingExpense"
             @add-expense="handleAddExpense"
@@ -39,7 +39,7 @@
       </div>
     </transition>
 
-    <!-- Modal do Calendário -->
+    
     <transition name="modal">
       <div
         v-if="showCalendar"
@@ -58,7 +58,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Lista Detalhada (ExpenseList) -->
+    
     <transition name="modal">
       <div
         v-if="showFullList"
