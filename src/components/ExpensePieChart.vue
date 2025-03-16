@@ -1,20 +1,12 @@
 <template>
-  <div class="flex justify-center">
-    <div class="max-w-md">
-      <canvas ref="chartCanvas"></canvas>
-    </div>
+  <div class="chart-container">
+    <canvas ref="chartCanvas"></canvas>
   </div>
 </template>
 
 <script>
 import { onMounted, ref, watch } from "vue";
-import {
-  Chart,
-  DoughnutController,
-  ArcElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from "chart.js";
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 export default {
@@ -90,3 +82,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.chart-container {
+  width: 100%;
+  max-width: 500px; /* Largura máxima para desktops, ajuste conforme necessário */
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Ajustes responsivos para telas menores */
+@media (max-width: 480px) {
+  .chart-container {
+    max-width: 90%;
+    padding: 0.5rem;
+  }
+}
+</style>

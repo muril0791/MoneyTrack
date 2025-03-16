@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-left">
+    <!-- Retângulo Horizontal: Saldo e Botão Adicionar -->
     <div class="saldo-box">
       <div class="saldo-info">
         <h3>Saldo</h3>
@@ -8,7 +9,9 @@
       <button @click="$emit('open-add')">Adicionar Transação</button>
     </div>
 
+    <!-- Container flexível para Gráfico/Percentuais e Totais/Top Categorias -->
     <div class="vertical-container">
+      <!-- Bloco 1: Gráfico e Percentuais -->
       <div class="vertical-box vertical-box-1">
         <h3>Gastos por Categoria</h3>
         <ExpensePieChart :expenses="expenses" />
@@ -28,6 +31,7 @@
         </div>
       </div>
 
+      <!-- Bloco 2: Totais e Top 5 Categorias -->
       <div class="vertical-box vertical-box-2">
         <div class="totals">
           <div class="total-box">
@@ -41,11 +45,7 @@
         </div>
         <div class="top-categories">
           <h3 class="top-title">Top 5 Gastos por Categoria</h3>
-          <div
-            v-for="(cat, index) in top5Categories"
-            :key="index"
-            class="category-bar"
-          >
+          <div v-for="(cat, index) in top5Categories" :key="index" class="category-bar">
             <div class="category-info">
               <span>{{ cat.category }}</span>
               <span>{{ cat.percent }}%</span>
@@ -66,26 +66,26 @@ export default {
   name: "DashboardLeft",
   components: { ExpensePieChart },
   props: {
-    expenses: { type: Array, required: true },
+    expenses: { type: Array, required: true }
   },
   computed: {
     saldo() {
       const entradas = this.expenses
-        .filter((e) => e.tipo === "entrada")
+        .filter(e => e.tipo === "entrada")
         .reduce((sum, e) => sum + Number(e.valor), 0);
       const saidas = this.expenses
-        .filter((e) => e.tipo === "saida")
+        .filter(e => e.tipo === "saida")
         .reduce((sum, e) => sum + Number(e.valor), 0);
       return entradas - saidas;
     },
     totalEntradas() {
       return this.expenses
-        .filter((e) => e.tipo === "entrada")
+        .filter(e => e.tipo === "entrada")
         .reduce((sum, e) => sum + Number(e.valor), 0);
     },
     totalSaidas() {
       return this.expenses
-        .filter((e) => e.tipo === "saida")
+        .filter(e => e.tipo === "saida")
         .reduce((sum, e) => sum + Number(e.valor), 0);
     },
     percentGanhos() {
@@ -97,64 +97,71 @@ export default {
       return total ? ((this.totalSaidas / total) * 100).toFixed(0) : 0;
     },
     percentInvestimentos() {
+      // Ajuste se tiver lógica real de investimentos
       return 0;
     },
     top5Categories() {
       const categoryTotals = {};
       this.expenses
-        .filter((e) => e.tipo === "saida")
-        .forEach((e) => {
-          if (categoryTotals[e.categoria]) {
-            categoryTotals[e.categoria] += Number(e.valor);
-          } else {
-            categoryTotals[e.categoria] = Number(e.valor);
-          }
+        .filter(e => e.tipo === "saida")
+        .forEach(e => {
+          categoryTotals[e.categoria] = (categoryTotals[e.categoria] || 0) + Number(e.valor);
         });
       const totalSaidas = this.totalSaidas;
-      const categories = Object.keys(categoryTotals).map((cat) => ({
+      const categories = Object.keys(categoryTotals).map(cat => ({
         category: cat,
         total: categoryTotals[cat],
-        percent: totalSaidas
-          ? ((categoryTotals[cat] / totalSaidas) * 100).toFixed(0)
-          : 0,
+        percent: totalSaidas ? ((categoryTotals[cat] / totalSaidas) * 100).toFixed(0) : 0
       }));
       categories.sort((a, b) => b.total - a.total);
       return categories.slice(0, 5);
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
+:root {
+  --cardbg: #161716;
+  --mainbg: #0f0e11;
+  --greenmain: #3ecf00;
+  --redmain: #e93030;
+  --textwhite: #c2c3c2;
+  --textgray: #aaaaaa;
+}
+
+/* Container principal do componente */
 .dashboard-left {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+/* Box de Saldo e Botão */
 .saldo-box {
-  background-color: #161716;
+  background-color: var(--cardbg);
   padding: 1rem;
   border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* Permite quebra em telas menores */
+  gap: 1rem;
 }
 .saldo-info h3 {
-  color: #c2c3c2;
+  color: var(--textwhite);
   font-size: 1.125rem;
   margin: 0;
 }
 .saldo-info p {
-  color: #ffffff;
+  color: #fff;
   font-size: 2rem;
   font-family: "Teko", sans-serif;
-  font-optical-sizing: auto;
   margin: 0;
 }
 .saldo-box button {
-  background-color: #3ecf00;
-  color: white;
+  background-color: var(--greenmain);
+  color: #fff;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
@@ -164,67 +171,73 @@ export default {
   background-color: #36b800;
 }
 
+/* Container que agrupa o gráfico e o outro bloco */
 .vertical-container {
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap; /* permite quebrar em telas menores */
   justify-content: space-between;
-  gap: 0;
-  flex-wrap: wrap;
 }
 
+/* Cada bloco interno (Gráfico/Percentuais, Totais/Categorias) */
+.vertical-box {
+  background-color: var(--cardbg);
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  width: 48%; /* 2 colunas ~ 50% cada em telas maiores */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Em telas menores (<= 768px), cada box ocupa 100% */
 @media (max-width: 768px) {
-  .vertical-container {
-    flex-direction: column;
+  .vertical-box {
+    width: 100%;
   }
 }
 
-.vertical-box {
-  background-color: #161716;
-  padding: 1rem;
-  border-radius: 4px;
-  width: 48%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
+/* Título do box */
 .vertical-box h3 {
-  color: #c2c3c2;
+  color: var(--textwhite);
   font-size: 1.125rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
+/* Percentuais abaixo do gráfico */
 .percentages {
   display: flex;
   justify-content: space-around;
-  margin-top: 1rem;
-}
-.percentage-box {
-  text-align: center;
 }
 .percentage-box p:first-child {
   font-size: 0.75rem;
-  color: #c2c3c2;
+  color: var(--textgray);
   margin: 0;
 }
 .percentage-box p:last-child {
   font-size: 1.5rem;
   font-weight: bold;
   margin: 0;
+  color: var(--textwhite);
 }
 
+/* Totais (Entradas, Saídas) */
 .totals {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 .total-box {
   flex: 1;
-  background-color: #0f0e11;
+  background-color: var(--mainbg);
   padding: 1rem;
   border-radius: 4px;
   text-align: center;
+  color: var(--textwhite);
 }
 .total-box p:first-child {
   font-size: 0.75rem;
-  color: #c2c3c2;
+  color: var(--textgray);
   margin: 0;
 }
 .total-box p:last-child {
@@ -232,11 +245,13 @@ export default {
   font-weight: bold;
   margin: 0;
 }
-.top-categories h3 {
+
+/* Top Categorias */
+.top-categories .top-title {
   font-size: 0.875rem;
   font-weight: bold;
-  color: #c2c3c2;
-  margin-bottom: 0.5rem;
+  color: var(--textwhite);
+  margin: 0;
 }
 .category-bar {
   margin-bottom: 0.5rem;
@@ -245,18 +260,24 @@ export default {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: #c2c3c2;
+  color: var(--textwhite);
   margin-bottom: 0.25rem;
 }
 .bar {
   width: 100%;
-  background-color: #0f0e11;
+  background-color: var(--mainbg);
   height: 0.5rem;
   border-radius: 4px;
 }
 .bar-fill {
   height: 100%;
-  background-color: #e93030;
+  background-color: var(--redmain);
   border-radius: 4px;
+}
+
+/* Ajuste do Canvas do gráfico (se necessário) */
+.vertical-box canvas {
+  max-width: 100%;
+  height: auto;
 }
 </style>

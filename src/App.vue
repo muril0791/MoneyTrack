@@ -1,21 +1,19 @@
 <template>
-  <div class="min-h-screen">
-    <TopBar
-      @open-modal="openNewTransaction"
-      @open-calendar="showCalendar = true"
-    />
+  <div class="app-container">
+    <!-- TopBar -->
+    <TopBar @open-modal="openNewTransaction" @open-calendar="showCalendar = true" />
 
+    <!-- Conteúdo Principal: Dashboard com duas colunas -->
     <main class="main-container">
       <div class="two-columns">
+        <!-- Coluna 1: DashboardLeft -->
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
-
-        <SimpleTransactionList
-          :expenses="expenses"
-          @view-more="showFullList = true"
-        />
+        <!-- Coluna 2: Lista simples -->
+        <SimpleTransactionList :expenses="expenses" @view-more="showFullList = true" />
       </div>
     </main>
 
+    <!-- Modal de Lançamento (Adicionar / Editar) -->
     <transition name="modal">
       <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
         <div class="modal-content" @click.stop>
@@ -25,7 +23,6 @@
             </h2>
             <button @click="closeFormModal" class="modal-close">&times;</button>
           </div>
-
           <ExpenseForm
             :editingExpense="editingExpense"
             @add-expense="handleAddExpense"
@@ -35,36 +32,34 @@
       </div>
     </transition>
 
+    <!-- Modal do Calendário -->
     <transition name="modal">
-      <div
-        v-if="showCalendar"
-        class="modal-overlay"
-        @click.self="showCalendar = false"
-      >
+      <div v-if="showCalendar" class="modal-overlay" @click.self="showCalendar = false">
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2 class="modal-title">Calendário</h2>
-            <button @click="showCalendar = false" class="modal-close">
-              &times;
-            </button>
+            <button @click="showCalendar = false" class="modal-close">&times;</button>
           </div>
           <ExpenseCalendar :expenses="expenses" />
         </div>
       </div>
     </transition>
 
+    <!-- Modal de Lista Detalhada -->
     <transition name="modal">
-      <div
-        v-if="showFullList"
-        class="modal-overlay"
-        @click.self="showFullList = false"
-      >
-        <ExpenseList
-          :expenses="expenses"
-          @add-transaction="openNewTransaction"
-          @edit-expense="handleEditExpense"
-          @delete-expense="handleDeleteExpense"
-        />
+      <div v-if="showFullList" class="modal-overlay" @click.self="showFullList = false">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h2 class="modal-title">Transações</h2>
+            <button @click="showFullList = false" class="modal-close">&times;</button>
+          </div>
+          <ExpenseList
+            :expenses="expenses"
+            @add-transaction="openNewTransaction"
+            @edit-expense="handleEditExpense"
+            @delete-expense="handleDeleteExpense"
+          />
+        </div>
       </div>
     </transition>
   </div>
@@ -94,7 +89,6 @@ export default {
     const showModal = ref(false);
     const showCalendar = ref(false);
     const showFullList = ref(false);
-
     const editingExpense = ref(null);
 
     const openNewTransaction = () => {
@@ -108,6 +102,7 @@ export default {
     };
 
     const handleAddExpense = (expense) => {
+      // Se estiver editando, substitui o item; senão, adiciona
       if (editingExpense.value) {
         const index = expenses.value.indexOf(editingExpense.value);
         if (index !== -1) {
@@ -117,10 +112,6 @@ export default {
         expenses.value.push(expense);
       }
       closeFormModal();
-    };
-
-    const viewMoreTransactions = () => {
-      showFullList.value = true;
     };
 
     const handleEditExpense = (expense) => {
@@ -141,7 +132,6 @@ export default {
       openNewTransaction,
       closeFormModal,
       handleAddExpense,
-      viewMoreTransactions,
       handleEditExpense,
       handleDeleteExpense,
     };
@@ -150,15 +140,40 @@ export default {
 </script>
 
 <style>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
+:root {
+  --cardbg: #161716;
+  --mainbg: #0f0e11;
+  --greenmain: #3ecf00;
+  --redmain: #e93030;
+  --textwhite: #c2c3c2;
+  --textgray: #aaaaaa;
 }
 
+.app-container {
+  background-color: var(--mainbg);
+  min-height: 100vh;
+}
+
+/* Container Principal */
+.main-container {
+  max-width: 96rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* Duas Colunas Responsivas */
+.two-columns {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .two-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Modal Overlay e Conteúdo */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -174,24 +189,24 @@ export default {
   background-color: var(--cardbg);
   border-radius: 0.5rem;
   padding: 1.5rem;
-  width: 50%;
+  width: 90%;
+  max-width: 50rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
   position: relative;
 }
 
+/* Modal Header */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
-
 .modal-title {
   font-size: 1.25rem;
   font-weight: bold;
   color: var(--textwhite);
 }
-
 .modal-close {
   font-size: 1.5rem;
   font-weight: bold;
@@ -200,33 +215,17 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 .modal-close:hover {
   color: var(--textwhite);
 }
 
-:root {
-  --cardbg: #161716;
-  --mainbg: #0f0e11;
-  --greenmain: #3ecf00;
-  --redmain: #e93030;
-  --textwhite: #c2c3c2;
-  --textgray: #aaaaaa;
+/* Transições do Modal */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s;
 }
-
-.main-container {
-  max-width: 96rem;
-  margin: 0 auto;
-  padding: 1.5rem 1rem;
-}
-
-.two-columns {
-  display: grid;
-  gap: 1.5rem;
-}
-@media (min-width: 768px) {
-  .two-columns {
-    grid-template-columns: 1fr 1fr;
-  }
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
 }
 </style>

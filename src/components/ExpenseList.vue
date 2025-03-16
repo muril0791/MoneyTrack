@@ -13,11 +13,10 @@
           <tr>
             <th>Data</th>
             <th>Tipo</th>
-            <th>Modalidade</th>
+            <th>TipoTransação</th>
             <th>Parcelas</th>
             <th>Valor</th>
             <th>Descrição</th>
-            <th>Pagamento</th>
             <th>Categoria</th>
             <th>Status</th>
             <th>Ações</th>
@@ -31,14 +30,14 @@
               <span
                 :class="{
                   'tipo-entrada': expense.tipo === 'entrada',
-                  'tipo-saida': expense.tipo === 'saida',
+                  'tipo-saida': expense.tipo === 'saida'
                 }"
               >
                 {{ formatTipo(expense.tipo) }}
               </span>
             </td>
 
-            <td class="capitalize">{{ expense.modalidade }}</td>
+            <td class="capitalize">{{ expense.tipoTransacao }}</td>
 
             <td>{{ formatParcelas(expense) }}</td>
 
@@ -46,15 +45,13 @@
 
             <td>{{ expense.descricao }}</td>
 
-            <td>{{ expense.pagamento }}</td>
-
             <td>{{ expense.categoria }}</td>
 
             <td>
               <span
                 :class="{
                   'status-positive': expense.tipo === 'entrada',
-                  'status-negative': expense.tipo === 'saida',
+                  'status-negative': expense.tipo === 'saida'
                 }"
               >
                 {{ expense.tipo === "entrada" ? "Completed" : "Pending" }}
@@ -62,12 +59,8 @@
             </td>
 
             <td class="finance-actions">
-              <button class="edit-btn" @click="editExpense(expense)">
-                Editar
-              </button>
-              <button class="delete-btn" @click="deleteExpense(expense)">
-                Excluir
-              </button>
+              <button class="edit-btn" @click="editExpense(expense)">Editar</button>
+              <button class="delete-btn" @click="deleteExpense(expense)">Excluir</button>
             </td>
           </tr>
         </tbody>
@@ -90,17 +83,14 @@ export default {
     editExpense(expense) {
       this.$emit("edit-expense", expense);
     },
-
     deleteExpense(expense) {
       this.$emit("delete-expense", expense);
     },
-
     formatTipo(tipo) {
       if (tipo === "entrada") return "Entrada";
       if (tipo === "saida") return "Saída";
       return tipo;
     },
-
     formatData(dataStr) {
       if (!dataStr) return "";
       const dataObj = new Date(dataStr);
@@ -110,7 +100,6 @@ export default {
         year: "numeric",
       });
     },
-
     formatValor(valor) {
       if (!valor) return "";
       return new Intl.NumberFormat("pt-BR", {
@@ -118,21 +107,15 @@ export default {
         currency: "BRL",
       }).format(valor);
     },
-
     formatParcelas(expense) {
+      // Se tiver "parcelas" > 1, mostra "Nx"
+      if (expense.parcelas && expense.parcelas > 1) {
+        return expense.parcelas + "x";
+      }
+      // Caso contrário, se for saída, exibe "1x", se for entrada, exibe "—"
       if (expense.tipo === "saida") {
-        if (
-          expense.pagamento === "cartao-credito" ||
-          expense.modalidade === "parcelado"
-        ) {
-          return expense.parcelas && expense.parcelas > 1
-            ? expense.parcelas + "x"
-            : "1x";
-        }
-
         return "1x";
       }
-
       return "—";
     },
   },
@@ -149,6 +132,7 @@ export default {
   --text-gray: #aaaaaa;
 }
 
+/* Container Principal */
 .finance-list-container {
   background-color: var(--card-dark);
   padding: 1rem;
@@ -158,8 +142,10 @@ export default {
   font-family: Roboto, sans-serif;
 }
 
+/* Cabeçalho */
 .finance-list-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
@@ -178,11 +164,18 @@ export default {
   font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
+  margin-top: 0.5rem;
+}
+@media (min-width: 480px) {
+  .finance-add-button {
+    margin-top: 0;
+  }
 }
 .finance-add-button:hover {
   background-color: #36b800;
 }
 
+/* Tabela */
 .finance-table-wrapper {
   overflow-x: auto;
 }
@@ -206,6 +199,7 @@ export default {
   background-color: var(--bg-main);
 }
 
+/* Tipos */
 .tipo-entrada {
   color: var(--green);
   font-weight: bold;
@@ -215,6 +209,7 @@ export default {
   font-weight: bold;
 }
 
+/* Status */
 .status-positive {
   background-color: rgba(62, 207, 0, 0.2);
   color: var(--green);
@@ -232,6 +227,7 @@ export default {
   font-weight: bold;
 }
 
+/* Ações */
 .finance-actions {
   white-space: nowrap;
 }
@@ -256,6 +252,7 @@ export default {
   color: #d32f2f;
 }
 
+/* Capitalize */
 .capitalize {
   text-transform: capitalize;
 }

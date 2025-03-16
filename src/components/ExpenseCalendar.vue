@@ -1,53 +1,34 @@
 <template>
-  <div class="overflow-x-auto">
-    <div class="flex justify-between items-center mb-4">
-      <button
-        @click="prevMonth"
-        class="bg-gray-700 text-gray-200 px-3 py-1 rounded-md"
-      >
-        &lt;
-      </button>
-      <h2 class="text-lg font-bold capitalize text-gray-200">
-        {{ monthYear }}
-      </h2>
-      <button
-        @click="nextMonth"
-        class="bg-gray-700 text-gray-200 px-3 py-1 rounded-md"
-      >
-        &gt;
-      </button>
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <button @click="prevMonth" class="calendar-nav">&lt;</button>
+      <h2 class="calendar-title">{{ monthYear }}</h2>
+      <button @click="nextMonth" class="calendar-nav">&gt;</button>
     </div>
-    <table class="min-w-full table-auto border-collapse">
+    <table class="calendar-table">
       <thead>
-        <tr class="bg-gray-700 text-gray-200">
-          <th
-            v-for="day in weekDays"
-            :key="day"
-            class="px-2 py-1 border border-gray-600"
-          >
+        <tr>
+          <th v-for="day in weekDays" :key="day" class="calendar-th">
             {{ day }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(week, index) in calendar" :key="index">
+        <tr v-for="(week, wIndex) in calendar" :key="wIndex">
           <td
-            v-for="day in week"
-            :key="day.date"
-            class="h-20 border border-gray-600 relative p-2 cursor-pointer hover:bg-gray-800"
+            v-for="(day, dIndex) in week"
+            :key="dIndex"
+            class="calendar-cell"
             @click="openDay(day)"
           >
-            <div
-              v-if="day.date"
-              class="absolute top-1 left-1 text-xs font-semibold text-gray-300"
-            >
+            <div v-if="day.date" class="calendar-day">
               {{ day.date.getDate() }}
             </div>
-            <div v-if="day.summary" class="mt-6 text-xs">
-              <div class="text-greenmain" v-if="day.summary.entrada">
+            <div v-if="day.summary" class="calendar-summary">
+              <div v-if="day.summary.entrada" class="summary-entrada">
                 +{{ day.summary.entrada.toFixed(2) }}
               </div>
-              <div class="text-redmain" v-if="day.summary.saida">
+              <div v-if="day.summary.saida" class="summary-saida">
                 -{{ day.summary.saida.toFixed(2) }}
               </div>
             </div>
@@ -86,6 +67,7 @@ export default {
       let week = new Array(7).fill({ date: null, summary: null });
       let dayCounter = 1;
 
+      // Preencher a primeira semana
       for (let i = startDay; i < 7; i++) {
         week[i] = {
           date: new Date(year, month, dayCounter),
@@ -95,6 +77,7 @@ export default {
       }
       weeks.push(week);
 
+      // Preencher as semanas seguintes
       while (dayCounter <= totalDays) {
         week = [];
         for (let i = 0; i < 7; i++) {
@@ -116,11 +99,7 @@ export default {
   methods: {
     getDaySummary(day) {
       const dateStr = this.formatDate(
-        new Date(
-          this.currentDate.getFullYear(),
-          this.currentDate.getMonth(),
-          day
-        )
+        new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day)
       );
       const dayExpenses = this.expenses.filter((e) => e.data === dateStr);
       if (!dayExpenses.length) return null;
@@ -154,3 +133,121 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+:root {
+  --cardbg: #161716;
+  --mainbg: #0f0e11;
+  --greenmain: #3ecf00;
+  --redmain: #e93030;
+  --textwhite: #c2c3c2;
+  --textgray: #aaaaaa;
+}
+
+.calendar-container {
+  overflow-x: auto;
+  padding: 1rem;
+  background-color: var(--cardbg);
+  border-radius: 4px;
+  color: var(--textwhite);
+  font-family: Roboto, sans-serif;
+}
+
+/* Cabeçalho do calendário */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.calendar-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  text-transform: capitalize;
+  color: var(--textwhite);
+}
+.calendar-nav {
+  background-color: var(--cardbg);
+  color: var(--textwhite);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.calendar-nav:hover {
+  background-color: var(--greenmain);
+}
+
+/* Tabela do calendário */
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+.calendar-th {
+  border: 1px solid var(--cardbg);
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  background-color: var(--cardbg);
+  color: var(--textwhite);
+}
+.calendar-table td {
+  border: 1px solid var(--cardbg);
+  padding: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  height: 4rem;
+}
+.calendar-table td:hover {
+  background-color: var(--mainbg);
+}
+.calendar-day {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--textgray);
+}
+.calendar-summary {
+  margin-top: 2.5rem;
+  font-size: 0.75rem;
+}
+.summary-entrada {
+  color: var(--greenmain);
+}
+.summary-saida {
+  color: var(--redmain);
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 480px) {
+  .calendar-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .calendar-nav {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+  }
+  .calendar-title {
+    font-size: 0.9rem;
+  }
+  .calendar-table td {
+    height: 3.5rem;
+    padding: 0.25rem;
+  }
+  .calendar-day {
+    font-size: 0.65rem;
+  }
+  .calendar-summary {
+    font-size: 0.65rem;
+  }
+}
+</style>
