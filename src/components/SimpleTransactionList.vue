@@ -109,7 +109,7 @@ export default {
 }
 
 .transaction-list {
-  background-color: var(--card-dark);
+  background-color: #161716;
   padding: 0.5rem;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
