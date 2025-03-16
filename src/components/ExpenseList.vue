@@ -5,7 +5,7 @@
       <h2 class="transactions-title">Transações</h2>
     </header>
 
-    <!-- Tabela responsiva -->
+    <!-- Tabela Responsiva -->
     <div class="table-wrapper">
       <table class="transactions-table">
         <thead>
@@ -27,8 +27,8 @@
             :key="index"
             class="table-row"
           >
-            <td>{{ formatData(expense.data) }}</td>
-            <td>
+            <td data-label="Data">{{ formatData(expense.data) }}</td>
+            <td data-label="Tipo">
               <span
                 :class="{
                   'tag-entrada': expense.tipo === 'entrada',
@@ -38,12 +38,14 @@
                 {{ formatTipo(expense.tipo) }}
               </span>
             </td>
-            <td class="capitalize">{{ expense.tipoTransacao }}</td>
-            <td>{{ formatParcelas(expense) }}</td>
-            <td>{{ formatValor(expense.valor) }}</td>
-            <td>{{ expense.descricao || '—' }}</td>
-            <td>{{ expense.categoria }}</td>
-            <td>
+            <td data-label="TipoTransação" class="capitalize">
+              {{ expense.tipoTransacao }}
+            </td>
+            <td data-label="Parcelas">{{ formatParcelas(expense) }}</td>
+            <td data-label="Valor">{{ formatValor(expense.valor) }}</td>
+            <td data-label="Descrição">{{ expense.descricao || '—' }}</td>
+            <td data-label="Categoria">{{ expense.categoria }}</td>
+            <td data-label="Status">
               <span
                 :class="{
                   'status-positive': expense.tipo === 'entrada',
@@ -53,7 +55,7 @@
                 {{ expense.tipo === 'entrada' ? 'Completed' : 'Pending' }}
               </span>
             </td>
-            <td class="actions-cell">
+            <td data-label="Ações" class="actions-cell">
               <button class="edit-btn" @click="editExpense(expense)">Editar</button>
               <button class="delete-btn" @click="deleteExpense(expense)">Excluir</button>
             </td>
@@ -116,13 +118,14 @@ export default {
 </script>
 
 <style scoped>
+/* Variáveis de cor e tipografia */
 :root {
-  --bg-dark: #0f0e11;
-  --card-dark: #161716;
-  --bg-header: #1e1f23;
-  --border-color: #2b2c2f;
-  --green: #3ecf00;
-  --red: #e93030;
+  --bg-dark: #0f0e11;        /* Fundo geral (mobile) */
+  --card-dark: #161716;      /* Fundo dos cards */
+  --bg-header: #1e1f23;      /* Fundo do cabeçalho da tabela */
+  --border-color: #2b2c2f;   /* Cor de borda sutil */
+  --green: #3ecf00;          /* Verde para entradas */
+  --red: #e93030;            /* Vermelho para saídas */
   --text-white: #c2c3c2;
   --text-gray: #aaaaaa;
   --font-main: "Roboto", sans-serif;
@@ -130,10 +133,10 @@ export default {
 
 /* Container Principal */
 .transactions-container {
-  background-color: #161716;
+  background-color: var(--card-dark);
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   color: var(--text-white);
   font-family: var(--font-main);
   width: 90%;
@@ -164,7 +167,6 @@ export default {
   border-collapse: collapse;
   font-size: 0.9rem;
   color: var(--text-white);
-  border-radius: 6px;
 }
 .transactions-table thead {
   background-color: var(--bg-header);
@@ -191,7 +193,7 @@ export default {
   text-transform: capitalize;
 }
 
-/* Tag de Tipo */
+/* Tags para Tipo */
 .tag-entrada {
   color: var(--green);
   font-weight: bold;
@@ -247,5 +249,46 @@ export default {
 }
 .delete-btn:hover {
   color: #d32f2f;
+}
+
+/* Responsividade para Mobile: transforma a tabela em um layout vertical */
+@media (max-width: 600px) {
+  .transactions-table,
+  .transactions-table thead,
+  .transactions-table tbody,
+  .transactions-table th,
+  .transactions-table td,
+  .table-row {
+    display: block;
+    height: 70%;
+  }
+  .transactions-table thead {
+    display: none;
+  }
+  .table-row {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+  .transactions-table td {
+    padding: 0.5rem;
+    text-align: right;
+    position: relative;
+  }
+  .transactions-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 40%;
+    padding-left: 0.5rem;
+    font-weight: bold;
+    text-align: left;
+    color: var(--text-gray);
+  }
+  /* Ajusta a célula de ações para centralizar os botões */
+  .actions-cell {
+    text-align: center;
+  }
 }
 </style>

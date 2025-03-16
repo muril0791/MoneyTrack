@@ -24,11 +24,7 @@
 
     <!-- Modal de Lançamento (Adicionar / Editar) -->
     <transition name="modal">
-      <div
-        v-if="showModal"
-        class="modal-overlay"
-        @click.self="closeFormModal"
-      >
+      <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2 class="modal-title">
@@ -55,7 +51,9 @@
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2 class="modal-title">Calendário</h2>
-            <button @click="showCalendar = false" class="modal-close">&times;</button>
+            <button @click="showCalendar = false" class="modal-close">
+              &times;
+            </button>
           </div>
           <ExpenseCalendar :expenses="expenses" />
         </div>
@@ -69,13 +67,11 @@
         class="modal-overlay"
         @click.self="closeDetailModal"
       >
-       
-          <ExpenseList
-            :expenses="[selectedExpense]" 
-            @edit-expense="handleEditExpense"
-            @delete-expense="handleDeleteExpense"
-          />
-       
+        <ExpenseList
+          :expenses="[selectedExpense]"
+          @edit-expense="handleEditExpense"
+          @delete-expense="handleDeleteExpense"
+        />
       </div>
     </transition>
   </div>
