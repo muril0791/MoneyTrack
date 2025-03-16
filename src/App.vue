@@ -48,18 +48,15 @@
     <!-- Modal de Lista Detalhada -->
     <transition name="modal">
       <div v-if="showFullList" class="modal-overlay" @click.self="showFullList = false">
-        <div class="modal-content" @click.stop>
-          <div class="modal-header">
-            <h2 class="modal-title">Transações</h2>
-            <button @click="showFullList = false" class="modal-close">&times;</button>
-          </div>
+       
+          
           <ExpenseList
             :expenses="expenses"
             @add-transaction="openNewTransaction"
             @edit-expense="handleEditExpense"
             @delete-expense="handleDeleteExpense"
           />
-        </div>
+        
       </div>
     </transition>
   </div>

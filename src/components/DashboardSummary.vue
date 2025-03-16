@@ -123,6 +123,7 @@ export default {
   font-weight: bold;
   color: var(--textgray);
   margin-bottom: 0.5rem;
+  font-family: "Teko", sans-serif;
 }
 .total-value {
   font-size: 2rem;

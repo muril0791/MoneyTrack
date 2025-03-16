@@ -1,14 +1,13 @@
 <template>
-  <div class="finance-list-container">
-    <div class="finance-list-header">
-      <h2 class="finance-list-title">Transações</h2>
-      <button class="finance-add-button" @click="$emit('add-transaction')">
-        Adicionar Transação
-      </button>
-    </div>
+  <div class="transactions-container">
+    <!-- Cabeçalho da lista -->
+    <header class="transactions-header">
+      <h2 class="transactions-title">Transações</h2>
+    </header>
 
-    <div class="finance-table-wrapper">
-      <table class="finance-table">
+    <!-- Tabela responsiva -->
+    <div class="table-wrapper">
+      <table class="transactions-table">
         <thead>
           <tr>
             <th>Data</th>
@@ -23,30 +22,27 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(expense, index) in expenses" :key="index">
+          <tr
+            v-for="(expense, index) in expenses"
+            :key="index"
+            class="table-row"
+          >
             <td>{{ formatData(expense.data) }}</td>
-
             <td>
               <span
                 :class="{
-                  'tipo-entrada': expense.tipo === 'entrada',
-                  'tipo-saida': expense.tipo === 'saida'
+                  'tag-entrada': expense.tipo === 'entrada',
+                  'tag-saida': expense.tipo === 'saida'
                 }"
               >
                 {{ formatTipo(expense.tipo) }}
               </span>
             </td>
-
             <td class="capitalize">{{ expense.tipoTransacao }}</td>
-
             <td>{{ formatParcelas(expense) }}</td>
-
             <td>{{ formatValor(expense.valor) }}</td>
-
-            <td>{{ expense.descricao }}</td>
-
+            <td>{{ expense.descricao || '—' }}</td>
             <td>{{ expense.categoria }}</td>
-
             <td>
               <span
                 :class="{
@@ -54,11 +50,10 @@
                   'status-negative': expense.tipo === 'saida'
                 }"
               >
-                {{ expense.tipo === "entrada" ? "Completed" : "Pending" }}
+                {{ expense.tipo === 'entrada' ? 'Completed' : 'Pending' }}
               </span>
             </td>
-
-            <td class="finance-actions">
+            <td class="actions-cell">
               <button class="edit-btn" @click="editExpense(expense)">Editar</button>
               <button class="delete-btn" @click="deleteExpense(expense)">Excluir</button>
             </td>
@@ -75,10 +70,10 @@ export default {
   props: {
     expenses: {
       type: Array,
-      required: true,
-    },
+      required: true
+    }
   },
-  emits: ["add-transaction", "edit-expense", "delete-expense"],
+  emits: ["edit-expense", "delete-expense"],
   methods: {
     editExpense(expense) {
       this.$emit("edit-expense", expense);
@@ -97,14 +92,14 @@ export default {
       return dataObj.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
-        year: "numeric",
+        year: "numeric"
       });
     },
     formatValor(valor) {
       if (!valor) return "";
       return new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL",
+        currency: "BRL"
       }).format(valor);
     },
     formatParcelas(expense) {
@@ -112,104 +107,102 @@ export default {
       if (expense.parcelas && expense.parcelas > 1) {
         return expense.parcelas + "x";
       }
-      // Caso contrário, se for saída, exibe "1x", se for entrada, exibe "—"
+      // Caso contrário, se for saída, "1x"; se for entrada, "—"
       if (expense.tipo === "saida") {
         return "1x";
       }
       return "—";
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
+/* Paleta e tipografia inspiradas no estilo "finance.ai" */
 :root {
-  --bg-main: #0f0e11;
-  --card-dark: #161716;
-  --green: #3ecf00;
-  --red: #e93030;
+  --bg-dark: #0f0e11;        /* Fundo geral */
+  --bg-card: #161716;        /* Fundo dos cards */
+  --bg-header: #1e1f23;      /* Fundo do cabeçalho da tabela */
+  --border-color: #2b2c2f;   /* Cor de borda sutil */
+  --green: #3ecf00;          /* Verde para entradas */
+  --red: #e93030;            /* Vermelho para saídas */
   --text-white: #c2c3c2;
   --text-gray: #aaaaaa;
+  --font-main: "Roboto", sans-serif;
 }
 
 /* Container Principal */
-.finance-list-container {
-  background-color: var(--card-dark);
+.transactions-container {
+  background-color: #161716;
   padding: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
   color: var(--text-white);
-  font-family: Roboto, sans-serif;
+  font-family: var(--font-main);
 }
 
 /* Cabeçalho */
-.finance-list-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+.transactions-header {
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
-.finance-list-title {
+.transactions-title {
   font-size: 1.25rem;
   font-weight: bold;
   margin: 0;
 }
-.finance-add-button {
-  background-color: var(--green);
-  color: #ffffff;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-@media (min-width: 480px) {
-  .finance-add-button {
-    margin-top: 0;
-  }
-}
-.finance-add-button:hover {
-  background-color: #36b800;
-}
 
-/* Tabela */
-.finance-table-wrapper {
+/* Tabela Responsiva */
+.table-wrapper {
   overflow-x: auto;
+  border-radius: 6px;
+  background-color: var(--bg-dark);
+  box-shadow: inset 0 0 0 1px var(--border-color);
 }
-.finance-table {
+.transactions-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  color: var(--text-white);
+  border-radius: 6px;
 }
-.finance-table thead {
-  background-color: var(--card-dark);
+.transactions-table thead {
+  background-color: var(--bg-header);
   text-transform: uppercase;
   font-weight: bold;
+  letter-spacing: 0.04rem;
 }
-.finance-table th,
-.finance-table td {
+.transactions-table th {
   padding: 0.75rem;
-  border: 1px solid var(--card-dark);
   text-align: left;
+  color: var(--text-gray);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.75rem;
 }
-.finance-table tbody tr:hover {
-  background-color: var(--bg-main);
+.transactions-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+.table-row:hover td {
+  background-color: #1c1c1c;
+}
+.capitalize {
+  text-transform: capitalize;
 }
 
-/* Tipos */
-.tipo-entrada {
+/* Tag de Tipo (Entrada / Saída) */
+.tag-entrada {
   color: var(--green);
   font-weight: bold;
 }
-.tipo-saida {
+.tag-saida {
   color: var(--red);
   font-weight: bold;
 }
 
-/* Status */
+/* Status (Completed / Pending) */
 .status-positive {
   background-color: rgba(62, 207, 0, 0.2);
   color: var(--green);
@@ -228,16 +221,21 @@ export default {
 }
 
 /* Ações */
-.finance-actions {
+.actions-cell {
   white-space: nowrap;
 }
-.finance-actions button {
+.actions-cell button {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: bold;
   margin-right: 0.5rem;
+  color: var(--text-gray);
+  transition: color 0.2s ease;
+}
+.actions-cell button:hover {
+  color: var(--text-white);
 }
 .edit-btn {
   color: var(--green);
@@ -250,10 +248,5 @@ export default {
 }
 .delete-btn:hover {
   color: #d32f2f;
-}
-
-/* Capitalize */
-.capitalize {
-  text-transform: capitalize;
 }
 </style>

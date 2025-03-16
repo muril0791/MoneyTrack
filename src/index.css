@@ -9,4 +9,5 @@ body {
   color: #c2c3c2;
   font-family: "Quicksand", sans-serif;
   font-optical-sizing: auto;
+  font-weight: inherit;
 }

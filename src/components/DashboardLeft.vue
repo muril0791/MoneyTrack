@@ -36,11 +36,11 @@
         <div class="totals">
           <div class="total-box">
             <p>Entradas</p>
-            <p>R$ {{ totalEntradas.toFixed(2) }}</p>
+            <p style=" font-family: Teko; font-weight: 500; ">R$ {{ totalEntradas.toFixed(2) }}</p>
           </div>
           <div class="total-box">
             <p>Saídas</p>
-            <p>R$ {{ totalSaidas.toFixed(2) }}</p>
+            <p style=" font-family: Teko; font-weight: 500; ">R$ {{ totalSaidas.toFixed(2) }}</p>
           </div>
         </div>
         <div class="top-categories">
@@ -135,6 +135,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  font-family: 'Quicksand'
 }
 
 /* Box de Saldo e Botão */
@@ -147,6 +148,7 @@ export default {
   align-items: center;
   flex-wrap: wrap; /* Permite quebra em telas menores */
   gap: 1rem;
+  
 }
 .saldo-info h3 {
   color: var(--textwhite);
@@ -252,6 +254,8 @@ export default {
   font-weight: bold;
   color: var(--textwhite);
   margin: 0;
+  font-family: "Quicksand", sans-serif;
+  font-optical-sizing: auto;
 }
 .category-bar {
   margin-bottom: 0.5rem;
