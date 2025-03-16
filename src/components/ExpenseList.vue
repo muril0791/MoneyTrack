@@ -103,11 +103,9 @@ export default {
       }).format(valor);
     },
     formatParcelas(expense) {
-      // Se tiver "parcelas" > 1, mostra "Nx"
       if (expense.parcelas && expense.parcelas > 1) {
         return expense.parcelas + "x";
       }
-      // Caso contrário, se for saída, "1x"; se for entrada, "—"
       if (expense.tipo === "saida") {
         return "1x";
       }
@@ -118,14 +116,13 @@ export default {
 </script>
 
 <style scoped>
-/* Paleta e tipografia inspiradas no estilo "finance.ai" */
 :root {
-  --bg-dark: #0f0e11;        /* Fundo geral */
-  --bg-card: #161716;        /* Fundo dos cards */
-  --bg-header: #1e1f23;      /* Fundo do cabeçalho da tabela */
-  --border-color: #2b2c2f;   /* Cor de borda sutil */
-  --green: #3ecf00;          /* Verde para entradas */
-  --red: #e93030;            /* Vermelho para saídas */
+  --bg-dark: #0f0e11;
+  --card-dark: #161716;
+  --bg-header: #1e1f23;
+  --border-color: #2b2c2f;
+  --green: #3ecf00;
+  --red: #e93030;
   --text-white: #c2c3c2;
   --text-gray: #aaaaaa;
   --font-main: "Roboto", sans-serif;
@@ -139,6 +136,8 @@ export default {
   box-shadow: 0 2px 4px rgba(0,0,0,0.5);
   color: var(--text-white);
   font-family: var(--font-main);
+  width: 90%;
+  margin: 0 auto;
 }
 
 /* Cabeçalho */
@@ -192,7 +191,7 @@ export default {
   text-transform: capitalize;
 }
 
-/* Tag de Tipo (Entrada / Saída) */
+/* Tag de Tipo */
 .tag-entrada {
   color: var(--green);
   font-weight: bold;
@@ -202,7 +201,7 @@ export default {
   font-weight: bold;
 }
 
-/* Status (Completed / Pending) */
+/* Status */
 .status-positive {
   background-color: rgba(62, 207, 0, 0.2);
   color: var(--green);

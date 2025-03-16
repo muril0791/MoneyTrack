@@ -1,16 +1,14 @@
 <template>
   <div class="transaction-list">
-    <div class="transaction-header">
+    <header class="transaction-header">
       <h2 class="transaction-title">Transações</h2>
-      <button class="transaction-view-more" @click="$emit('view-more')">
-        Ver mais
-      </button>
-    </div>
+    </header>
     <div class="transaction-items">
       <div
-        v-for="(expense, index) in expenses"
+        v-for="(expense, index) in paginatedExpenses"
         :key="index"
         class="transaction-item"
+        @click="openDetail(expense)"
       >
         <div class="transaction-icon">
           <span v-if="expense.tipo === 'entrada'" class="icon-positive">↑</span>
@@ -30,6 +28,17 @@
         </div>
       </div>
     </div>
+    <!-- Paginação -->
+    <div class="pagination">
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        :class="['page-btn', { active: currentPage === page }]"
+        @click="changePage(page)"
+      >
+        {{ page }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -37,9 +46,11 @@
 export default {
   name: "SimpleTransactionList",
   props: {
-    expenses: { type: Array, required: true }
+    expenses: { type: Array, required: true },
+    currentPage: { type: Number, required: true },
+    totalPages: { type: Number, required: true }
   },
-  emits: ["view-more"],
+  emits: ["view-more", "open-detail", "change-page"],
   methods: {
     formatTipo(tipo) {
       if (tipo === "entrada") return "Entrada";
@@ -63,15 +74,25 @@ export default {
       }).format(valor);
     },
     formatParcelas(expense) {
-      // Se tiver "parcelas" > 1, mostra "Nx"
       if (expense.parcelas && expense.parcelas > 1) {
         return expense.parcelas + "x";
       }
-      // Caso contrário, "1x" se for saída, ou "—" se for entrada
       if (expense.tipo === "saida") {
         return "1x";
       }
       return "—";
+    },
+    openDetail(expense) {
+      this.$emit("open-detail", expense);
+    },
+    changePage(page) {
+      this.$emit("change-page", page);
+    }
+  },
+  computed: {
+    paginatedExpenses() {
+      // Aqui, assumimos que o pai já enviou os itens paginados
+      return this.expenses;
     }
   }
 };
@@ -87,60 +108,35 @@ export default {
   --text-gray: #aaaaaa;
 }
 
-/* Container Principal */
 .transaction-list {
-  background-color: #161716 ;
+  background-color: var(--card-dark);
   padding: 0.5rem;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: "Roboto", sans-serif;
   color: var(--text-white);
-  font-family: Roboto, sans-serif;
 }
 
-/* Cabeçalho */
 .transaction-header {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  border-bottom: 1.5px solid white;
+  border-bottom: 1.5px solid var(--text-white);
 }
+
 .transaction-title {
   font-size: 1.25rem;
   font-weight: bold;
   margin: 0;
-  
-}
-.transaction-view-more {
-  font-size: 0.75rem;
-  color: var(--text-white);
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 20px;
-  background-color: transparent;
-  border: 1px solid var(--text-white);
-  margin-top: 0.5rem;
-}
-@media (min-width: 480px) {
-  .transaction-view-more {
-    margin-top: 0;
-  }
-}
-.transaction-view-more:hover {
-  background-color: var(--green);
-  color: #fff;
-  border-color: var(--green);
 }
 
-/* Lista de itens */
 .transaction-items {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-/* Layout dos itens - grid para telas maiores */
 .transaction-item {
   display: grid;
   grid-template-columns: 2.5rem 1fr auto auto;
@@ -155,21 +151,6 @@ export default {
   background-color: #151415;
 }
 
-/* Layout responsivo para telas pequenas */
-@media (max-width: 480px) {
-  .transaction-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  .transaction-amount,
-  .transaction-parcelas {
-    align-self: flex-end;
-  }
-}
-
-/* Ícone */
 .transaction-icon {
   display: flex;
   align-items: center;
@@ -186,7 +167,6 @@ export default {
   font-size: 1.25rem;
 }
 
-/* Informações da transação */
 .transaction-info {
   margin-left: 0.5rem;
 }
@@ -202,7 +182,6 @@ export default {
   color: var(--text-white);
 }
 
-/* Valor */
 .transaction-amount {
   font-size: 0.875rem;
   font-weight: bold;
@@ -211,12 +190,33 @@ export default {
   text-align: right;
 }
 
-/* Parcelas */
 .transaction-parcelas {
   font-size: 0.75rem;
   font-weight: bold;
   color: var(--text-white);
   margin-left: 1rem;
   text-align: right;
+}
+
+/* Paginação */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+.page-btn {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--card-dark);
+  border-radius: 4px;
+  color: var(--text-white);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.page-btn.active,
+.page-btn:hover {
+  background-color: var(--card-dark);
 }
 </style>

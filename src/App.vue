@@ -1,7 +1,10 @@
 <template>
   <div class="app-container">
     <!-- TopBar -->
-    <TopBar @open-modal="openNewTransaction" @open-calendar="showCalendar = true" />
+    <TopBar
+      @open-modal="openNewTransaction"
+      @open-calendar="showCalendar = true"
+    />
 
     <!-- Conteúdo Principal: Dashboard com duas colunas -->
     <main class="main-container">
@@ -9,13 +12,23 @@
         <!-- Coluna 1: DashboardLeft -->
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
         <!-- Coluna 2: Lista simples -->
-        <SimpleTransactionList :expenses="expenses" @view-more="showFullList = true" />
+        <SimpleTransactionList
+          :expenses="expensesPaginated"
+          @open-detail="openDetail"
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          @change-page="changePage"
+        />
       </div>
     </main>
 
     <!-- Modal de Lançamento (Adicionar / Editar) -->
     <transition name="modal">
-      <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
+      <div
+        v-if="showModal"
+        class="modal-overlay"
+        @click.self="closeFormModal"
+      >
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2 class="modal-title">
@@ -34,7 +47,11 @@
 
     <!-- Modal do Calendário -->
     <transition name="modal">
-      <div v-if="showCalendar" class="modal-overlay" @click.self="showCalendar = false">
+      <div
+        v-if="showCalendar"
+        class="modal-overlay"
+        @click.self="showCalendar = false"
+      >
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2 class="modal-title">Calendário</h2>
@@ -47,23 +64,25 @@
 
     <!-- Modal de Lista Detalhada -->
     <transition name="modal">
-      <div v-if="showFullList" class="modal-overlay" @click.self="showFullList = false">
+      <div
+        v-if="showDetailModal"
+        class="modal-overlay"
+        @click.self="closeDetailModal"
+      >
        
-          
           <ExpenseList
-            :expenses="expenses"
-            @add-transaction="openNewTransaction"
+            :expenses="[selectedExpense]" 
             @edit-expense="handleEditExpense"
             @delete-expense="handleDeleteExpense"
           />
-        
+       
       </div>
     </transition>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import TopBar from "./components/TopBar.vue";
 import DashboardLeft from "./components/DashboardLeft.vue";
 import SimpleTransactionList from "./components/SimpleTransactionList.vue";
@@ -85,8 +104,23 @@ export default {
     const expenses = ref([]);
     const showModal = ref(false);
     const showCalendar = ref(false);
-    const showFullList = ref(false);
+    const showDetailModal = ref(false);
     const editingExpense = ref(null);
+    const selectedExpense = ref(null);
+
+    // Paginação para a lista simples
+    const currentPage = ref(1);
+    const itemsPerPage = 5;
+    const totalPages = computed(() => {
+      return Math.ceil(expenses.value.length / itemsPerPage);
+    });
+    const expensesPaginated = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage;
+      return expenses.value.slice(start, start + itemsPerPage);
+    });
+    const changePage = (page) => {
+      currentPage.value = page;
+    };
 
     const openNewTransaction = () => {
       editingExpense.value = null;
@@ -99,7 +133,6 @@ export default {
     };
 
     const handleAddExpense = (expense) => {
-      // Se estiver editando, substitui o item; senão, adiciona
       if (editingExpense.value) {
         const index = expenses.value.indexOf(editingExpense.value);
         if (index !== -1) {
@@ -114,23 +147,42 @@ export default {
     const handleEditExpense = (expense) => {
       editingExpense.value = expense;
       showModal.value = true;
+      closeDetailModal();
     };
 
     const handleDeleteExpense = (expense) => {
       expenses.value = expenses.value.filter((e) => e !== expense);
+      closeDetailModal();
+    };
+
+    const openDetail = (expense) => {
+      selectedExpense.value = expense;
+      showDetailModal.value = true;
+    };
+
+    const closeDetailModal = () => {
+      showDetailModal.value = false;
+      selectedExpense.value = null;
     };
 
     return {
       expenses,
       showModal,
       showCalendar,
-      showFullList,
+      showDetailModal,
       editingExpense,
+      selectedExpense,
+      currentPage,
+      totalPages,
+      expensesPaginated,
       openNewTransaction,
       closeFormModal,
       handleAddExpense,
       handleEditExpense,
       handleDeleteExpense,
+      openDetail,
+      closeDetailModal,
+      changePage,
     };
   },
 };
