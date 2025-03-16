@@ -33,7 +33,8 @@ export default {
           datasets: [
             {
               data: [1],
-              backgroundColor: ["transparent"],
+              backgroundColor: ["#555555"], // Cor neutra para valores zerados
+              borderWidth: 0,
             },
           ],
         };
@@ -41,8 +42,10 @@ export default {
           responsive: true,
           plugins: {
             legend: { display: false },
+            tooltip: { enabled: false },
           },
           cutout: "80%",
+          maintainAspectRatio: false,
         };
       } else {
         data = {
@@ -50,15 +53,20 @@ export default {
             {
               data: [entradas, saidas],
               backgroundColor: ["#3ecf00", "#e93030"],
+              borderWidth: 0,
             },
           ],
         };
         options = {
           responsive: true,
           plugins: {
-            legend: { position: "bottom", labels: { color: "#c2c3c2" } },
+            legend: {
+              position: "bottom",
+              labels: { color: "#c2c3c2" },
+            },
           },
           cutout: "80%",
+          maintainAspectRatio: false,
         };
       }
 
