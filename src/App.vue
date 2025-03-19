@@ -4,16 +4,15 @@
     <TopBar
       @open-modal="openNewTransaction"
       @open-calendar="showCalendar = true"
-      @open-credit-cards="openCreditCardsModal"
+      @open-credit-cards="openCreditCardsRegistrationModal"
       @open-categories="openCategoriesModal"
+      @open-credit-cards-list="openCreditCardsModal"
     />
 
     <!-- Conteúdo Principal: Dashboard com duas colunas -->
     <main class="main-container">
       <div class="two-columns">
-        <!-- Coluna 1: DashboardLeft -->
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
-        <!-- Coluna 2: Lista Simples -->
         <SimpleTransactionList
           :expenses="expensesPaginated"
           @open-detail="openDetail"
@@ -34,12 +33,14 @@
             </h2>
             <button @click="closeFormModal" class="modal-close">&times;</button>
           </div>
-          <!-- Passamos as categorias para o formulário -->
+          <!-- Passamos as categorias e os cartões para o formulário -->
           <ExpenseForm
             :editingExpense="editingExpense"
             :categories="categories"
+            :creditCards="creditCards"
             @add-expense="handleAddExpense"
             @close="closeFormModal"
+            @open-categories="openCategoriesModal"
           />
         </div>
       </div>
@@ -55,9 +56,7 @@
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h2 class="modal-title">Calendário</h2>
-            <button @click="showCalendar = false" class="modal-close">
-              &times;
-            </button>
+            <button @click="showCalendar = false" class="modal-close">&times;</button>
           </div>
           <ExpenseCalendar :expenses="expenses" />
         </div>
@@ -71,13 +70,13 @@
         class="modal-overlay"
         @click.self="closeDetailModal"
       >
-        
+        <div class="modal-content" @click.stop>
           <ExpenseList
             :expenses="[selectedExpense]"
             @edit-expense="handleEditExpense"
             @delete-expense="handleDeleteExpense"
           />
-        
+        </div>
       </div>
     </transition>
 
@@ -89,7 +88,6 @@
         @click.self="closeCategoriesModal"
       >
         <div class="modal-content" @click.stop>
-          <!-- Passamos as categorias e recebemos de volta via update-categories -->
           <CategoriasScreen
             :categories="categories"
             @update-categories="updateCategories"
@@ -99,7 +97,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Cadastro de Cartões de Crédito -->
+    <!-- Modal de Listagem de Cartões de Crédito -->
     <transition name="modal">
       <div
         v-if="showCreditCardsModal"
@@ -107,7 +105,27 @@
         @click.self="closeCreditCardsModal"
       >
         <div class="modal-content" @click.stop>
-          <CartoesScreen @close="closeCreditCardsModal" />
+          <CreditCardList
+            :creditCards="creditCards"
+            :expenses="expenses"
+            @close="closeCreditCardsModal"
+          />
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal de Cadastro de Cartões de Crédito -->
+    <transition name="modal">
+      <div
+        v-if="showCreditCardsRegistrationModal"
+        class="modal-overlay"
+        @click.self="closeCreditCardsRegistrationModal"
+      >
+        <div class="modal-content" @click.stop>
+          <CartoesScreen
+            @update-credit-cards="updateCreditCards"
+            @close="closeCreditCardsRegistrationModal"
+          />
         </div>
       </div>
     </transition>
@@ -124,6 +142,7 @@ import ExpenseCalendar from "./components/ExpenseCalendar.vue";
 import ExpenseList from "./components/ExpenseList.vue";
 import CategoriasScreen from "./components/CategoriasScreen.vue";
 import CartoesScreen from "./components/CartoesScreen.vue";
+import CreditCardList from "./components/CreditCardList.vue";
 
 export default {
   name: "App",
@@ -136,14 +155,15 @@ export default {
     ExpenseList,
     CategoriasScreen,
     CartoesScreen,
+    CreditCardList,
   },
   setup() {
     // Lançamentos
     const expenses = ref([]);
 
-    // Categorias globais – iniciando com as categorias padrão
+    // Categorias globais (padrão + criadas pelo usuário)
     const categories = ref([
-      // Categorias de Entrada
+      // Entrada
       { id: "salario", name: "Salário", type: "entrada" },
       { id: "venda", name: "Venda", type: "entrada" },
       { id: "devolucao", name: "Devolução", type: "entrada" },
@@ -151,8 +171,7 @@ export default {
       { id: "investimentos", name: "Investimentos", type: "entrada" },
       { id: "premiacoes", name: "Premiações", type: "entrada" },
       { id: "outros-entrada", name: "Outros", type: "entrada" },
-
-      // Categorias de Saída
+      // Saída
       { id: "lazer", name: "Lazer", type: "saida" },
       { id: "mercado", name: "Mercado", type: "saida" },
       { id: "compras", name: "Compras", type: "saida" },
@@ -163,12 +182,18 @@ export default {
       { id: "outros-saida", name: "Outros", type: "saida" },
     ]);
 
-    // Atualiza o array de categorias quando a tela de categorias emite "update-categories"
+    // Cartões de Crédito
+    const creditCards = ref([]);
+    const updateCreditCards = (newCards) => {
+      creditCards.value = newCards;
+    };
+
+    // Atualiza categorias vindas da tela de cadastro
     const updateCategories = (newCategories) => {
       categories.value = newCategories;
     };
 
-    // Paginação
+    // Paginação para lista simples
     const currentPage = ref(1);
     const itemsPerPage = 5;
     const totalPages = computed(() =>
@@ -188,12 +213,12 @@ export default {
     const showDetailModal = ref(false);
     const showCategoriesModal = ref(false);
     const showCreditCardsModal = ref(false);
+    const showCreditCardsRegistrationModal = ref(false);
 
     // Edição de lançamentos
     const editingExpense = ref(null);
     const selectedExpense = ref(null);
 
-    // Funções de abertura/fechamento
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
@@ -203,7 +228,6 @@ export default {
       editingExpense.value = null;
     };
 
-    // Ao confirmar um novo lançamento
     const handleAddExpense = (expense) => {
       if (editingExpense.value) {
         const index = expenses.value.indexOf(editingExpense.value);
@@ -216,18 +240,17 @@ export default {
       closeFormModal();
     };
 
-    // Editar/Excluir
     const handleEditExpense = (expense) => {
       editingExpense.value = expense;
       showModal.value = true;
       closeDetailModal();
     };
+
     const handleDeleteExpense = (expense) => {
       expenses.value = expenses.value.filter((e) => e !== expense);
       closeDetailModal();
     };
 
-    // Detalhes
     const openDetail = (expense) => {
       selectedExpense.value = expense;
       showDetailModal.value = true;
@@ -237,7 +260,7 @@ export default {
       selectedExpense.value = null;
     };
 
-    // Categorias
+    // Modal de categorias
     const openCategoriesModal = () => {
       showCategoriesModal.value = true;
     };
@@ -245,34 +268,38 @@ export default {
       showCategoriesModal.value = false;
     };
 
-    // Cartões
+    // Modal de cartões
     const openCreditCardsModal = () => {
       showCreditCardsModal.value = true;
     };
     const closeCreditCardsModal = () => {
       showCreditCardsModal.value = false;
     };
+    const openCreditCardsRegistrationModal = () => {
+      showCreditCardsRegistrationModal.value = true;
+    };
+    const closeCreditCardsRegistrationModal = () => {
+      showCreditCardsRegistrationModal.value = false;
+    };
 
     return {
       expenses,
       categories,
+      creditCards,
+      updateCreditCards,
       updateCategories,
-
       currentPage,
-      itemsPerPage,
       totalPages,
       expensesPaginated,
       changePage,
-
       showModal,
       showCalendar,
       showDetailModal,
       showCategoriesModal,
       showCreditCardsModal,
-
+      showCreditCardsRegistrationModal,
       editingExpense,
       selectedExpense,
-
       openNewTransaction,
       closeFormModal,
       handleAddExpense,
@@ -280,11 +307,12 @@ export default {
       handleDeleteExpense,
       openDetail,
       closeDetailModal,
-
       openCategoriesModal,
       closeCategoriesModal,
       openCreditCardsModal,
       closeCreditCardsModal,
+      openCreditCardsRegistrationModal,
+      closeCreditCardsRegistrationModal,
     };
   },
 };

@@ -1,3 +1,4 @@
+<!-- CartoesScreen.vue -->
 <template>
   <div class="cartoes-screen">
     <h2 class="title">Cadastro de Cartões de Crédito</h2>
@@ -22,16 +23,33 @@
           required
         />
       </div>
+      <div class="form-group">
+        <label for="closingDay">Dia de Fechamento</label>
+        <input
+          type="number"
+          id="closingDay"
+          v-model.number="cardForm.closingDay"
+          min="1"
+          max="31"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="dueDay">Dia de Vencimento</label>
+        <input
+          type="number"
+          id="dueDay"
+          v-model.number="cardForm.dueDay"
+          min="1"
+          max="31"
+          required
+        />
+      </div>
       <div class="form-buttons">
         <button type="submit" class="btn">
           {{ isEditing ? "Atualizar" : "Adicionar" }}
         </button>
-        <button
-          v-if="isEditing"
-          type="button"
-          class="btn-cancel"
-          @click="cancelEdit"
-        >
+        <button v-if="isEditing" type="button" class="btn-cancel" @click="cancelEdit">
           Cancelar
         </button>
       </div>
@@ -39,8 +57,11 @@
     <div class="cards-list">
       <h3 class="list-title">Cartões Cadastrados</h3>
       <ul>
-        <li v-for="(card, index) in cards" :key="index" class="list-item">
-          <span class="item-name">{{ card.name }} - R$ {{ card.limit.toFixed(2) }}</span>
+        <li v-for="(card, index) in cards" :key="card.id" class="list-item">
+          <span class="item-name">
+            {{ card.name }} - R$ {{ card.limit.toFixed(2) }}<br />
+            Fechamento: {{ card.closingDay }} | Vencimento: {{ card.dueDay }}
+          </span>
           <div class="item-actions">
             <button class="btn-edit" @click="editCard(index)">Editar</button>
             <button class="btn-delete" @click="deleteCard(index)">Excluir</button>
@@ -56,23 +77,29 @@
 import { ref } from "vue";
 export default {
   name: "CartoesScreen",
-  emits: ["close"],
-  setup() {
+  emits: ["close", "update-credit-cards"],
+  setup(_, { emit }) {
     const cards = ref([]);
     const cardForm = ref({
       name: "",
-      limit: 0
+      limit: 0,
+      closingDay: null,
+      dueDay: null,
     });
     const isEditing = ref(false);
     const editingIndex = ref(null);
 
     const handleSubmit = () => {
       if (isEditing.value && editingIndex.value !== null) {
-        cards.value[editingIndex.value] = { ...cardForm.value };
+        // Atualiza o cartão mantendo o ID original
+        cards.value[editingIndex.value] = { ...cardForm.value, id: cards.value[editingIndex.value].id };
       } else {
-        cards.value.push({ ...cardForm.value });
+        // Gera um ID único combinando Date.now() e uma string aleatória
+        const newId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        cards.value.push({ ...cardForm.value, id: newId });
       }
       resetForm();
+      emit("update-credit-cards", cards.value);
     };
 
     const editCard = (index) => {
@@ -83,9 +110,11 @@ export default {
 
     const deleteCard = (index) => {
       cards.value.splice(index, 1);
+      // Se o cartão em edição for excluído, reseta o formulário
       if (editingIndex.value === index) {
         resetForm();
       }
+      emit("update-credit-cards", cards.value);
     };
 
     const cancelEdit = () => {
@@ -93,8 +122,7 @@ export default {
     };
 
     const resetForm = () => {
-      cardForm.value.name = "";
-      cardForm.value.limit = 0;
+      cardForm.value = { name: "", limit: 0, closingDay: null, dueDay: null };
       isEditing.value = false;
       editingIndex.value = null;
     };
@@ -106,9 +134,9 @@ export default {
       handleSubmit,
       editCard,
       deleteCard,
-      cancelEdit
+      cancelEdit,
     };
-  }
+  },
 };
 </script>
 
@@ -149,11 +177,10 @@ export default {
 input {
   width: 100%;
   padding: 0.5rem;
-  margin-bottom: 1rem;
-  background-color: var(--mainbg);
-  border: 1px solid #2b2c2f;
-  color: var(--textwhite);
+  border: 1px solid var(--mainbg);
   border-radius: 4px;
+  background-color: var(--mainbg);
+  color: var(--textwhite);
 }
 
 .form-buttons {

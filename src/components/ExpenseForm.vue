@@ -5,17 +5,11 @@
       <h2 class="modal-title">TRANSAÇÕES</h2>
       <div class="button-group">
         <button class="btn-entrada" @click="selectType('entrada')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l-5.5 9h11z"/>
-            <path d="M11 13v9h2v-9h-2z"/>
-          </svg>
+          <!-- SVG omitido para brevidade -->
           Entrada
         </button>
         <button class="btn-saida" @click="selectType('saida')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 22l5.5-9h-11z"/>
-            <path d="M13 11V2h-2v9h2z"/>
-          </svg>
+          <!-- SVG omitido para brevidade -->
           Saída
         </button>
       </div>
@@ -27,13 +21,7 @@
       <!-- Valor -->
       <div class="form-group">
         <label class="form-label">Valor</label>
-        <input
-          v-model.number="form.valor"
-          type="number"
-          step="0.01"
-          required
-          class="form-input"
-        />
+        <input v-model.number="form.valor" type="number" step="0.01" required class="form-input" />
       </div>
       <!-- Tipo de Transação -->
       <div class="form-group">
@@ -54,24 +42,20 @@
           </template>
         </select>
       </div>
-      <!-- Campos Condicionais para Saída com Cartão de Crédito -->
+      <!-- Se for Saída com Cartão de Crédito, mostra select para escolher o cartão, parcelas e data da primeira parcela -->
       <template v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'">
         <div class="form-group">
-          <label class="form-label">Número de Parcelas</label>
-          <input
-            v-model.number="form.parcelas"
-            type="number"
-            min="2"
-            class="form-input"
-          />
+          <label class="form-label">Cartão de Crédito</label>
+          <select v-model="form.creditCardId" required class="form-input">
+            <option disabled value="">Selecione</option>
+            <option v-for="card in creditCards" :key="card.id" :value="card.id">
+              {{ card.name }}
+            </option>
+          </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Data da Primeira Parcela</label>
-          <input
-            v-model="form.dataPrimeiraParcela"
-            type="date"
-            class="form-input"
-          />
+          <label class="form-label">Número de Parcelas</label>
+          <input v-model.number="form.parcelas" type="number" min="2" class="form-input" />
         </div>
       </template>
       <!-- Data -->
@@ -79,35 +63,25 @@
         <label class="form-label">Data</label>
         <input v-model="form.data" type="date" required class="form-input" />
       </div>
-      <!-- Categoria (usa as categorias globais filtradas) -->
+      <!-- Categoria -->
       <div class="form-group">
         <label class="form-label">Categoria</label>
         <select v-model="form.categoria" required class="form-input">
           <option disabled value="">Selecione</option>
-          <!-- Filtra apenas as categorias com type igual a form.tipo -->
           <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">
             {{ cat.name }}
           </option>
           <option value="adicionar">[Adicionar categoria]</option>
         </select>
       </div>
-      <!-- Descrição (opcional) -->
+      <!-- Descrição -->
       <div class="form-group">
         <label class="form-label">Descrição</label>
-        <input
-          v-model="form.descricao"
-          type="text"
-          class="form-input"
-          placeholder="Opcional"
-        />
+        <input v-model="form.descricao" type="text" class="form-input" placeholder="Opcional" />
       </div>
       <div class="form-buttons">
-        <button type="button" class="btn-back" @click="goBackToStep0">
-          Voltar
-        </button>
-        <button type="button" class="btn-next" @click="nextStep">
-          Próximo
-        </button>
+        <button type="button" class="btn-back" @click="goBackToStep0">Voltar</button>
+        <button type="button" class="btn-next" @click="nextStep">Próximo</button>
       </div>
     </div>
 
@@ -118,23 +92,20 @@
         <p><strong>Tipo:</strong> {{ form.tipo }}</p>
         <p><strong>Valor:</strong> {{ form.valor }}</p>
         <p><strong>Tipo de Transação:</strong> {{ form.tipoTransacao }}</p>
-        <template
-          v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito' && form.parcelas && form.parcelas > 1"
-        >
-          <p><strong>Parcelas:</strong> {{ form.parcelas }}</p>
-          <p><strong>Data da Primeira Parcela:</strong> {{ form.dataPrimeiraParcela }}</p>
+        <template v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'">
+          <p><strong>Cartão:</strong> {{ getCreditCardName(form.creditCardId) }}</p>
+          <p v-if="form.parcelas"><strong>Parcelas:</strong> {{ form.parcelas }}</p>
+          <p v-if="form.dataPrimeiraParcela">
+            <strong>Data da Primeira Parcela:</strong> {{ form.dataPrimeiraParcela }}
+          </p>
         </template>
         <p><strong>Data:</strong> {{ form.data }}</p>
         <p><strong>Categoria:</strong> {{ selectedCategoryName || "—" }}</p>
         <p><strong>Descrição:</strong> {{ form.descricao }}</p>
       </div>
       <div class="form-buttons">
-        <button type="button" class="btn-back" @click="prevStep">
-          Voltar
-        </button>
-        <button type="button" class="btn-confirm" @click="handleSubmit">
-          Confirmar
-        </button>
+        <button type="button" class="btn-back" @click="prevStep">Voltar</button>
+        <button type="button" class="btn-confirm" @click="handleSubmit">Confirmar</button>
       </div>
     </div>
   </div>
@@ -147,7 +118,8 @@ export default {
   emits: ["add-expense", "close", "open-categories"],
   props: {
     editingExpense: { type: Object, default: null },
-    categories: { type: Array, default: () => [] }
+    categories: { type: Array, default: () => [] },
+    creditCards: { type: Array, default: () => [] }
   },
   setup(props, { emit }) {
     const currentStep = ref(0);
@@ -155,14 +127,14 @@ export default {
       tipo: "",
       tipoTransacao: "",
       parcelas: null,
-      dataPrimeiraParcela: "",
       data: "",
       valor: null,
       categoria: "",
-      descricao: ""
+      descricao: "",
+      creditCardId: ""
     });
 
-    // Watch: Se o usuário selecionar a opção "adicionar", abre a modal de categorias
+    // Se o usuário selecionar "adicionar" em categoria, dispara modal de categorias
     watch(
       () => form.categoria,
       (newVal) => {
@@ -191,11 +163,11 @@ export default {
         tipo: "",
         tipoTransacao: "",
         parcelas: null,
-        dataPrimeiraParcela: "",
         data: "",
         valor: null,
         categoria: "",
-        descricao: ""
+        descricao: "",
+        creditCardId: ""
       });
       currentStep.value = 0;
     };
@@ -222,24 +194,28 @@ export default {
         tipo: "",
         tipoTransacao: "",
         parcelas: null,
-        dataPrimeiraParcela: "",
         data: "",
         valor: null,
         categoria: "",
-        descricao: ""
+        descricao: "",
+        creditCardId: ""
       });
     };
 
-    // Filtra categorias conforme o tipo selecionado (entrada ou saída)
+    // Filtra categorias conforme o tipo selecionado
     const filteredCategories = computed(() => {
       return props.categories.filter((cat) => cat.type === form.tipo);
     });
 
-    // Exibe o nome da categoria selecionada
     const selectedCategoryName = computed(() => {
       const cat = props.categories.find((c) => c.id === form.categoria);
       return cat ? cat.name : "";
     });
+
+    const getCreditCardName = (id) => {
+      const card = props.creditCards.find((c) => c.id === id);
+      return card ? card.name : "";
+    };
 
     return {
       currentStep,
@@ -251,6 +227,7 @@ export default {
       handleSubmit,
       filteredCategories,
       selectedCategoryName,
+      getCreditCardName
     };
   }
 };
@@ -265,7 +242,6 @@ export default {
   --textwhite: #c2c3c2;
   --textgray: #aaaaaa;
 }
-
 .expense-form-container {
   background-color: var(--cardbg);
   max-width: 70%;
