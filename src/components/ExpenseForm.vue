@@ -1,6 +1,6 @@
 <template>
   <div class="expense-form-container">
-    <!-- Passo 0: Escolha "Entrada" ou "Saída" -->
+    <!-- Passo 0: Seleção de "Entrada" ou "Saída" -->
     <div v-if="currentStep === 0" class="transaction-type-selection">
       <h2 class="modal-title">TRANSAÇÕES</h2>
       <div class="button-group">
@@ -24,7 +24,6 @@
     <!-- Passo 1: Preenchimento dos dados -->
     <div v-else-if="currentStep === 1" class="form-step">
       <h2 class="form-heading">Preencha os Dados</h2>
-
       <!-- Valor -->
       <div class="form-group">
         <label class="form-label">Valor</label>
@@ -36,7 +35,6 @@
           class="form-input"
         />
       </div>
-
       <!-- Tipo de Transação -->
       <div class="form-group">
         <label class="form-label">Tipo de Transação</label>
@@ -56,8 +54,7 @@
           </template>
         </select>
       </div>
-
-      <!-- Se for Saída + Cartão de Crédito, pergunta nº de parcelas e data da primeira parcela -->
+      <!-- Campos Condicionais para Saída com Cartão de Crédito -->
       <template v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'">
         <div class="form-group">
           <label class="form-label">Número de Parcelas</label>
@@ -77,47 +74,23 @@
           />
         </div>
       </template>
-
       <!-- Data -->
       <div class="form-group">
         <label class="form-label">Data</label>
-        <input
-          v-model="form.data"
-          type="date"
-          required
-          class="form-input"
-        />
+        <input v-model="form.data" type="date" required class="form-input" />
       </div>
-
-      <!-- Categoria -->
+      <!-- Categoria (usa as categorias globais filtradas) -->
       <div class="form-group">
         <label class="form-label">Categoria</label>
         <select v-model="form.categoria" required class="form-input">
           <option disabled value="">Selecione</option>
-          <template v-if="form.tipo === 'entrada'">
-            <option value="salario">Salário</option>
-            <option value="venda">Venda</option>
-            <option value="devolucao">Devolução</option>
-            <option value="emprestimo">Empréstimo</option>
-            <option value="investimentos">Investimentos</option>
-            <option value="premiacoes">Premiações</option>
-            <option value="outros">Outros</option>
-            <option value="adicionar">[Adicionar categoria]</option>
-          </template>
-          <template v-else-if="form.tipo === 'saida'">
-            <option value="lazer">Lazer</option>
-            <option value="mercado">Mercado</option>
-            <option value="compras">Compras</option>
-            <option value="saude">Saúde</option>
-            <option value="educacao">Educação</option>
-            <option value="transporte">Transporte</option>
-            <option value="moradia">Moradia</option>
-            <option value="outros">Outros</option>
-            <option value="adicionar">[Adicionar categoria]</option>
-          </template>
+          <!-- Filtra apenas as categorias com type igual a form.tipo -->
+          <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">
+            {{ cat.name }}
+          </option>
+          <option value="adicionar">[Adicionar categoria]</option>
         </select>
       </div>
-
       <!-- Descrição (opcional) -->
       <div class="form-group">
         <label class="form-label">Descrição</label>
@@ -128,7 +101,6 @@
           placeholder="Opcional"
         />
       </div>
-
       <div class="form-buttons">
         <button type="button" class="btn-back" @click="goBackToStep0">
           Voltar
@@ -146,12 +118,14 @@
         <p><strong>Tipo:</strong> {{ form.tipo }}</p>
         <p><strong>Valor:</strong> {{ form.valor }}</p>
         <p><strong>Tipo de Transação:</strong> {{ form.tipoTransacao }}</p>
-        <template v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito' && form.parcelas && form.parcelas > 1">
-          <p><strong>Número de Parcelas:</strong> {{ form.parcelas }}</p>
+        <template
+          v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito' && form.parcelas && form.parcelas > 1"
+        >
+          <p><strong>Parcelas:</strong> {{ form.parcelas }}</p>
           <p><strong>Data da Primeira Parcela:</strong> {{ form.dataPrimeiraParcela }}</p>
         </template>
         <p><strong>Data:</strong> {{ form.data }}</p>
-        <p><strong>Categoria:</strong> {{ form.categoria }}</p>
+        <p><strong>Categoria:</strong> {{ selectedCategoryName || "—" }}</p>
         <p><strong>Descrição:</strong> {{ form.descricao }}</p>
       </div>
       <div class="form-buttons">
@@ -167,18 +141,16 @@
 </template>
 
 <script>
-import { ref, reactive } from "vue";
-
+import { ref, reactive, computed, watch } from "vue";
 export default {
   name: "ExpenseForm",
-  emits: ["add-expense", "close"],
+  emits: ["add-expense", "close", "open-categories"],
   props: {
-    editingExpense: { type: Object, default: null }
+    editingExpense: { type: Object, default: null },
+    categories: { type: Array, default: () => [] }
   },
   setup(props, { emit }) {
-    // currentStep: 0 (Escolha Entrada/Saída), 1 (Formulário), 2 (Revisão Final)
     const currentStep = ref(0);
-
     const form = reactive({
       tipo: "",
       tipoTransacao: "",
@@ -190,8 +162,16 @@ export default {
       descricao: ""
     });
 
-    // Caso esteja editando, poderíamos popular o form, se desejado
-    // mas, como não foi especificado, assumimos que é só para demonstração
+    // Watch: Se o usuário selecionar a opção "adicionar", abre a modal de categorias
+    watch(
+      () => form.categoria,
+      (newVal) => {
+        if (newVal === "adicionar") {
+          emit("open-categories");
+          form.categoria = "";
+        }
+      }
+    );
 
     const selectType = (tipo) => {
       form.tipo = tipo;
@@ -199,15 +179,11 @@ export default {
     };
 
     const nextStep = () => {
-      if (currentStep.value < 2) {
-        currentStep.value++;
-      }
+      if (currentStep.value < 2) currentStep.value++;
     };
 
     const prevStep = () => {
-      if (currentStep.value > 0) {
-        currentStep.value--;
-      }
+      if (currentStep.value > 0) currentStep.value--;
     };
 
     const goBackToStep0 = () => {
@@ -225,7 +201,6 @@ export default {
     };
 
     const handleSubmit = () => {
-      // Se for "saida" + "cartao-credito" + parcelas>1 => gera 1 item com "parcelas"
       if (
         form.tipo === "saida" &&
         form.tipoTransacao === "cartao-credito" &&
@@ -239,11 +214,8 @@ export default {
           parcelas: form.parcelas
         });
       } else {
-        // caso normal
         emit("add-expense", { ...form });
       }
-
-      // Fecha modal e reseta
       emit("close");
       currentStep.value = 0;
       Object.assign(form, {
@@ -258,6 +230,17 @@ export default {
       });
     };
 
+    // Filtra categorias conforme o tipo selecionado (entrada ou saída)
+    const filteredCategories = computed(() => {
+      return props.categories.filter((cat) => cat.type === form.tipo);
+    });
+
+    // Exibe o nome da categoria selecionada
+    const selectedCategoryName = computed(() => {
+      const cat = props.categories.find((c) => c.id === form.categoria);
+      return cat ? cat.name : "";
+    });
+
     return {
       currentStep,
       form,
@@ -265,7 +248,9 @@ export default {
       nextStep,
       prevStep,
       goBackToStep0,
-      handleSubmit
+      handleSubmit,
+      filteredCategories,
+      selectedCategoryName,
     };
   }
 };
@@ -281,7 +266,6 @@ export default {
   --textgray: #aaaaaa;
 }
 
-/* Container do Formulário */
 .expense-form-container {
   background-color: var(--cardbg);
   max-width: 70%;
@@ -295,8 +279,6 @@ export default {
     max-width: 90%;
   }
 }
-
-/* Passo 0: Seleção de "Entrada" ou "Saída" */
 .transaction-type-selection {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -329,8 +311,6 @@ export default {
   background-color: var(--redmain);
   color: #fff;
 }
-
-/* Passos 1 e 2 */
 .form-step {
   margin-bottom: 1.5rem;
 }
@@ -363,8 +343,6 @@ export default {
   border-color: var(--greenmain);
   box-shadow: 0 0 0 2px rgba(62,207,0,0.3);
 }
-
-/* Revisão Final */
 .review-box {
   background-color: var(--mainbg);
   padding: 1rem;
@@ -373,8 +351,6 @@ export default {
   font-size: 0.875rem;
   color: var(--textwhite);
 }
-
-/* Botões */
 .form-buttons {
   display: flex;
   justify-content: space-between;

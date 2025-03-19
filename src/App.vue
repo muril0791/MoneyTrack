@@ -1,9 +1,11 @@
 <template>
   <div class="app-container">
-    <!-- TopBar -->
+    <!-- TopBar com menu de cadastros -->
     <TopBar
       @open-modal="openNewTransaction"
       @open-calendar="showCalendar = true"
+      @open-credit-cards="openCreditCardsModal"
+      @open-categories="openCategoriesModal"
     />
 
     <!-- Conteúdo Principal: Dashboard com duas colunas -->
@@ -11,7 +13,7 @@
       <div class="two-columns">
         <!-- Coluna 1: DashboardLeft -->
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
-        <!-- Coluna 2: Lista simples -->
+        <!-- Coluna 2: Lista Simples -->
         <SimpleTransactionList
           :expenses="expensesPaginated"
           @open-detail="openDetail"
@@ -32,8 +34,10 @@
             </h2>
             <button @click="closeFormModal" class="modal-close">&times;</button>
           </div>
+          <!-- Passamos as categorias para o formulário -->
           <ExpenseForm
             :editingExpense="editingExpense"
+            :categories="categories"
             @add-expense="handleAddExpense"
             @close="closeFormModal"
           />
@@ -67,11 +71,44 @@
         class="modal-overlay"
         @click.self="closeDetailModal"
       >
-        <ExpenseList
-          :expenses="[selectedExpense]"
-          @edit-expense="handleEditExpense"
-          @delete-expense="handleDeleteExpense"
-        />
+        
+          <ExpenseList
+            :expenses="[selectedExpense]"
+            @edit-expense="handleEditExpense"
+            @delete-expense="handleDeleteExpense"
+          />
+        
+      </div>
+    </transition>
+
+    <!-- Modal de Cadastro de Categorias -->
+    <transition name="modal">
+      <div
+        v-if="showCategoriesModal"
+        class="modal-overlay"
+        @click.self="closeCategoriesModal"
+      >
+        <div class="modal-content" @click.stop>
+          <!-- Passamos as categorias e recebemos de volta via update-categories -->
+          <CategoriasScreen
+            :categories="categories"
+            @update-categories="updateCategories"
+            @close="closeCategoriesModal"
+          />
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal de Cadastro de Cartões de Crédito -->
+    <transition name="modal">
+      <div
+        v-if="showCreditCardsModal"
+        class="modal-overlay"
+        @click.self="closeCreditCardsModal"
+      >
+        <div class="modal-content" @click.stop>
+          <CartoesScreen @close="closeCreditCardsModal" />
+        </div>
       </div>
     </transition>
   </div>
@@ -85,6 +122,8 @@ import SimpleTransactionList from "./components/SimpleTransactionList.vue";
 import ExpenseForm from "./components/ExpenseForm.vue";
 import ExpenseCalendar from "./components/ExpenseCalendar.vue";
 import ExpenseList from "./components/ExpenseList.vue";
+import CategoriasScreen from "./components/CategoriasScreen.vue";
+import CartoesScreen from "./components/CartoesScreen.vue";
 
 export default {
   name: "App",
@@ -95,21 +134,46 @@ export default {
     ExpenseForm,
     ExpenseCalendar,
     ExpenseList,
+    CategoriasScreen,
+    CartoesScreen,
   },
   setup() {
+    // Lançamentos
     const expenses = ref([]);
-    const showModal = ref(false);
-    const showCalendar = ref(false);
-    const showDetailModal = ref(false);
-    const editingExpense = ref(null);
-    const selectedExpense = ref(null);
 
-    // Paginação para a lista simples
+    // Categorias globais – iniciando com as categorias padrão
+    const categories = ref([
+      // Categorias de Entrada
+      { id: "salario", name: "Salário", type: "entrada" },
+      { id: "venda", name: "Venda", type: "entrada" },
+      { id: "devolucao", name: "Devolução", type: "entrada" },
+      { id: "emprestimo", name: "Empréstimo", type: "entrada" },
+      { id: "investimentos", name: "Investimentos", type: "entrada" },
+      { id: "premiacoes", name: "Premiações", type: "entrada" },
+      { id: "outros-entrada", name: "Outros", type: "entrada" },
+
+      // Categorias de Saída
+      { id: "lazer", name: "Lazer", type: "saida" },
+      { id: "mercado", name: "Mercado", type: "saida" },
+      { id: "compras", name: "Compras", type: "saida" },
+      { id: "saude", name: "Saúde", type: "saida" },
+      { id: "educacao", name: "Educação", type: "saida" },
+      { id: "transporte", name: "Transporte", type: "saida" },
+      { id: "moradia", name: "Moradia", type: "saida" },
+      { id: "outros-saida", name: "Outros", type: "saida" },
+    ]);
+
+    // Atualiza o array de categorias quando a tela de categorias emite "update-categories"
+    const updateCategories = (newCategories) => {
+      categories.value = newCategories;
+    };
+
+    // Paginação
     const currentPage = ref(1);
     const itemsPerPage = 5;
-    const totalPages = computed(() => {
-      return Math.ceil(expenses.value.length / itemsPerPage);
-    });
+    const totalPages = computed(() =>
+      Math.ceil(expenses.value.length / itemsPerPage)
+    );
     const expensesPaginated = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage;
       return expenses.value.slice(start, start + itemsPerPage);
@@ -118,16 +182,28 @@ export default {
       currentPage.value = page;
     };
 
+    // Estados de modais
+    const showModal = ref(false);
+    const showCalendar = ref(false);
+    const showDetailModal = ref(false);
+    const showCategoriesModal = ref(false);
+    const showCreditCardsModal = ref(false);
+
+    // Edição de lançamentos
+    const editingExpense = ref(null);
+    const selectedExpense = ref(null);
+
+    // Funções de abertura/fechamento
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
     };
-
     const closeFormModal = () => {
       showModal.value = false;
       editingExpense.value = null;
     };
 
+    // Ao confirmar um novo lançamento
     const handleAddExpense = (expense) => {
       if (editingExpense.value) {
         const index = expenses.value.indexOf(editingExpense.value);
@@ -140,37 +216,63 @@ export default {
       closeFormModal();
     };
 
+    // Editar/Excluir
     const handleEditExpense = (expense) => {
       editingExpense.value = expense;
       showModal.value = true;
       closeDetailModal();
     };
-
     const handleDeleteExpense = (expense) => {
       expenses.value = expenses.value.filter((e) => e !== expense);
       closeDetailModal();
     };
 
+    // Detalhes
     const openDetail = (expense) => {
       selectedExpense.value = expense;
       showDetailModal.value = true;
     };
-
     const closeDetailModal = () => {
       showDetailModal.value = false;
       selectedExpense.value = null;
     };
 
+    // Categorias
+    const openCategoriesModal = () => {
+      showCategoriesModal.value = true;
+    };
+    const closeCategoriesModal = () => {
+      showCategoriesModal.value = false;
+    };
+
+    // Cartões
+    const openCreditCardsModal = () => {
+      showCreditCardsModal.value = true;
+    };
+    const closeCreditCardsModal = () => {
+      showCreditCardsModal.value = false;
+    };
+
     return {
       expenses,
+      categories,
+      updateCategories,
+
+      currentPage,
+      itemsPerPage,
+      totalPages,
+      expensesPaginated,
+      changePage,
+
       showModal,
       showCalendar,
       showDetailModal,
+      showCategoriesModal,
+      showCreditCardsModal,
+
       editingExpense,
       selectedExpense,
-      currentPage,
-      totalPages,
-      expensesPaginated,
+
       openNewTransaction,
       closeFormModal,
       handleAddExpense,
@@ -178,7 +280,11 @@ export default {
       handleDeleteExpense,
       openDetail,
       closeDetailModal,
-      changePage,
+
+      openCategoriesModal,
+      closeCategoriesModal,
+      openCreditCardsModal,
+      closeCreditCardsModal,
     };
   },
 };
@@ -229,7 +335,6 @@ export default {
   backdrop-filter: blur(4px);
   z-index: 50;
 }
-
 .modal-content {
   background-color: var(--cardbg);
   border-radius: 0.5rem;
