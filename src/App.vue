@@ -12,7 +12,9 @@
     <!-- Conteúdo Principal: Dashboard com duas colunas -->
     <main class="main-container">
       <div class="two-columns">
+        <!-- Coluna 1: DashboardLeft -->
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
+        <!-- Coluna 2: Lista Simples -->
         <SimpleTransactionList
           :expenses="expensesPaginated"
           @open-detail="openDetail"
@@ -58,24 +60,30 @@
             <h2 class="modal-title">Calendário</h2>
             <button @click="showCalendar = false" class="modal-close">&times;</button>
           </div>
-          <ExpenseCalendar :expenses="expenses" />
+          <!-- Passa também os cartões para o calendário para cálculo dos lançamentos de cartão -->
+          <ExpenseCalendar 
+            :expenses="expenses" 
+            :creditCards="creditCards" 
+            @open-day="openDayModal"
+          />
         </div>
       </div>
     </transition>
 
-    <!-- Modal de Lista Detalhada -->
+    <!-- Modal de Lista Detalhada (ao clicar em um dia no calendário) -->
     <transition name="modal">
       <div
-        v-if="showDetailModal"
+        v-if="showDayModal"
         class="modal-overlay"
-        @click.self="closeDetailModal"
+        @click.self="closeDayModal"
       >
         <div class="modal-content" @click.stop>
           <ExpenseList
-            :expenses="[selectedExpense]"
+            :expenses="selectedDayExpenses"
             @edit-expense="handleEditExpense"
             @delete-expense="handleDeleteExpense"
           />
+          <button class="btn-close" @click="closeDayModal">Fechar</button>
         </div>
       </div>
     </transition>
@@ -163,7 +171,7 @@ export default {
 
     // Categorias globais (padrão + criadas pelo usuário)
     const categories = ref([
-      // Entrada
+      // Categorias de Entrada
       { id: "salario", name: "Salário", type: "entrada" },
       { id: "venda", name: "Venda", type: "entrada" },
       { id: "devolucao", name: "Devolução", type: "entrada" },
@@ -171,7 +179,7 @@ export default {
       { id: "investimentos", name: "Investimentos", type: "entrada" },
       { id: "premiacoes", name: "Premiações", type: "entrada" },
       { id: "outros-entrada", name: "Outros", type: "entrada" },
-      // Saída
+      // Categorias de Saída
       { id: "lazer", name: "Lazer", type: "saida" },
       { id: "mercado", name: "Mercado", type: "saida" },
       { id: "compras", name: "Compras", type: "saida" },
@@ -193,7 +201,7 @@ export default {
       categories.value = newCategories;
     };
 
-    // Paginação para lista simples
+    // Paginação para a lista simples
     const currentPage = ref(1);
     const itemsPerPage = 5;
     const totalPages = computed(() =>
@@ -214,11 +222,26 @@ export default {
     const showCategoriesModal = ref(false);
     const showCreditCardsModal = ref(false);
     const showCreditCardsRegistrationModal = ref(false);
+    const showDayModal = ref(false);
 
     // Edição de lançamentos
     const editingExpense = ref(null);
     const selectedExpense = ref(null);
 
+    // Modal para listagem de lançamentos em um dia específico
+    const selectedDayExpenses = ref([]);
+    const openDayModal = (date) => {
+      selectedDayExpenses.value = expenses.value.filter(
+        (e) => e.data === date
+      );
+      showDayModal.value = true;
+    };
+    const closeDayModal = () => {
+      showDayModal.value = false;
+      selectedDayExpenses.value = [];
+    };
+
+    // Funções de abertura/fechamento de modais
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
@@ -260,7 +283,7 @@ export default {
       selectedExpense.value = null;
     };
 
-    // Modal de categorias
+    // Modal de Categorias
     const openCategoriesModal = () => {
       showCategoriesModal.value = true;
     };
@@ -268,7 +291,7 @@ export default {
       showCategoriesModal.value = false;
     };
 
-    // Modal de cartões
+    // Modal de Cartões
     const openCreditCardsModal = () => {
       showCreditCardsModal.value = true;
     };
@@ -298,6 +321,8 @@ export default {
       showCategoriesModal,
       showCreditCardsModal,
       showCreditCardsRegistrationModal,
+      showDayModal,
+      selectedDayExpenses,
       editingExpense,
       selectedExpense,
       openNewTransaction,
@@ -313,6 +338,8 @@ export default {
       closeCreditCardsModal,
       openCreditCardsRegistrationModal,
       closeCreditCardsRegistrationModal,
+      openDayModal,
+      closeDayModal,
     };
   },
 };

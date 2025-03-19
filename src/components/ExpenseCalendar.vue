@@ -31,6 +31,12 @@
               <div v-if="day.summary.saida" class="summary-saida">
                 -{{ day.summary.saida.toFixed(2) }}
               </div>
+              <div v-if="day.summary.creditLaunch" class="credit-launch">
+                {{ day.summary.creditLaunch.toFixed(2) }}
+              </div>
+              <div v-if="day.summary.creditPayment" class="credit-payment">
+                {{ day.summary.creditPayment.toFixed(2) }}
+              </div>
             </div>
           </td>
         </tr>
@@ -42,18 +48,21 @@
 <script>
 export default {
   name: "ExpenseCalendar",
-  props: { expenses: Array },
+  props: {
+    expenses: Array,
+    creditCards: Array
+  },
   data() {
     return {
       currentDate: new Date(),
-      weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+      weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
     };
   },
   computed: {
     monthYear() {
       return this.currentDate.toLocaleDateString("pt-BR", {
         month: "long",
-        year: "numeric",
+        year: "numeric"
       });
     },
     calendar() {
@@ -66,25 +75,23 @@ export default {
       let weeks = [];
       let week = new Array(7).fill({ date: null, summary: null });
       let dayCounter = 1;
-
-      // Preencher a primeira semana
+      // Preenche a primeira semana
       for (let i = startDay; i < 7; i++) {
         week[i] = {
           date: new Date(year, month, dayCounter),
-          summary: this.getDaySummary(dayCounter),
+          summary: this.getDaySummary(dayCounter)
         };
         dayCounter++;
       }
       weeks.push(week);
-
-      // Preencher as semanas seguintes
+      // Preenche as semanas seguintes
       while (dayCounter <= totalDays) {
         week = [];
         for (let i = 0; i < 7; i++) {
           if (dayCounter <= totalDays) {
             week.push({
               date: new Date(year, month, dayCounter),
-              summary: this.getDaySummary(dayCounter),
+              summary: this.getDaySummary(dayCounter)
             });
             dayCounter++;
           } else {
@@ -94,22 +101,69 @@ export default {
         weeks.push(week);
       }
       return weeks;
-    },
+    }
   },
   methods: {
     getDaySummary(day) {
-      const dateStr = this.formatDate(
-        new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day)
+      const dateObj = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        day
       );
-      const dayExpenses = this.expenses.filter((e) => e.data === dateStr);
+      const dateStr = this.formatDate(dateObj);
+      // Filtra os lançamentos para o dia
+      const dayExpenses = this.expenses.filter(
+        (e) => e.data === dateStr
+      );
       if (!dayExpenses.length) return null;
-      const entrada = dayExpenses
-        .filter((e) => e.tipo === "entrada")
-        .reduce((acc, e) => acc + Number(e.valor), 0);
-      const saida = dayExpenses
-        .filter((e) => e.tipo === "saida")
-        .reduce((acc, e) => acc + Number(e.valor), 0);
-      return { entrada, saida };
+      let entrada = 0,
+        saida = 0,
+        creditLaunch = 0,
+        creditPayment = 0;
+      dayExpenses.forEach((expense) => {
+        if (expense.tipo === "entrada") {
+          entrada += Number(expense.valor);
+        } else if (expense.tipo === "saida") {
+          if (expense.tipoTransacao === "cartao-credito") {
+            // Para lançamentos de cartão, calcule os dois momentos:
+            // 1. O dia de lançamento (expensa.data) -> valor em tom cinza (creditLaunch)
+            // 2. O dia de pagamento (baseado no cartão) -> valor em vermelho (creditPayment)
+            const card = this.creditCards.find(
+              (c) => c.id === expense.creditCardId
+            );
+            if (card) {
+              const expenseDate = new Date(expense.data);
+              let paymentDate = new Date(
+                expenseDate.getFullYear(),
+                expenseDate.getMonth(),
+                card.dueDay
+              );
+              // Se o dia da despesa for maior que o dia de vencimento, o pagamento será no mês seguinte
+              if (expenseDate.getDate() > card.dueDay) {
+                paymentDate = new Date(
+                  expenseDate.getFullYear(),
+                  expenseDate.getMonth() + 1,
+                  card.dueDay
+                );
+              }
+              const paymentDateStr = this.formatDate(paymentDate);
+              // Some no dia de lançamento
+              if (dateStr === this.formatDate(expenseDate)) {
+                creditLaunch += Number(expense.valor);
+              }
+              // Some no dia de pagamento
+              if (dateStr === paymentDateStr) {
+                creditPayment += Number(expense.valor);
+              }
+            } else {
+              saida += Number(expense.valor);
+            }
+          } else {
+            saida += Number(expense.valor);
+          }
+        }
+      });
+      return { entrada, saida, creditLaunch, creditPayment };
     },
     formatDate(date) {
       const yyyy = date.getFullYear();
@@ -127,10 +181,11 @@ export default {
     },
     openDay(day) {
       if (day.date) {
+        // Emite o evento com a data do dia clicado para que o App.vue abra a modal com os lançamentos deste dia
         this.$emit("open-day", this.formatDate(day.date));
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -143,7 +198,6 @@ export default {
   --textwhite: #c2c3c2;
   --textgray: #aaaaaa;
 }
-
 .calendar-container {
   overflow-x: auto;
   padding: 1rem;
@@ -152,8 +206,6 @@ export default {
   color: var(--textwhite);
   font-family: Roboto, sans-serif;
 }
-
-/* Cabeçalho do calendário */
 .calendar-header {
   display: flex;
   justify-content: space-between;
@@ -180,8 +232,6 @@ export default {
 .calendar-nav:hover {
   background-color: var(--greenmain);
 }
-
-/* Tabela do calendário */
 .calendar-table {
   width: 100%;
   border-collapse: collapse;
@@ -225,8 +275,12 @@ export default {
 .summary-saida {
   color: var(--redmain);
 }
-
-/* Responsividade para telas pequenas */
+.credit-launch {
+  color: #ccc; /* Tom de cinza para o lançamento */
+}
+.credit-payment {
+  color: var(--redmain); /* Vermelho para o pagamento */
+}
 @media (max-width: 480px) {
   .calendar-header {
     flex-direction: column;
