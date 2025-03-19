@@ -1,13 +1,23 @@
 <template>
-  <div class="login-container">
-    <h2 class="title">Login</h2>
-    <form @submit.prevent="handleLogin" class="form">
+  <div class="register-container">
+    <h2 class="title">Cadastro de Usuário</h2>
+    <form @submit.prevent="handleRegister" class="form">
+      <div class="form-group">
+        <label for="username">Nome de Usuário</label>
+        <input
+          type="text"
+          id="username"
+          v-model="user.username"
+          placeholder="Digite seu nome de usuário"
+          required
+        />
+      </div>
       <div class="form-group">
         <label for="email">E-mail</label>
         <input
           type="email"
           id="email"
-          v-model="credentials.email"
+          v-model="user.email"
           placeholder="Digite seu e-mail"
           required
         />
@@ -17,20 +27,29 @@
         <input
           type="password"
           id="password"
-          v-model="credentials.password"
+          v-model="user.password"
           placeholder="Digite sua senha"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Senha</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          v-model="user.confirmPassword"
+          placeholder="Confirme sua senha"
           required
         />
       </div>
       <div v-if="error" class="error">{{ error }}</div>
       <div class="form-buttons">
-        <button type="submit" class="btn">Entrar</button>
+        <button type="submit" class="btn">Cadastrar</button>
       </div>
+      <p class="redirect">
+        Já possui conta? <router-link to="/login">Faça login</router-link>
+      </p>
     </form>
-    <p class="redirect">
-      Não possui conta?
-      <router-link to="/register">Cadastre-se</router-link>
-    </p>
   </div>
 </template>
 
@@ -39,45 +58,51 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 export default {
-  name: "Login",
+  name: "Register",
   setup() {
-    const credentials = ref({
+    const router = useRouter();
+    const user = ref({
+      username: "",
       email: "",
-      password: ""
+      password: "",
+      confirmPassword: "",
     });
     const error = ref("");
-    const router = useRouter();
 
-    const handleLogin = () => {
+    const handleRegister = () => {
       error.value = "";
-      // Simulação de login (futuro: substituir por chamada à API)
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const user = users.find(
-        (u) =>
-          u.email === credentials.value.email &&
-          u.password === credentials.value.password
-      );
-      if (!user) {
-        error.value = "E-mail ou senha incorretos!";
+      if (user.value.password !== user.value.confirmPassword) {
+        error.value = "As senhas não conferem!";
         return;
       }
-      // Armazena um token (simulado) para indicar que o usuário está autenticado
-      localStorage.setItem("userToken", "123456");
-      // Redireciona para a Home após login
-      router.push("/");
+      // Simulação de cadastro: armazena os usuários no localStorage
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      if (users.find((u) => u.email === user.value.email)) {
+        error.value = "E-mail já cadastrado!";
+        return;
+      }
+      const newUser = {
+        username: user.value.username,
+        email: user.value.email,
+        password: user.value.password, // Em uma aplicação real, a senha deve ser criptografada
+      };
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+      // Redireciona para a tela de login após o cadastro
+      router.push("/login");
     };
 
     return {
-      credentials,
+      user,
       error,
-      handleLogin
+      handleRegister,
     };
-  }
+  },
 };
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   background-color: var(--cardbg);
   padding: 2rem;
   border-radius: 8px;
