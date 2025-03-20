@@ -18,7 +18,6 @@
           <option disabled value="">Selecione</option>
           <option value="entrada">Entrada</option>
           <option value="saida">Saída</option>
-          <option value="ambos">Ambos</option>
         </select>
       </div>
       <div class="form-buttons">
@@ -30,81 +29,56 @@
         </button>
       </div>
     </form>
+
     <div class="categories-list">
       <h3 class="list-title">Categorias Cadastradas</h3>
       <ul>
-        <li v-for="(cat, index) in paginatedCategories" :key="cat.id" class="list-item">
+        <li v-for="cat in categories" :key="cat.id" class="list-item">
           <span class="item-name">{{ cat.name }} ({{ cat.type }})</span>
           <div class="item-actions">
-            <button class="btn-edit" @click="editCategory(index)">Editar</button>
-            <button class="btn-delete" @click="deleteCategory(index)">Excluir</button>
+            <button class="btn-edit" @click="editCategory(cat)">Editar</button>
+            <button class="btn-delete" @click="deleteCategory(cat.id)">Excluir</button>
           </div>
         </li>
       </ul>
     </div>
-    <!-- Paginação -->
-    <div class="pagination" v-if="totalPages > 1">
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        :class="['page-btn', { active: currentPage === page }]"
-        @click="changePage(page)"
-      >
-        {{ page }}
-      </button>
-    </div>
-    <button class="btn-close" @click="emitClose">Fechar</button>
+
+    <button class="btn-close" @click="$emit('close')">Fechar</button>
   </div>
 </template>
 
 <script>
-import { ref, watch, computed } from "vue";
+import { ref } from "vue";
+import { useMainStore } from "../stores/store";
+import { storeToRefs } from "pinia";
+
 export default {
   name: "CategoriasScreen",
-  emits: ["close", "update-categories"],
-  props: {
-    categories: { type: Array, default: () => [] }
-  },
-  setup(props, { emit }) {
-    // Usamos uma cópia local para permitir edição sem alterar a prop diretamente
-    const localCategories = ref([...props.categories]);
-    // Atualiza a cópia local sempre que a prop mudar
-    watch(
-      () => props.categories,
-      (newVal) => {
-        localCategories.value = [...newVal];
-      }
-    );
-
-    // Formulário de categoria com um campo novo para o tipo
+  emits: ["close"],
+  setup() {
+    const store = useMainStore();
+    const { categories } = storeToRefs(store);
     const categoryForm = ref({ name: "", type: "" });
     const isEditing = ref(false);
-    const editingIndex = ref(null);
+    const editingId = ref(null);
 
-    const handleSubmit = () => {
-      if (isEditing.value && editingIndex.value !== null) {
-        localCategories.value[editingIndex.value] = { ...categoryForm.value, id: localCategories.value[editingIndex.value].id };
+    const handleSubmit = async () => {
+      if (isEditing.value && editingId.value) {
+        await store.updateCategory({ ...categoryForm.value, id: editingId.value });
       } else {
-        // Gera um ID único simples
-        const newId = Date.now().toString();
-        localCategories.value.push({ ...categoryForm.value, id: newId });
+        await store.addCategory({ ...categoryForm.value });
       }
       resetForm();
-      emit("update-categories", localCategories.value);
     };
 
-    const editCategory = (index) => {
-      categoryForm.value = { ...localCategories.value[index] };
+    const editCategory = (cat) => {
       isEditing.value = true;
-      editingIndex.value = index;
+      editingId.value = cat.id;
+      categoryForm.value = { name: cat.name, type: cat.type };
     };
 
-    const deleteCategory = (index) => {
-      localCategories.value.splice(index, 1);
-      if (editingIndex.value === index) {
-        resetForm();
-      }
-      emit("update-categories", localCategories.value);
+    const deleteCategory = async (catId) => {
+      await store.removeCategory(catId);
     };
 
     const cancelEdit = () => {
@@ -112,41 +86,19 @@ export default {
     };
 
     const resetForm = () => {
-      categoryForm.value.name = "";
-      categoryForm.value.type = "";
+      categoryForm.value = { name: "", type: "" };
       isEditing.value = false;
-      editingIndex.value = null;
-    };
-
-    const emitClose = () => {
-      emit("close");
-    };
-
-    // Paginação
-    const currentPage = ref(1);
-    const itemsPerPage = ref(5);
-    const totalPages = computed(() => Math.ceil(localCategories.value.length / itemsPerPage.value));
-    const paginatedCategories = computed(() => {
-      const start = (currentPage.value - 1) * itemsPerPage.value;
-      return localCategories.value.slice(start, start + itemsPerPage.value);
-    });
-    const changePage = (page) => {
-      currentPage.value = page;
+      editingId.value = null;
     };
 
     return {
-      localCategories,
+      categories,
       categoryForm,
       isEditing,
       handleSubmit,
       editCategory,
       deleteCategory,
       cancelEdit,
-      emitClose,
-      currentPage,
-      totalPages,
-      paginatedCategories,
-      changePage
     };
   },
 };

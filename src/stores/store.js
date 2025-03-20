@@ -1,63 +1,134 @@
-// src/store.js
+// src/stores/store.js
 import { defineStore, createPinia } from "pinia";
+import expenseService from "../services/expenseService";
+import categoryService from "../services/categoryService";
+import creditCardService from "../services/creditCardService";
 
 export const useMainStore = defineStore("main", {
   state: () => ({
     expenses: [],
-    categories: [
-      // Categorias de Entrada
-      { id: "salario", name: "Salário", type: "entrada" },
-      { id: "venda", name: "Venda", type: "entrada" },
-      { id: "devolucao", name: "Devolução", type: "entrada" },
-      { id: "emprestimo", name: "Empréstimo", type: "entrada" },
-      { id: "investimentos", name: "Investimentos", type: "entrada" },
-      { id: "premiacoes", name: "Premiações", type: "entrada" },
-      { id: "outros-entrada", name: "Outros", type: "entrada" },
-      // Categorias de Saída
-      { id: "lazer", name: "Lazer", type: "saida" },
-      { id: "mercado", name: "Mercado", type: "saida" },
-      { id: "compras", name: "Compras", type: "saida" },
-      { id: "saude", name: "Saúde", type: "saida" },
-      { id: "educacao", name: "Educação", type: "saida" },
-      { id: "transporte", name: "Transporte", type: "saida" },
-      { id: "moradia", name: "Moradia", type: "saida" },
-      { id: "outros-saida", name: "Outros", type: "saida" },
-    ],
+    categories: [],
     creditCards: [],
   }),
+
   actions: {
-    // Lançamentos
-    addExpense(expense) {
-      this.expenses.push(expense);
-    },
-    updateExpense(updatedExpense) {
-      const index = this.expenses.findIndex((e) => e.id === updatedExpense.id);
-      if (index !== -1) {
-        this.expenses[index] = updatedExpense;
+    // --------------------------
+    // EXPENSES
+    // --------------------------
+    async fetchExpenses() {
+      try {
+        const data = await expenseService.getExpenses();
+        this.expenses = data;
+      } catch (error) {
+        console.error("Erro ao buscar Expenses:", error);
       }
     },
-    removeExpense(expenseId) {
-      this.expenses = this.expenses.filter((e) => e.id !== expenseId);
-    },
-    // Categorias
-    updateCategories(newCategories) {
-      this.categories = newCategories;
-    },
-    // Cartões de Crédito
-    addCreditCard(card) {
-      this.creditCards.push(card);
-    },
-    updateCreditCard(updatedCard) {
-      const index = this.creditCards.findIndex((c) => c.id === updatedCard.id);
-      if (index !== -1) {
-        this.creditCards[index] = updatedCard;
+    async addExpense(expense) {
+      try {
+        const created = await expenseService.addExpense(expense);
+        this.expenses.push(created);
+      } catch (error) {
+        console.error("Erro ao adicionar Expense:", error);
       }
     },
-    removeCreditCard(cardId) {
-      this.creditCards = this.creditCards.filter((c) => c.id !== cardId);
+    async updateExpense(expense) {
+      try {
+        const updated = await expenseService.updateExpense(expense);
+        const index = this.expenses.findIndex((e) => e.id === expense.id);
+        if (index !== -1) {
+          this.expenses[index] = updated;
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar Expense:", error);
+      }
+    },
+    async removeExpense(expenseId) {
+      try {
+        await expenseService.deleteExpense(expenseId);
+        this.expenses = this.expenses.filter((e) => e.id !== expenseId);
+      } catch (error) {
+        console.error("Erro ao remover Expense:", error);
+      }
+    },
+
+    // --------------------------
+    // CATEGORIES
+    // --------------------------
+    async fetchCategories() {
+      try {
+        const data = await categoryService.getCategories();
+        this.categories = data;
+      } catch (error) {
+        console.error("Erro ao buscar Categories:", error);
+      }
+    },
+    async addCategory(category) {
+      try {
+        const created = await categoryService.addCategory(category);
+        this.categories.push(created);
+      } catch (error) {
+        console.error("Erro ao adicionar Category:", error);
+      }
+    },
+    async updateCategory(category) {
+      try {
+        const updated = await categoryService.updateCategory(category);
+        const index = this.categories.findIndex((c) => c.id === category.id);
+        if (index !== -1) {
+          this.categories[index] = updated;
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar Category:", error);
+      }
+    },
+    async removeCategory(categoryId) {
+      try {
+        await categoryService.deleteCategory(categoryId);
+        this.categories = this.categories.filter((c) => c.id !== categoryId);
+      } catch (error) {
+        console.error("Erro ao remover Category:", error);
+      }
+    },
+
+    // --------------------------
+    // CREDIT CARDS
+    // --------------------------
+    async fetchCreditCards() {
+      try {
+        const data = await creditCardService.getCreditCards();
+        this.creditCards = data;
+      } catch (error) {
+        console.error("Erro ao buscar Credit Cards:", error);
+      }
+    },
+    async addCreditCard(card) {
+      try {
+        const created = await creditCardService.addCreditCard(card);
+        this.creditCards.push(created);
+      } catch (error) {
+        console.error("Erro ao adicionar Credit Card:", error);
+      }
+    },
+    async updateCreditCard(card) {
+      try {
+        const updated = await creditCardService.updateCreditCard(card);
+        const index = this.creditCards.findIndex((c) => c.id === card.id);
+        if (index !== -1) {
+          this.creditCards[index] = updated;
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar Credit Card:", error);
+      }
+    },
+    async removeCreditCard(cardId) {
+      try {
+        await creditCardService.deleteCreditCard(cardId);
+        this.creditCards = this.creditCards.filter((c) => c.id !== cardId);
+      } catch (error) {
+        console.error("Erro ao remover Credit Card:", error);
+      }
     },
   },
 });
 
-// Crie o Pinia para ser usado na aplicação
 export const pinia = createPinia();

@@ -1,3 +1,4 @@
+<!-- src/views/Home.vue -->
 <template>
   <div class="app-container">
     <!-- TopBar com menu de cadastros -->
@@ -9,7 +10,6 @@
       @open-credit-cards-list="openCreditCardsModal"
     />
 
-    <!-- Conteúdo Principal: Dashboard com duas colunas -->
     <main class="main-container">
       <div class="two-columns">
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
@@ -33,7 +33,6 @@
             </h2>
             <button @click="closeFormModal" class="modal-close">&times;</button>
           </div>
-          <!-- Enviamos as categorias e os cartões para o formulário -->
           <ExpenseForm
             :editingExpense="editingExpense"
             :categories="categories"
@@ -59,7 +58,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Lista Detalhada (para visualizar lançamentos de um dia) -->
+    <!-- Modal de Lista Detalhada -->
     <transition name="modal">
       <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
         <div class="modal-content" @click.stop>
@@ -76,11 +75,7 @@
     <transition name="modal">
       <div v-if="showCategoriesModal" class="modal-overlay" @click.self="closeCategoriesModal">
         <div class="modal-content" @click.stop>
-          <CategoriasScreen
-            :categories="categories"
-            @update-categories="updateCategories"
-            @close="closeCategoriesModal"
-          />
+          <CategoriasScreen :categories="categories" @close="closeCategoriesModal" />
         </div>
       </div>
     </transition>
@@ -102,10 +97,7 @@
     <transition name="modal">
       <div v-if="showCreditCardsRegistrationModal" class="modal-overlay" @click.self="closeCreditCardsRegistrationModal">
         <div class="modal-content" @click.stop>
-          <CartoesScreen
-            @update-credit-cards="updateCreditCards"
-            @close="closeCreditCardsRegistrationModal"
-          />
+          <CartoesScreen @close="closeCreditCardsRegistrationModal" />
         </div>
       </div>
     </transition>
@@ -113,8 +105,9 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
-import { useMainStore } from "../stores/store"; // Nossa store do Pinia
+import { ref, computed, onMounted } from "vue";
+import { useMainStore } from "../stores/store";
+
 import TopBar from "../components/TopBar.vue";
 import DashboardLeft from "../components/DashboardLeft.vue";
 import SimpleTransactionList from "../components/SimpleTransactionList.vue";
@@ -126,7 +119,7 @@ import CartoesScreen from "../components/CartoesScreen.vue";
 import CreditCardList from "../components/CreditCardList.vue";
 
 export default {
-  name: "App",
+  name: "Home",
   components: {
     TopBar,
     DashboardLeft,
@@ -139,15 +132,18 @@ export default {
     CreditCardList,
   },
   setup() {
-    // Acessa o store global
     const store = useMainStore();
 
-    // Para facilitar, definimos computed properties para acessar os estados do store
+    onMounted(() => {
+      store.fetchExpenses();
+      store.fetchCategories();
+      store.fetchCreditCards();
+    });
+
     const expenses = computed(() => store.expenses);
     const categories = computed(() => store.categories);
     const creditCards = computed(() => store.creditCards);
 
-    // Gerenciamento de modais e edição local (não centralizado no store)
     const showModal = ref(false);
     const showCalendar = ref(false);
     const showDetailModal = ref(false);
@@ -158,21 +154,17 @@ export default {
     const editingExpense = ref(null);
     const selectedExpense = ref(null);
 
-    // Paginação para a lista simples
     const currentPage = ref(1);
     const itemsPerPage = 5;
-    const totalPages = computed(() =>
-      Math.ceil(store.expenses.length / itemsPerPage)
-    );
+    const totalPages = computed(() => Math.ceil(expenses.value.length / itemsPerPage));
     const paginatedExpenses = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage;
-      return store.expenses.slice(start, start + itemsPerPage);
+      return expenses.value.slice(start, start + itemsPerPage);
     });
     const changePage = (page) => {
       currentPage.value = page;
     };
 
-    // Métodos para modais e transações
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
@@ -206,24 +198,18 @@ export default {
       selectedExpense.value = expense;
       showDetailModal.value = true;
     };
-
     const closeDetailModal = () => {
       showDetailModal.value = false;
       selectedExpense.value = null;
     };
 
-    // Para categorias
     const openCategoriesModal = () => {
       showCategoriesModal.value = true;
     };
     const closeCategoriesModal = () => {
       showCategoriesModal.value = false;
     };
-    const updateCategories = (newCategories) => {
-      store.updateCategories(newCategories);
-    };
 
-    // Para cartões de crédito
     const openCreditCardsModal = () => {
       showCreditCardsModal.value = true;
     };
@@ -236,10 +222,6 @@ export default {
     const closeCreditCardsRegistrationModal = () => {
       showCreditCardsRegistrationModal.value = false;
     };
-    const updateCreditCards = (newCards) => {
-      // Aqui substituímos o array inteiro; também poderia ser feita via ação individual
-      store.creditCards = newCards;
-    };
 
     return {
       expenses,
@@ -249,6 +231,7 @@ export default {
       currentPage,
       totalPages,
       changePage,
+
       showModal,
       showCalendar,
       showDetailModal,
@@ -257,6 +240,7 @@ export default {
       showCreditCardsRegistrationModal,
       editingExpense,
       selectedExpense,
+
       openNewTransaction,
       closeFormModal,
       handleAddExpense,
@@ -266,18 +250,17 @@ export default {
       closeDetailModal,
       openCategoriesModal,
       closeCategoriesModal,
-      updateCategories,
       openCreditCardsModal,
       closeCreditCardsModal,
       openCreditCardsRegistrationModal,
       closeCreditCardsRegistrationModal,
-      updateCreditCards,
     };
   },
 };
 </script>
 
 <style>
+/* Estilos gerais e dos modais (copie os seus estilos conforme necessário) */
 :root {
   --cardbg: #161716;
   --mainbg: #0f0e11;
@@ -292,14 +275,12 @@ export default {
   min-height: 100vh;
 }
 
-/* Container Principal */
 .main-container {
   max-width: 96rem;
   margin: 0 auto;
   padding: 1.5rem 1rem;
 }
 
-/* Duas Colunas Responsivas */
 .two-columns {
   display: grid;
   gap: 1.5rem;
@@ -311,7 +292,7 @@ export default {
   }
 }
 
-/* Modal Overlay e Conteúdo */
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -331,8 +312,6 @@ export default {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
   position: relative;
 }
-
-/* Modal Header */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -356,7 +335,7 @@ export default {
   color: var(--textwhite);
 }
 
-/* Transições do Modal */
+/* Transições */
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.3s;

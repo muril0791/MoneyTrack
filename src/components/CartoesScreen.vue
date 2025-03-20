@@ -54,32 +54,38 @@
         </button>
       </div>
     </form>
+
     <div class="cards-list">
       <h3 class="list-title">Cartões Cadastrados</h3>
       <ul>
-        <li v-for="(card, index) in cards" :key="card.id" class="list-item">
+        <li v-for="card in creditCards" :key="card.id" class="list-item">
           <span class="item-name">
             {{ card.name }} - R$ {{ card.limit.toFixed(2) }}<br />
             Fechamento: {{ card.closingDay }} | Vencimento: {{ card.dueDay }}
           </span>
           <div class="item-actions">
-            <button class="btn-edit" @click="editCard(index)">Editar</button>
-            <button class="btn-delete" @click="deleteCard(index)">Excluir</button>
+            <button class="btn-edit" @click="editCard(card)">Editar</button>
+            <button class="btn-delete" @click="deleteCard(card.id)">Excluir</button>
           </div>
         </li>
       </ul>
     </div>
+
     <button class="btn-close" @click="$emit('close')">Fechar</button>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
+import { useMainStore } from "../stores/store";
+import { storeToRefs } from "pinia";
+
 export default {
   name: "CartoesScreen",
-  emits: ["close", "update-credit-cards"],
-  setup(_, { emit }) {
-    const cards = ref([]);
+  emits: ["close"],
+  setup() {
+    const store = useMainStore();
+    const { creditCards } = storeToRefs(store);
     const cardForm = ref({
       name: "",
       limit: 0,
@@ -87,34 +93,25 @@ export default {
       dueDay: null,
     });
     const isEditing = ref(false);
-    const editingIndex = ref(null);
+    const editingId = ref(null);
 
-    const handleSubmit = () => {
-      if (isEditing.value && editingIndex.value !== null) {
-        // Atualiza o cartão mantendo o ID original
-        cards.value[editingIndex.value] = { ...cardForm.value, id: cards.value[editingIndex.value].id };
+    const handleSubmit = async () => {
+      if (isEditing.value && editingId.value) {
+        await store.updateCreditCard({ ...cardForm.value, id: editingId.value });
       } else {
-        // Gera um ID único combinando Date.now() e uma string aleatória
-        const newId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-        cards.value.push({ ...cardForm.value, id: newId });
+        await store.addCreditCard({ ...cardForm.value });
       }
       resetForm();
-      emit("update-credit-cards", cards.value);
     };
 
-    const editCard = (index) => {
-      cardForm.value = { ...cards.value[index] };
+    const editCard = (card) => {
       isEditing.value = true;
-      editingIndex.value = index;
+      editingId.value = card.id;
+      cardForm.value = { ...card };
     };
 
-    const deleteCard = (index) => {
-      cards.value.splice(index, 1);
-      // Se o cartão em edição for excluído, reseta o formulário
-      if (editingIndex.value === index) {
-        resetForm();
-      }
-      emit("update-credit-cards", cards.value);
+    const deleteCard = async (cardId) => {
+      await store.removeCreditCard(cardId);
     };
 
     const cancelEdit = () => {
@@ -124,11 +121,11 @@ export default {
     const resetForm = () => {
       cardForm.value = { name: "", limit: 0, closingDay: null, dueDay: null };
       isEditing.value = false;
-      editingIndex.value = null;
+      editingId.value = null;
     };
 
     return {
-      cards,
+      creditCards,
       cardForm,
       isEditing,
       handleSubmit,
