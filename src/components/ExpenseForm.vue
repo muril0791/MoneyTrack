@@ -23,7 +23,6 @@
         <label class="form-label">Valor</label>
         <input v-model.number="form.valor" type="number" step="0.01" required class="form-input" />
       </div>
-     >
       <div class="form-group">
         <label class="form-label">Tipo de Transação</label>
         <select v-model="form.tipoTransacao" required class="form-input">
