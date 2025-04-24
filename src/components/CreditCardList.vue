@@ -50,10 +50,10 @@ export default {
     const selectedCardId = ref("todos");
 
     const applyFilter = () => {
-      // Apenas reativo – a computada filteredExpenses reagirá à mudança de selectedCardId
+      
     };
 
-    // Filtra os lançamentos que são de cartão de crédito e (se filtrado) pertencem ao cartão selecionado
+   
     const filteredExpenses = computed(() => {
       let filtered = props.expenses.filter(
         (expense) =>
@@ -69,7 +69,7 @@ export default {
       return filtered;
     });
 
-    // Total usado: soma dos valores dos lançamentos filtrados
+    
     const totalUsed = computed(() => {
       return filteredExpenses.value.reduce(
         (acc, expense) => acc + Number(expense.valor),
@@ -77,7 +77,7 @@ export default {
       );
     });
 
-    // Se um cartão específico for selecionado, disponível = card.limit - total usado para esse cartão; se "todos", soma disponível de cada cartão
+    
     const totalAvailable = computed(() => {
       if (selectedCardId.value !== "todos") {
         const card = props.creditCards.find((c) => c.id === selectedCardId.value);
@@ -95,7 +95,7 @@ export default {
       }
     });
 
-    // Total do próximo vencimento (simplificado: igual ao total usado)
+   
     const totalNextDue = computed(() => {
       return totalUsed.value;
     });
@@ -109,12 +109,12 @@ export default {
       });
     };
 
-    // Calcula a data de pagamento com base na data da transação e no dueDay do cartão
+   
     const computePaymentDate = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return "";
       const expenseDate = new Date(expense.data);
-      // Se o dia da transação for maior que o dia de fechamento (não temos fechamento aqui, mas podemos assumir que se for maior que o dueDay, o pagamento será no próximo mês)
+      
       let paymentDate = new Date(expenseDate.getFullYear(), expenseDate.getMonth(), card.dueDay);
       if (expenseDate.getDate() > card.dueDay) {
         paymentDate = new Date(expenseDate.getFullYear(), expenseDate.getMonth() + 1, card.dueDay);
@@ -126,7 +126,7 @@ export default {
       });
     };
 
-    // Calcula o limite disponível do cartão após as despesas (para o cartão do lançamento)
+   
     const computeAvailableLimit = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return 0;

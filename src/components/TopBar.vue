@@ -7,7 +7,7 @@
       <button class="topbar__button" @click="$emit('open-calendar')">
         {{ currentMonth }}
       </button>
-      <!-- Dropdown para Cadastros -->
+     
       <div class="dropdown" tabindex="0" @click="toggleDropdown" @blur="closeDropdown">
         <button class="dropdown-toggle">Cadastros</button>
         <div v-if="dropdownOpen" class="dropdown-menu">
@@ -96,7 +96,7 @@ export default {
   color: #161716;
 }
 
-/* Dropdown Styles */
+
 .dropdown {
   position: relative;
   display: inline-block;

@@ -1,4 +1,4 @@
-// src/services/expenseService.js
+
 import api from "../api";
 
 const expenseService = {
@@ -11,7 +11,7 @@ const expenseService = {
     return response.data;
   },
   async updateExpense(expense) {
-    // expense.id é usado para atualizar
+    
     const response = await api.put(`/expenses/${expense.id}`, expense);
     return response.data;
   },

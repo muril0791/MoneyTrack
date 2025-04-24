@@ -1,4 +1,3 @@
-// src/stores/store.js
 import { defineStore, createPinia } from "pinia";
 import expenseService from "../services/expenseService";
 import categoryService from "../services/categoryService";
@@ -12,9 +11,7 @@ export const useMainStore = defineStore("main", {
   }),
 
   actions: {
-    // --------------------------
-    // EXPENSES
-    // --------------------------
+
     async fetchExpenses() {
       try {
         const data = await expenseService.getExpenses();
@@ -51,9 +48,7 @@ export const useMainStore = defineStore("main", {
       }
     },
 
-    // --------------------------
-    // CATEGORIES
-    // --------------------------
+
     async fetchCategories() {
       try {
         const data = await categoryService.getCategories();
@@ -90,9 +85,7 @@ export const useMainStore = defineStore("main", {
       }
     },
 
-    // --------------------------
-    // CREDIT CARDS
-    // --------------------------
+
     async fetchCreditCards() {
       try {
         const data = await creditCardService.getCreditCards();

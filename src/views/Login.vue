@@ -114,6 +114,7 @@ export default {
   color: #fff;
   cursor: pointer;
   font-size: 1rem;
+  width: 100%;
 }
 .btn:hover {
   background-color: #36b800;

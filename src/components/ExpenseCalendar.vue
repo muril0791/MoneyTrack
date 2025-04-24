@@ -75,7 +75,7 @@ export default {
       let weeks = [];
       let week = new Array(7).fill({ date: null, summary: null });
       let dayCounter = 1;
-      // Preenche a primeira semana
+     
       for (let i = startDay; i < 7; i++) {
         week[i] = {
           date: new Date(year, month, dayCounter),
@@ -84,7 +84,7 @@ export default {
         dayCounter++;
       }
       weeks.push(week);
-      // Preenche as semanas seguintes
+     
       while (dayCounter <= totalDays) {
         week = [];
         for (let i = 0; i < 7; i++) {
@@ -111,7 +111,7 @@ export default {
         day
       );
       const dateStr = this.formatDate(dateObj);
-      // Filtra os lançamentos para o dia
+      
       const dayExpenses = this.expenses.filter(
         (e) => e.data === dateStr
       );
@@ -125,9 +125,7 @@ export default {
           entrada += Number(expense.valor);
         } else if (expense.tipo === "saida") {
           if (expense.tipoTransacao === "cartao-credito") {
-            // Para lançamentos de cartão, calcule os dois momentos:
-            // 1. O dia de lançamento (expensa.data) -> valor em tom cinza (creditLaunch)
-            // 2. O dia de pagamento (baseado no cartão) -> valor em vermelho (creditPayment)
+          
             const card = this.creditCards.find(
               (c) => c.id === expense.creditCardId
             );
@@ -138,7 +136,7 @@ export default {
                 expenseDate.getMonth(),
                 card.dueDay
               );
-              // Se o dia da despesa for maior que o dia de vencimento, o pagamento será no mês seguinte
+             
               if (expenseDate.getDate() > card.dueDay) {
                 paymentDate = new Date(
                   expenseDate.getFullYear(),
@@ -147,11 +145,11 @@ export default {
                 );
               }
               const paymentDateStr = this.formatDate(paymentDate);
-              // Some no dia de lançamento
+             
               if (dateStr === this.formatDate(expenseDate)) {
                 creditLaunch += Number(expense.valor);
               }
-              // Some no dia de pagamento
+            
               if (dateStr === paymentDateStr) {
                 creditPayment += Number(expense.valor);
               }
@@ -181,7 +179,7 @@ export default {
     },
     openDay(day) {
       if (day.date) {
-        // Emite o evento com a data do dia clicado para que o App.vue abra a modal com os lançamentos deste dia
+        
         this.$emit("open-day", this.formatDate(day.date));
       }
     }
@@ -276,10 +274,10 @@ export default {
   color: var(--redmain);
 }
 .credit-launch {
-  color: #ccc; /* Tom de cinza para o lançamento */
+  color: #ccc; 
 }
 .credit-payment {
-  color: var(--redmain); /* Vermelho para o pagamento */
+  color: var(--redmain); 
 }
 @media (max-width: 480px) {
   .calendar-header {

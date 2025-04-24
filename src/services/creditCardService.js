@@ -1,4 +1,3 @@
-// src/services/creditCardService.js
 import api from "../api";
 
 const creditCardService = {

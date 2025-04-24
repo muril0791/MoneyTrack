@@ -1,4 +1,3 @@
-<!-- CartoesScreen.vue -->
 <template>
   <div class="cartoes-screen">
     <h2 class="title">Cadastro de Cartões de Crédito</h2>

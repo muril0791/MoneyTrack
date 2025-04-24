@@ -9,5 +9,4 @@ export default {
 </script>
 
 <style>
-/* Você pode adicionar estilos globais aqui, se necessário */
 </style>

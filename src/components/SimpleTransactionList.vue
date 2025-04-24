@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-    <!-- Paginação -->
+  
     <div class="pagination">
       <button
         v-for="page in totalPages"
@@ -91,7 +91,7 @@ export default {
   },
   computed: {
     paginatedExpenses() {
-      // Aqui, assumimos que o pai já enviou os itens paginados
+      
       return this.expenses;
     }
   }
@@ -198,7 +198,7 @@ export default {
   text-align: right;
 }
 
-/* Paginação */
+
 .pagination {
   display: flex;
   justify-content: center;

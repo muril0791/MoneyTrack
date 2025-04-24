@@ -1,4 +1,4 @@
-// src/router/router.js
+
 import { createRouter, createWebHistory } from "vue-router";
 import * as jwtDecodeImport from "jwt-decode";
 const jwtDecode = jwtDecodeImport.default || jwtDecodeImport;
@@ -7,7 +7,7 @@ import Login from "../views/Login.vue";
 import AppMain from "../views/Home.vue";
 import Register from "../views/Register.vue";
 
-// Função que verifica se o token expirou
+
 function isTokenExpired(token) {
   try {
     const { exp } = jwtDecode(token);

@@ -1,29 +1,29 @@
 <template>
   <div class="expense-form-container">
-    <!-- Passo 0: Seleção de "Entrada" ou "Saída" -->
+  
     <div v-if="currentStep === 0" class="transaction-type-selection">
       <h2 class="modal-title">TRANSAÇÕES</h2>
       <div class="button-group">
         <button class="btn-entrada" @click="selectType('entrada')">
-          <!-- SVG omitido para brevidade -->
+        
           Entrada
         </button>
         <button class="btn-saida" @click="selectType('saida')">
-          <!-- SVG omitido para brevidade -->
+        
           Saída
         </button>
       </div>
     </div>
 
-    <!-- Passo 1: Preenchimento dos dados -->
+   
     <div v-else-if="currentStep === 1" class="form-step">
       <h2 class="form-heading">Preencha os Dados</h2>
-      <!-- Valor -->
+     
       <div class="form-group">
         <label class="form-label">Valor</label>
         <input v-model.number="form.valor" type="number" step="0.01" required class="form-input" />
       </div>
-      <!-- Tipo de Transação -->
+     >
       <div class="form-group">
         <label class="form-label">Tipo de Transação</label>
         <select v-model="form.tipoTransacao" required class="form-input">
@@ -42,7 +42,7 @@
           </template>
         </select>
       </div>
-      <!-- Se for Saída com Cartão de Crédito, mostra select para escolher o cartão, parcelas e data da primeira parcela -->
+     
       <template v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'">
         <div class="form-group">
           <label class="form-label">Cartão de Crédito</label>
@@ -58,12 +58,12 @@
           <input v-model.number="form.parcelas" type="number" min="2" class="form-input" />
         </div>
       </template>
-      <!-- Data -->
+     
       <div class="form-group">
         <label class="form-label">Data</label>
         <input v-model="form.data" type="date" required class="form-input" />
       </div>
-      <!-- Categoria -->
+      
       <div class="form-group">
         <label class="form-label">Categoria</label>
         <select v-model="form.categoria" required class="form-input">
@@ -74,7 +74,7 @@
           <option value="adicionar">[Adicionar categoria]</option>
         </select>
       </div>
-      <!-- Descrição -->
+      
       <div class="form-group">
         <label class="form-label">Descrição</label>
         <input v-model="form.descricao" type="text" class="form-input" placeholder="Opcional" />
@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <!-- Passo 2: Revisão Final -->
+   
     <div v-else-if="currentStep === 2" class="form-step">
       <h2 class="form-heading">Revisão Final</h2>
       <div class="review-box">
@@ -134,7 +134,7 @@ export default {
       creditCardId: ""
     });
 
-    // Se o usuário selecionar "adicionar" em categoria, dispara modal de categorias
+    
     watch(
       () => form.categoria,
       (newVal) => {
@@ -202,7 +202,7 @@ export default {
       });
     };
 
-    // Filtra categorias conforme o tipo selecionado
+    
     const filteredCategories = computed(() => {
       return props.categories.filter((cat) => cat.type === form.tipo);
     });

@@ -1,7 +1,7 @@
-<!-- src/views/Home.vue -->
+
 <template>
   <div class="app-container">
-    <!-- TopBar com menu de cadastros -->
+    
     <TopBar
       @open-modal="openNewTransaction"
       @open-calendar="(showCalendar = true)"
@@ -23,7 +23,7 @@
       </div>
     </main>
 
-    <!-- Modal de Lançamento (Adicionar / Editar) -->
+    
     <transition name="modal">
       <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
         <div class="modal-content" @click.stop>
@@ -45,7 +45,7 @@
       </div>
     </transition>
 
-    <!-- Modal do Calendário -->
+   
     <transition name="modal">
       <div v-if="showCalendar" class="modal-overlay" @click.self="showCalendar = false">
         <div class="modal-content" @click.stop>
@@ -58,7 +58,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Lista Detalhada -->
+    
     <transition name="modal">
       <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
         <div class="modal-content" @click.stop>
@@ -71,7 +71,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Cadastro de Categorias -->
+    
     <transition name="modal">
       <div v-if="showCategoriesModal" class="modal-overlay" @click.self="closeCategoriesModal">
         <div class="modal-content" @click.stop>
@@ -80,7 +80,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Listagem de Cartões de Crédito -->
+   
     <transition name="modal">
       <div v-if="showCreditCardsModal" class="modal-overlay" @click.self="closeCreditCardsModal">
         <div class="modal-content" @click.stop>
@@ -93,7 +93,7 @@
       </div>
     </transition>
 
-    <!-- Modal de Cadastro de Cartões de Crédito -->
+    
     <transition name="modal">
       <div v-if="showCreditCardsRegistrationModal" class="modal-overlay" @click.self="closeCreditCardsRegistrationModal">
         <div class="modal-content" @click.stop>
@@ -260,7 +260,7 @@ export default {
 </script>
 
 <style>
-/* Estilos gerais e dos modais (copie os seus estilos conforme necessário) */
+
 :root {
   --cardbg: #161716;
   --mainbg: #0f0e11;
@@ -292,7 +292,7 @@ export default {
   }
 }
 
-/* Modal Overlay */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -335,7 +335,6 @@ export default {
   color: var(--textwhite);
 }
 
-/* Transições */
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.3s;
