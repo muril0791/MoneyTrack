@@ -1,14 +1,15 @@
 import api from "../api";
 
-const authService = {
-  async register(userData) {
-    const response = await api.post("/auth/register", userData);
-    return response.data;
-  },
-  async login(credentials) {
-    const response = await api.post("/auth/login", credentials);
-    return response.data;
-  },
-};
+async function register({ username, email, password }) {
+  return api.post("/auth/register", { username, email, password });
+}
 
-export default authService;
+async function login({ email, password }) {
+  const response = await api.post("/auth/login", { email, password });
+  return response;
+}
+
+export default {
+  register,
+  login,
+};

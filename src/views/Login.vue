@@ -37,34 +37,28 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import authService from "../services/authService";
 
-export default {
-  name: "Login",
-  setup() {
-    const credentials = ref({ email: "", password: "" });
-    const error = ref("");
-    const router = useRouter();
+const credentials = ref({ email: "", password: "" });
+const error = ref("");
+const router = useRouter();
 
-    const handleLogin = async () => {
-      error.value = "";
-      try {
-        const data = await authService.login(credentials.value);
-        console.log("Token recebido:", data.token);
-        localStorage.setItem("userToken", data.token);
-        router.push("/");
-      } catch (err) {
-        error.value =
-          err.response?.data?.message || "E-mail ou senha incorretos!";
-      }
-    };
-
-    return { credentials, error, handleLogin };
-  },
-};
+async function handleLogin() {
+  error.value = "";
+  try {
+    const response = await authService.login(credentials.value);
+    const token = response.data.token;
+    console.log("Token recebido:", token);
+    localStorage.setItem("userToken", token);
+    router.push({ name: "Home" });
+  } catch (err) {
+    error.value =
+      err.response?.data?.message || "E-mail ou senha incorretos!";
+  }
+}
 </script>
 
 <style scoped>

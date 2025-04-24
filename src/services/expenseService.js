@@ -1,24 +1,25 @@
-
 import api from "../api";
 
-const expenseService = {
-  async getExpenses() {
-    const response = await api.get("/expenses");
-    return response.data;
-  },
-  async addExpense(expense) {
-    const response = await api.post("/expenses", expense);
-    return response.data;
-  },
-  async updateExpense(expense) {
-    
-    const response = await api.put(`/expenses/${expense.id}`, expense);
-    return response.data;
-  },
-  async deleteExpense(expenseId) {
-    const response = await api.delete(`/expenses/${expenseId}`);
-    return response.data;
-  },
-};
+export function getExpenses() {
+  return api.get("/expenses");
+}
 
-export default expenseService;
+export function addExpense(data) {
+  return api.post("/expenses", data);
+}
+
+export function updateExpense(id, data) {
+  return api.put(`/expenses/${id}`, data);
+}
+
+export function deleteExpense(id) {
+  return api.delete(`/expenses/${id}`);
+}
+
+// Default export
+export default {
+  getExpenses,
+  addExpense,
+  updateExpense,
+  deleteExpense,
+};
