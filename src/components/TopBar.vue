@@ -7,15 +7,27 @@
       <button class="topbar__button" @click="$emit('open-calendar')">
         {{ currentMonth }}
       </button>
-     
-      <div class="dropdown" tabindex="0" @click="toggleDropdown" @blur="closeDropdown">
+
+      <div
+        class="dropdown"
+        tabindex="0"
+        @click="toggleDropdown"
+        @blur="closeDropdown"
+      >
         <button class="dropdown-toggle">Cadastros</button>
         <div v-if="dropdownOpen" class="dropdown-menu">
-          <button class="dropdown-item" @click="openCreditCards">Cartões de Crédito</button>
-          <button class="dropdown-item" @click="openCategories">Categorias</button>
-          <button class="dropdown-item" @click="openCreditCardsList">Lista de Cartões de Crédito</button>
+          <button class="dropdown-item" @click="openCreditCards">
+            Cartões de Crédito
+          </button>
+          <button class="dropdown-item" @click="openCategories">
+            Categorias
+          </button>
+          <button class="dropdown-item" @click="openCreditCardsList">
+            Lista de Cartões
+          </button>
         </div>
       </div>
+      <button class="topbar__logout" @click="logout">Logout</button>
     </div>
   </header>
 </template>
@@ -23,7 +35,12 @@
 <script>
 export default {
   name: "TopBar",
-  emits: ["open-calendar", "open-credit-cards", "open-categories","open-credit-cards-list"],
+  emits: [
+    "open-calendar",
+    "open-credit-cards",
+    "open-categories",
+    "open-credit-cards-list",
+  ],
   data() {
     return {
       dropdownOpen: false,
@@ -46,12 +63,16 @@ export default {
       this.closeDropdown();
     },
     openCreditCardsList() {
-      this.$emit("open-credit-cards-list")
+      this.$emit("open-credit-cards-list");
       this.closeDropdown();
     },
     openCategories() {
       this.$emit("open-categories");
       this.closeDropdown();
+    },
+    logout() {
+      localStorage.removeItem("userToken");
+      this.$router.push({ name: "Login" });
     },
   },
 };
@@ -65,42 +86,49 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
+
 .topbar__left {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
+
 .topbar__title {
   font-size: 1.5rem;
   font-weight: bold;
   color: #3ecf00;
   margin: 0;
 }
+
 .topbar__right {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
-.topbar__button {
-  margin-right: 1rem;
+
+.topbar__button,
+.topbar__logout {
   padding: 0.5rem 1rem;
   background-color: #161716;
   color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
   border: 1px solid #3ecf00;
   border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
 }
-.topbar__button:hover {
+
+.topbar__button:hover,
+.topbar__logout:hover {
   background-color: #3ecf00;
   color: #161716;
 }
-
 
 .dropdown {
   position: relative;
   display: inline-block;
 }
+
 .dropdown-toggle {
   padding: 0.5rem 1rem;
   background-color: #161716;
@@ -109,6 +137,11 @@ export default {
   border-radius: 4px;
   cursor: pointer;
 }
+.dropdown-toggle:hover {
+  background-color: #3ecf00;
+  color: #161716;
+}
+
 .dropdown-menu {
   position: absolute;
   right: 0;
@@ -119,6 +152,7 @@ export default {
   min-width: 150px;
   z-index: 10;
 }
+
 .dropdown-item {
   width: 100%;
   padding: 0.5rem;
@@ -129,6 +163,7 @@ export default {
   cursor: pointer;
   transition: background-color 0.2s;
 }
+
 .dropdown-item:hover {
   background-color: #3ecf00;
   color: #161716;
