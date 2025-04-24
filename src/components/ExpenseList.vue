@@ -1,11 +1,11 @@
 <template>
   <div class="transactions-container">
-    <!-- Cabeçalho da lista -->
+    
     <header class="transactions-header">
       <h2 class="transactions-title">Transações</h2>
     </header>
 
-    <!-- Tabela Responsiva -->
+    
     <div class="table-wrapper">
       <table class="transactions-table">
         <thead>
@@ -118,20 +118,19 @@ export default {
 </script>
 
 <style scoped>
-/* Variáveis de cor e tipografia */
+
 :root {
-  --bg-dark: #0f0e11;        /* Fundo geral (mobile) */
-  --card-dark: #161716;      /* Fundo dos cards */
-  --bg-header: #1e1f23;      /* Fundo do cabeçalho da tabela */
-  --border-color: #2b2c2f;   /* Cor de borda sutil */
-  --green: #3ecf00;          /* Verde para entradas */
-  --red: #e93030;            /* Vermelho para saídas */
+  --bg-dark: #0f0e11;        
+  --bg-header: #1e1f23;      
+  --border-color: #2b2c2f;   
+  --green: #3ecf00;          
+  --red: #e93030;            
   --text-white: #c2c3c2;
   --text-gray: #aaaaaa;
   --font-main: "Roboto", sans-serif;
 }
 
-/* Container Principal */
+
 .transactions-container {
   background-color: #161716;
   padding: 1rem;
@@ -143,7 +142,7 @@ export default {
   margin: 0 auto;
 }
 
-/* Cabeçalho */
+
 .transactions-header {
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 1rem;
@@ -155,7 +154,6 @@ export default {
   margin: 0;
 }
 
-/* Tabela Responsiva */
 .table-wrapper {
   overflow-x: auto;
   border-radius: 6px;
@@ -193,7 +191,7 @@ export default {
   text-transform: capitalize;
 }
 
-/* Tags para Tipo */
+
 .tag-entrada {
   color: var(--green);
   font-weight: bold;
@@ -203,7 +201,7 @@ export default {
   font-weight: bold;
 }
 
-/* Status */
+
 .status-positive {
   background-color: rgba(62, 207, 0, 0.2);
   color: var(--green);
@@ -221,7 +219,7 @@ export default {
   font-weight: bold;
 }
 
-/* Ações */
+
 .actions-cell {
   white-space: nowrap;
 }
@@ -251,7 +249,7 @@ export default {
   color: #d32f2f;
 }
 
-/* Responsividade para Mobile: transforma a tabela em um layout vertical */
+
 @media (max-width: 600px) {
   .transactions-table,
   .transactions-table thead,
@@ -286,7 +284,7 @@ export default {
     text-align: left;
     color: var(--text-gray);
   }
-  /* Ajusta a célula de ações para centralizar os botões */
+  
   .actions-cell {
     text-align: center;
   }

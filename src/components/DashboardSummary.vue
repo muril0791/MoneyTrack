@@ -1,13 +1,13 @@
 <template>
   <div class="dashboard-summary">
-    <!-- Cabeçalho com botão de Novo Lançamento -->
+    
     <div class="summary-header">
       <button class="new-transaction-btn" @click="$emit('open-modal')">
         Novo Lançamento
       </button>
     </div>
 
-    <!-- Totais: Saldo e Despesas -->
+   
     <div class="totals-container">
       <div class="total-box">
         <h3 class="total-title">Saldo</h3>
@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <!-- Seções: Gráfico e Lista de Transações -->
+    
     <div class="charts-transactions">
       <div class="chart-container">
         <h3 class="section-title">Gastos por categoria</h3>
@@ -72,7 +72,7 @@ export default {
   --textgray: #aaaaaa;
 }
 
-/* Container principal do DashboardSummary */
+
 .dashboard-summary {
   background-color: var(--mainbg);
   padding: 1rem;
@@ -81,7 +81,7 @@ export default {
   font-family: Roboto, sans-serif;
 }
 
-/* Cabeçalho com botão de Novo Lançamento */
+
 .summary-header {
   display: flex;
   justify-content: flex-end;
@@ -102,7 +102,7 @@ export default {
   background-color: #36b800;
 }
 
-/* Totais (Saldo e Despesas) */
+
 .totals-container {
   display: flex;
   flex-wrap: wrap;
@@ -132,7 +132,7 @@ export default {
   color: var(--textwhite);
 }
 
-/* Seções de Gráfico e Lista de Transações */
+
 .charts-transactions {
   display: grid;
   gap: 1.5rem;
@@ -144,7 +144,7 @@ export default {
   }
 }
 
-/* Bloco do Gráfico */
+
 .chart-container,
 .list-container {
   background-color: var(--cardbg);

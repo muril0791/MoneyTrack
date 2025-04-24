@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-left">
-    <!-- Retângulo Horizontal: Saldo e Botão Adicionar -->
+   
     <div class="saldo-box">
       <div class="saldo-info">
         <h3>Saldo</h3>
@@ -9,9 +9,9 @@
       <button @click="$emit('open-add')">Adicionar Transação</button>
     </div>
 
-    <!-- Container flexível para Gráfico/Percentuais e Totais/Top Categorias -->
+    
     <div class="vertical-container">
-      <!-- Bloco 1: Gráfico e Percentuais -->
+     
       <div class="vertical-box vertical-box-1">
         <h3>Gastos por Categoria</h3>
         <ExpensePieChart :expenses="expenses" />
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <!-- Bloco 2: Totais e Top 5 Categorias -->
+      
       <div class="vertical-box vertical-box-2">
         <div class="totals">
           <div class="total-box">
@@ -97,7 +97,7 @@ export default {
       return total ? ((this.totalSaidas / total) * 100).toFixed(0) : 0;
     },
     percentInvestimentos() {
-      // Ajuste se tiver lógica real de investimentos
+      
       return 0;
     },
     top5Categories() {
@@ -130,7 +130,7 @@ export default {
   --textgray: #aaaaaa;
 }
 
-/* Container principal do componente */
+
 .dashboard-left {
   display: flex;
   flex-direction: column;
@@ -138,7 +138,7 @@ export default {
   font-family: 'Quicksand'
 }
 
-/* Box de Saldo e Botão */
+
 .saldo-box {
   background-color: var(--cardbg);
   padding: 1rem;
@@ -146,7 +146,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Permite quebra em telas menores */
+  flex-wrap: wrap;
   gap: 1rem;
   
 }
@@ -173,41 +173,41 @@ export default {
   background-color: #36b800;
 }
 
-/* Container que agrupa o gráfico e o outro bloco */
+
 .vertical-container {
   display: flex;
   gap: 1.5rem;
-  flex-wrap: wrap; /* permite quebrar em telas menores */
+  flex-wrap: wrap; 
   justify-content: space-between;
 }
 
-/* Cada bloco interno (Gráfico/Percentuais, Totais/Categorias) */
+
 .vertical-box {
   background-color: var(--cardbg);
   padding: 1rem;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  width: 48%; /* 2 colunas ~ 50% cada em telas maiores */
+  width: 48%; 
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-/* Em telas menores (<= 768px), cada box ocupa 100% */
+
 @media (max-width: 768px) {
   .vertical-box {
     width: 100%;
   }
 }
 
-/* Título do box */
+
 .vertical-box h3 {
   color: var(--textwhite);
   font-size: 1.125rem;
   margin: 0;
 }
 
-/* Percentuais abaixo do gráfico */
+
 .percentages {
   display: flex;
   justify-content: space-around;
@@ -224,7 +224,7 @@ export default {
   color: var(--textwhite);
 }
 
-/* Totais (Entradas, Saídas) */
+
 .totals {
   display: flex;
   gap: 1rem;
@@ -248,7 +248,7 @@ export default {
   margin: 0;
 }
 
-/* Top Categorias */
+
 .top-categories .top-title {
   font-size: 0.875rem;
   font-weight: bold;
@@ -279,7 +279,7 @@ export default {
   border-radius: 4px;
 }
 
-/* Ajuste do Canvas do gráfico (se necessário) */
+
 .vertical-box canvas {
   max-width: 100%;
   height: auto;

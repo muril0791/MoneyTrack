@@ -10,6 +10,8 @@
           v-model="credentials.email"
           placeholder="Digite seu e-mail"
           required
+          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+          v-trim
         />
       </div>
       <div class="form-group">
@@ -20,6 +22,8 @@
           v-model="credentials.password"
           placeholder="Digite sua senha"
           required
+          minlength="6"
+          v-trim
         />
       </div>
       <div v-if="error" class="error">{{ error }}</div>
@@ -28,8 +32,7 @@
       </div>
     </form>
     <p class="redirect">
-      Não possui conta?
-      <router-link to="/register">Cadastre-se</router-link>
+      Não possui conta? <router-link to="/register">Cadastre-se</router-link>
     </p>
   </div>
 </template>
@@ -37,42 +40,30 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import authService from "../services/authService";
 
 export default {
   name: "Login",
   setup() {
-    const credentials = ref({
-      email: "",
-      password: ""
-    });
+    const credentials = ref({ email: "", password: "" });
     const error = ref("");
     const router = useRouter();
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       error.value = "";
-      // Simulação de login (futuro: substituir por chamada à API)
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const user = users.find(
-        (u) =>
-          u.email === credentials.value.email &&
-          u.password === credentials.value.password
-      );
-      if (!user) {
-        error.value = "E-mail ou senha incorretos!";
-        return;
+      try {
+        const data = await authService.login(credentials.value);
+        console.log("Token recebido:", data.token);
+        localStorage.setItem("userToken", data.token);
+        router.push("/");
+      } catch (err) {
+        error.value =
+          err.response?.data?.message || "E-mail ou senha incorretos!";
       }
-      // Armazena um token (simulado) para indicar que o usuário está autenticado
-      localStorage.setItem("userToken", "123456");
-      // Redireciona para a Home após login
-      router.push("/");
     };
 
-    return {
-      credentials,
-      error,
-      handleLogin
-    };
-  }
+    return { credentials, error, handleLogin };
+  },
 };
 </script>
 
@@ -82,6 +73,7 @@ export default {
   padding: 2rem;
   border-radius: 8px;
   max-width: 400px;
+  height: 100%;
   margin: 2rem auto;
   color: var(--textwhite);
 }
@@ -122,6 +114,7 @@ export default {
   color: #fff;
   cursor: pointer;
   font-size: 1rem;
+  width: 100%;
 }
 .btn:hover {
   background-color: #36b800;

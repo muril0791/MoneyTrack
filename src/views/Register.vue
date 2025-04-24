@@ -10,6 +10,7 @@
           v-model="user.username"
           placeholder="Digite seu nome de usuário"
           required
+          v-trim
         />
       </div>
       <div class="form-group">
@@ -20,6 +21,8 @@
           v-model="user.email"
           placeholder="Digite seu e-mail"
           required
+          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+          v-trim
         />
       </div>
       <div class="form-group">
@@ -30,6 +33,8 @@
           v-model="user.password"
           placeholder="Digite sua senha"
           required
+          minlength="6"
+          v-trim
         />
       </div>
       <div class="form-group">
@@ -40,6 +45,8 @@
           v-model="user.confirmPassword"
           placeholder="Confirme sua senha"
           required
+          minlength="6"
+          v-trim
         />
       </div>
       <div v-if="error" class="error">{{ error }}</div>
@@ -56,6 +63,7 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import authService from "../services/authService";
 
 export default {
   name: "Register",
@@ -69,34 +77,21 @@ export default {
     });
     const error = ref("");
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
       error.value = "";
       if (user.value.password !== user.value.confirmPassword) {
         error.value = "As senhas não conferem!";
         return;
       }
-      // Simulação de cadastro: armazena os usuários no localStorage
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      if (users.find((u) => u.email === user.value.email)) {
-        error.value = "E-mail já cadastrado!";
-        return;
+      try {
+        await authService.register(user.value);
+        router.push("/login");
+      } catch (err) {
+        error.value = err.response?.data?.message || "Erro no cadastro.";
       }
-      const newUser = {
-        username: user.value.username,
-        email: user.value.email,
-        password: user.value.password, // Em uma aplicação real, a senha deve ser criptografada
-      };
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-      // Redireciona para a tela de login após o cadastro
-      router.push("/login");
     };
 
-    return {
-      user,
-      error,
-      handleRegister,
-    };
+    return { user, error, handleRegister };
   },
 };
 </script>

@@ -33,7 +33,7 @@ export default {
           datasets: [
             {
               data: [1],
-              backgroundColor: ["#555555"], // Cor neutra para valores zerados
+              backgroundColor: ["#555555"],
               borderWidth: 0,
             },
           ],
@@ -94,7 +94,7 @@ export default {
 <style scoped>
 .chart-container {
   width: 100%;
-  max-width: 500px; /* Largura máxima para desktops, ajuste conforme necessário */
+  max-width: 500px; 
   margin: 0 auto;
   padding: 1rem;
 }
@@ -104,7 +104,7 @@ export default {
   height: auto !important;
 }
 
-/* Ajustes responsivos para telas menores */
+
 @media (max-width: 480px) {
   .chart-container {
     max-width: 90%;

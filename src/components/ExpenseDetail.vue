@@ -30,7 +30,7 @@ export default {
   --textwhite: #c2c3c2;
 }
 
-/* Overlay cobrindo toda a tela */
+
 .expense-detail-overlay {
   position: fixed;
   top: 0;
@@ -45,7 +45,7 @@ export default {
   z-index: 1000;
 }
 
-/* Container do Modal */
+
 .expense-detail-container {
   background-color: var(--cardbg);
   padding: 1.5rem;
@@ -56,14 +56,14 @@ export default {
   color: var(--textwhite);
 }
 
-/* Título do Modal */
+
 .expense-detail-title {
   font-size: 1.25rem;
   font-weight: bold;
   margin-bottom: 1rem;
 }
 
-/* Botão Fechar */
+
 .expense-detail-close-btn {
   margin-top: 1rem;
   background-color: var(--redmain);
