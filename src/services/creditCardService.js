@@ -1,25 +1,55 @@
-import api from "../api";
+import { supabase } from '@/lib/supabase'
 
-export function getCreditCards() {
-  return api.get("/credit-cards");
+export async function listCreditCards() {
+  const { data, error } = await supabase.from('credit_cards').select('*').order('created_at', { ascending: false })
+  if (error) throw error
+  return data.map(mapCard)
 }
 
-export function addCreditCard(data) {
-  return api.post("/credit-cards", data);
+export async function createCreditCard({ name, limit, closingDay, dueDay }) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('not-auth')
+
+  const { data, error } = await supabase
+    .from('credit_cards')
+    .insert({
+      user_id: user.id,
+      name,
+      limit,
+      closing_day: closingDay,
+      due_day: dueDay,
+    })
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return mapCard(data)
 }
 
-export function updateCreditCard(id, data) {
-  return api.put(`/credit-cards/${id}`, data);
+export async function updateCreditCard(id, { name, limit, closingDay, dueDay }) {
+  const { data, error } = await supabase
+    .from('credit_cards')
+    .update({ name, limit, closing_day: closingDay, due_day: dueDay })
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return mapCard(data)
 }
 
-export function deleteCreditCard(id) {
-  return api.delete(`/credit-cards/${id}`);
+export async function removeCreditCard(id) {
+  const { error } = await supabase.from('credit_cards').delete().eq('id', id)
+  if (error) throw error
 }
 
-// Default export
-export default {
-  getCreditCards,
-  addCreditCard,
-  updateCreditCard,
-  deleteCreditCard,
-};
+function mapCard(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    limit: Number(row.limit),
+    closingDay: row.closing_day,
+    dueDay: row.due_day,
+    created_at: row.created_at,
+  }
+}

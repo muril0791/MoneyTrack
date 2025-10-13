@@ -1,25 +1,38 @@
-import api from "../api";
+import { supabase } from '@/lib/supabase'
 
-export function getCategories() {
-  return api.get("/categories");
+export async function listCategories() {
+  const { data, error } = await supabase.from('categories').select('*').order('created_at', { ascending: false })
+  if (error) throw error
+  return data
 }
 
-export function addCategory(data) {
-  return api.post("/categories", data);
+export async function createCategory({ name, type }) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('not-auth')
+
+  const { data, error } = await supabase
+    .from('categories')
+    .insert({ user_id: user.id, name, type })
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return data
 }
 
-export function updateCategory(id, data) {
-  return api.put(`/categories/${id}`, data);
+export async function updateCategory(id, { name, type }) {
+  const { data, error } = await supabase
+    .from('categories')
+    .update({ name, type })
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return data
 }
 
-export function deleteCategory(id) {
-  return api.delete(`/categories/${id}`);
+export async function removeCategory(id) {
+  const { error } = await supabase.from('categories').delete().eq('id', id)
+  if (error) throw error
 }
-
-
-export default {
-  getCategories,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-};

@@ -61,33 +61,34 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import authService from "../services/authService";
+import { ref } from "vue"
+import { useRouter } from "vue-router"
+import authService from "../services/authService"
 
-const router = useRouter();
-const user = ref({
-  username: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-});
-const error = ref("");
+const router = useRouter()
+const user = ref({ username:"", email:"", password:"", confirmPassword:"" })
+const error = ref("")
 
 async function handleRegister() {
-  error.value = "";
+  error.value = ""
   if (user.value.password !== user.value.confirmPassword) {
-    error.value = "As senhas não conferem!";
-    return;
+    error.value = "As senhas não conferem!"
+    return
   }
   try {
-    await authService.register(user.value);
-    router.push({ name: "Login" });
+    await authService.signUp({
+      email: user.value.email,
+      password: user.value.password,
+      username: user.value.username,
+    })
+    router.push({ name: "Login" })
   } catch (err) {
-    error.value = err.response?.data?.message || "Erro no cadastro.";
+    error.value = err?.message || "Erro no cadastro."
   }
 }
 </script>
+
+
 
 <style scoped>
 .register-container {

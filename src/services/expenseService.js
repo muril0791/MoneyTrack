@@ -1,25 +1,75 @@
-import api from "../api";
+import { supabase } from '@/lib/supabase'
 
-export function getExpenses() {
-  return api.get("/expenses");
+export async function listExpenses() {
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data.map(mapExpense)
 }
 
-export function addExpense(data) {
-  return api.post("/expenses", data);
+export async function createExpense(payload) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('not-auth')
+
+  const { data, error } = await supabase
+    .from('expenses')
+    .insert({
+      user_id: user.id,
+      tipo: payload.tipo,
+      tipo_transacao: payload.tipoTransacao,
+      parcelas: payload.parcelas ?? null,
+      data: payload.data,
+      valor: payload.valor,
+      categoria: payload.categoria,
+      descricao: payload.descricao || null,
+      credit_card_id: payload.creditCardId || null,
+    })
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return mapExpense(data)
 }
 
-export function updateExpense(id, data) {
-  return api.put(`/expenses/${id}`, data);
+export async function updateExpense(id, payload) {
+  const { data, error } = await supabase
+    .from('expenses')
+    .update({
+      tipo: payload.tipo,
+      tipo_transacao: payload.tipoTransacao,
+      parcelas: payload.parcelas ?? null,
+      data: payload.data,
+      valor: payload.valor,
+      categoria: payload.categoria,
+      descricao: payload.descricao || null,
+      credit_card_id: payload.creditCardId || null,
+    })
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return mapExpense(data)
 }
 
-export function deleteExpense(id) {
-  return api.delete(`/expenses/${id}`);
+export async function removeExpense(id) {
+  const { error } = await supabase.from('expenses').delete().eq('id', id)
+  if (error) throw error
 }
 
-// Default export
-export default {
-  getExpenses,
-  addExpense,
-  updateExpense,
-  deleteExpense,
-};
+function mapExpense(row) {
+  return {
+    id: row.id,
+    tipo: row.tipo,
+    tipoTransacao: row.tipo_transacao,
+    parcelas: row.parcelas,
+    data: row.data,
+    valor: Number(row.valor),
+    categoria: row.categoria,
+    descricao: row.descricao || '',
+    creditCardId: row.credit_card_id,
+    created_at: row.created_at,
+  }
+}
