@@ -32,7 +32,7 @@
     <div class="mt-3 flex items-baseline gap-2">
       <span class="text-neutral-400 text-[1.05rem] font-medium">R$</span>
       <span
-        class="text-[4rem] sm:text-[4rem] leading-none font-semibold tracking-tight text-neutral-100"
+        class="text-[3.5rem] sm:text-[3.5rem] leading-none font-semibold tracking-tight text-neutral-100"
       >
         {{ formatCurrency(balance) }}
       </span>

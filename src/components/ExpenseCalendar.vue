@@ -1,11 +1,40 @@
 <template>
-  <div class="calendar-container">
-    <div class="calendar-header">
-      <button @click="prevMonth" class="calendar-nav">&lt;</button>
-      <h2 class="calendar-title">{{ monthYear }}</h2>
-      <button @click="nextMonth" class="calendar-nav">&gt;</button>
+  <div
+    class="text-[#c2c3c2] p-4"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-[15px] font-semibold">Calendario</h3>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          @click="prevMonth"
+          class="h-8 w-8 inline-flex items-center justify-center rounded-lg bg-[#232323] ring-1 ring-[#2a2a2a] hover:bg-[#2a2a2a] transition"
+          aria-label="Mês anterior"
+        >
+          ‹
+        </button>
+
+        <div class="min-w-[88px]">
+          <span class="text-emerald-400 font-semibold capitalize text-center">
+            {{ monthName }}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          @click="nextMonth"
+          class="h-8 w-8 inline-flex items-center justify-center rounded-lg bg-[#232323] ring-1 ring-[#2a2a2a] hover:bg-[#2a2a2a] transition"
+          aria-label="Próximo mês"
+        >
+          ›
+        </button>
+      </div>
     </div>
-    <table class="calendar-table">
+
+    <!-- Week header -->
+    <table class="w-full calendar-table select-none">
       <thead>
         <tr>
           <th v-for="day in weekDays" :key="day" class="calendar-th">
@@ -13,46 +42,122 @@
           </th>
         </tr>
       </thead>
+
+      <!-- Days -->
       <tbody>
         <tr v-for="(week, wIndex) in calendar" :key="wIndex">
           <td
             v-for="(day, dIndex) in week"
             :key="dIndex"
-            class="calendar-cell"
+            class="calendar-td"
+            :class="{
+              'opacity-60': !day.date,
+              'cursor-pointer hover:bg-white/5': !!day.date
+            }"
             @click="openDay(day)"
           >
-            <div v-if="day.date" class="calendar-day">
-              {{ day.date.getDate() }}
-            </div>
-            <div v-if="day.summary" class="calendar-summary">
-              <div v-if="day.summary.entrada" class="summary-entrada">
-                +{{ day.summary.entrada.toFixed(2) }}
+            <div v-if="day.date" class="flex flex-col items-center gap-1">
+              <div class="calendar-day">
+                {{ day.date.getDate() }}
               </div>
-              <div v-if="day.summary.saida" class="summary-saida">
-                -{{ day.summary.saida.toFixed(2) }}
-              </div>
-              <div v-if="day.summary.creditLaunch" class="credit-launch">
-                {{ day.summary.creditLaunch.toFixed(2) }}
-              </div>
-              <div v-if="day.summary.creditPayment" class="credit-payment">
-                {{ day.summary.creditPayment.toFixed(2) }}
+
+              <div v-if="day.summary" class="calendar-summary">
+                <div
+                  v-if="day.summary.entrada"
+                  class="summary-entrada"
+                  title="Entradas"
+                >
+                  +{{ day.summary.entrada.toFixed(2) }}
+                </div>
+                <div
+                  v-if="day.summary.saida"
+                  class="summary-saida"
+                  title="Saídas"
+                >
+                  -{{ day.summary.saida.toFixed(2) }}
+                </div>
+                <div
+                  v-if="day.summary.creditLaunch"
+                  class="credit-launch"
+                  title="Compra no cartão"
+                >
+                  {{ day.summary.creditLaunch.toFixed(2) }}
+                </div>
+                <div
+                  v-if="day.summary.creditPayment"
+                  class="credit-payment"
+                  title="Pagamento de fatura / parcela"
+                >
+                  {{ day.summary.creditPayment.toFixed(2) }}
+                </div>
               </div>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <!-- Segmented control (decorativo, mantendo compatibilidade) -->
+    <div
+      class="mt-3 bg-[#232323] rounded-full p-1 flex items-center justify-between"
+      role="tablist"
+      aria-label="Modo de visualização"
+    >
+      <button
+        type="button"
+        role="tab"
+        @click="mode = 'year'"
+        :aria-selected="mode==='year'"
+        class="px-4 py-1.5 rounded-full text-sm transition"
+        :class="
+          mode==='year'
+            ? 'bg-emerald-500 text-[#0f0f0f]'
+            : 'text-[#e5e5e5] hover:bg-white/5'
+        "
+      >
+        Ano
+      </button>
+      <button
+        type="button"
+        role="tab"
+        @click="mode = 'month'"
+        :aria-selected="mode==='month'"
+        class="px-4 py-1.5 rounded-full text-sm transition"
+        :class="
+          mode==='month'
+            ? 'bg-emerald-500 text-[#0f0f0f]'
+            : 'text-[#e5e5e5] hover:bg-white/5'
+        "
+      >
+        Mês
+      </button>
+      <button
+        type="button"
+        role="tab"
+        @click="mode = 'week'"
+        :aria-selected="mode==='week'"
+        class="px-4 py-1.5 rounded-full text-sm transition"
+        :class="
+          mode==='week'
+            ? 'bg-emerald-500 text-[#0f0f0f]'
+            : 'text-[#e5e5e5] hover:bg-white/5'
+        "
+      >
+        Semana
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: "ExpenseCalendar",
-  props: { expenses:Array, creditCards:Array, compact:{type:Boolean, default:false} },
+  props: { expenses: Array, creditCards: Array, compact: { type: Boolean, default: false } },
   data() {
     return {
       currentDate: new Date(),
       weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+      mode: "month", // UI apenas; mantém sua geração mensal
     };
   },
   computed: {
@@ -60,6 +165,11 @@ export default {
       return this.currentDate.toLocaleDateString("pt-BR", {
         month: "long",
         year: "numeric",
+      });
+    },
+    monthName() {
+      return this.currentDate.toLocaleDateString("pt-BR", {
+        month: "long",
       });
     },
     calendar() {
@@ -111,7 +221,7 @@ export default {
       );
       const dateStr = this.formatDate(dateObj);
 
-      const dayExpenses = this.expenses.filter((e) => e.data === dateStr);
+      const dayExpenses = this.expenses?.filter((e) => e.data === dateStr) ?? [];
       if (!dayExpenses.length) return null;
 
       let entrada = 0,
@@ -135,7 +245,6 @@ export default {
               // 1º vencimento
               let firstPay;
               if (expense.parcelas && expense.parcelas > 1) {
-                // quando parcelado, usamos a própria data como 1ª parcela
                 firstPay = new Date(
                   purchase.getFullYear(),
                   purchase.getMonth(),
@@ -153,12 +262,10 @@ export default {
                   ? Number(expense.valor) / Number(expense.parcelas)
                   : Number(expense.valor);
 
-              // dia da compra
               if (dateStr === this.formatDate(purchase)) {
                 creditLaunch += Number(expense.valor);
               }
 
-              // cada vencimento (todas as parcelas)
               const n = Math.max(1, Number(expense.parcelas || 1));
               for (let i = 0; i < n; i++) {
                 const pay = new Date(
@@ -201,23 +308,51 @@ export default {
 </script>
 
 <style scoped>
-/* Mantive sua lógica, só refinei a “pele” para bater com o mock */
-.calendar-container{ padding:1rem; background:#1b1b1b; border:1px solid #2a2a2a; border-radius:16px; color:#c2c3c2; }
-.calendar-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
-.calendar-title{ font-size:1rem; font-weight:600; text-transform:capitalize; }
-.calendar-nav{ background:#232323; border:1px solid #2a2a2a; border-radius:8px; padding:.25rem .6rem; }
-.calendar-nav:hover{ background:#2a2a2a; }
-.calendar-table{ width:100%; border-collapse:collapse; text-align:center; }
-.calendar-th{ padding:.35rem 0; color:#a7a7a7; font-size:.8rem; }
-.calendar-table td{ height:38px; border-top:1px solid #222; border-bottom:1px solid #222; }
-.calendar-day{ font-weight:600; color:#d2d2d2; font-size:.85rem; }
-.calendar-summary{ margin-top:.2rem; font-size:.7rem; }
+/* Estrutura visual das células, próxima à referência */
+.calendar-table {
+  border-collapse: collapse;
+}
+.calendar-th {
+  padding: 0.35rem 0;
+  font-size: 0.8rem;
+  color: #a7a7a7;
+  font-weight: 500;
+}
+.calendar-td {
+  height: 42px;
+  text-align: center;
+  border-top: 1px solid #202020;
+  border-bottom: 1px solid #202020;
+  vertical-align: middle;
+}
+.calendar-day {
+  font-weight: 600;
+  color: #d2d2d2;
+  font-size: 0.9rem;
+  line-height: 1rem;
+}
 
-:deep(.mode-bar){
-  display:flex; gap:8px; background:#232323; border-radius:999px; padding:4px; margin-top:10px;
+/* mini resumos */
+.calendar-summary {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 2px;
+  font-size: 0.68rem;
+  line-height: 0.8rem;
 }
-:deep(.mode-bar > button){
-  padding:.35rem .9rem; border-radius:999px; background:transparent; color:#e5e5e5; border:none;
+.summary-entrada {
+  color: #34d399; /* emerald-400 */
 }
-:deep(.mode-bar > button.active){ background:#22c55e; color:#0f0f0f; }
+.summary-saida {
+  color: #f87171; /* red-400 */
+}
+.credit-launch {
+  color: #a78bfa; /* purple-400 */
+}
+.credit-payment {
+  color: #fbbf24; /* amber-400 */
+}
+
+/* capitalização do mês fica clean em diferentes locales */
+:where(.capitalize) { text-transform: capitalize; }
 </style>

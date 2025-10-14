@@ -29,7 +29,7 @@ export default {
     const cv = ref(null);
     let chart, ro;
 
-    const colorIn = "#3ecf00";   
+    const colorIn = "#17B269";   
     const colorOut = "#e93030"; 
     const ringBg = "#2a2a2a";
 

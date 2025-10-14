@@ -44,9 +44,6 @@
           <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
             <SummaryCard :expenses="expenses" />
             <section class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-5">
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="text-neutral-300">Calendario</h3>
-              </div>
               <ExpenseCalendar :expenses="expenses" :creditCards="creditCards" />
             </section>
           </div>
