@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrap" class="w-full h-72 lg:h-80">
+  <div ref="wrap" class="w-full h-72 lg:h-80 font-sans">
     <canvas ref="cv"></canvas>
 
     <!-- legenda simples -->

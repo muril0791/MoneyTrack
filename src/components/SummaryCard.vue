@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-6 py-6">
+  <section class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-6 py-6 font-sans">
     <!-- cabeçalho -->
     <div class="flex items-start justify-between">
       <h3 class="text-[15px] text-neutral-300">Saldo total</h3>
@@ -73,9 +73,19 @@
                 ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30'
                 : 'bg-rose-500/15 text-rose-400 ring-1 ring-rose-500/30',
             ]"
-            
           >
             {{ Math.abs(pctChange).toFixed(1) }}%
+            <svg
+              v-if="pctChange >= 0"
+              class="w-3 h-3"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 4l6 6h-4v10h-4V10H6l6-6z" />
+            </svg>
+            <svg v-else class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 20l-6-6h4V4h4v10h4l-6 6z" />
+            </svg>
           </span>
         </div>
         <p class="mt-1 flex items-baseline gap-2">

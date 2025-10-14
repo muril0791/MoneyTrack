@@ -1,6 +1,9 @@
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+   font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;;
   line-height: 1.5;
   font-weight: 400;
 
@@ -63,6 +66,7 @@ button:focus-visible {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  font-family: "Inter", sans-serif !important;
 }
 
 @media (prefers-color-scheme: light) {
