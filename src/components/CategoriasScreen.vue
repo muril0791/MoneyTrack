@@ -1,49 +1,152 @@
 <template>
-  <div class="categorias-screen">
-    <h2 class="title">Cadastro de Categorias</h2>
-    <form @submit.prevent="handleSubmit" class="form">
-      <div class="form-group">
-        <label for="categoryName">Nome da Categoria</label>
-        <input
-          type="text"
-          id="categoryName"
-          v-model="categoryForm.name"
-          placeholder="Digite o nome da categoria"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="categoryType">Tipo da Categoria</label>
-        <select id="categoryType" v-model="categoryForm.type" required class="form-input">
-          <option disabled value="">Selecione</option>
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
-        </select>
-      </div>
-      <div class="form-buttons">
-        <button type="submit" class="btn">
-          {{ isEditing ? "Atualizar" : "Adicionar" }}
-        </button>
-        <button v-if="isEditing" type="button" class="btn-cancel" @click="cancelEdit">
-          Cancelar
+  <div class="w-full max-w-xl">
+    <div
+      class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
+    >
+      
+      <div
+        class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
+      >
+        <h2 class="text-lg md:text-xl font-semibold tracking-tight">
+          Categorias
+        </h2>
+        <button
+          class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
+          @click="$emit('close')"
+          aria-label="Fechar modal"
+        >
+          ✕
         </button>
       </div>
-    </form>
 
-    <div class="categories-list">
-      <h3 class="list-title">Categorias Cadastradas</h3>
-      <ul>
-        <li v-for="cat in categories" :key="cat.id" class="list-item">
-          <span class="item-name">{{ cat.name }} ({{ cat.type }})</span>
-          <div class="item-actions">
-            <button class="btn-edit" @click="editCategory(cat)">Editar</button>
-            <button class="btn-delete" @click="deleteCategory(cat.id)">Excluir</button>
+     
+      <div class="p-6 grid gap-6">
+       
+        <form
+          @submit.prevent="handleSubmit"
+          class="grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          <div class="md:col-span-2">
+            <label
+              for="categoryName"
+              class="block text-sm text-neutral-300 mb-1"
+              >Nome</label
+            >
+            <input
+              id="categoryName"
+              v-model="categoryForm.name"
+              type="text"
+              required
+              placeholder="Ex.: Salário, Moradia, Mercado…"
+              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
+            />
           </div>
-        </li>
-      </ul>
-    </div>
 
-    <button class="btn-close" @click="$emit('close')">Fechar</button>
+          <div>
+            <label
+              for="categoryType"
+              class="block text-sm text-neutral-300 mb-1"
+              >Tipo</label
+            >
+            <select
+              id="categoryType"
+              v-model="categoryForm.type"
+              required
+              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
+            >
+              <option disabled value="">Selecione</option>
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-3 flex gap-3">
+            <button
+              type="submit"
+              class="flex-1 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10"
+            >
+              {{ isEditing ? "Atualizar" : "Adicionar" }}
+            </button>
+
+            <button
+              v-if="isEditing"
+              type="button"
+              @click="cancelEdit"
+              class="px-4 py-3 rounded-lg bg-[#262626] hover:bg-[#2f2f2f] text-neutral-200 font-medium transition"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        
+        <div class="grid gap-3">
+          <h3 class="text-sm uppercase tracking-wider text-neutral-400">
+            Categorias cadastradas
+          </h3>
+
+          <div
+            v-if="categories.length === 0"
+            class="text-sm text-neutral-400 bg-[#151515] border border-dashed border-[#2a2a2a] rounded-xl p-6 text-center"
+          >
+            Nenhuma categoria cadastrada ainda.
+          </div>
+
+          <ul
+            v-else
+            class="divide-y divide-[#232323] rounded-xl overflow-hidden ring-1 ring-[#232323]"
+          >
+            <li
+              v-for="cat in categories"
+              :key="cat.id"
+              class="flex items-center justify-between gap-4 bg-[#161616] px-4 py-3"
+            >
+              <div class="min-w-0">
+                <p class="font-medium truncate">{{ cat.name }}</p>
+                <p class="text-sm text-neutral-400">
+                  Tipo:
+                  <span
+                    :class="
+                      cat.type === 'entrada'
+                        ? 'text-emerald-400'
+                        : 'text-red-400'
+                    "
+                    class="font-medium"
+                  >
+                    {{ cat.type }}
+                  </span>
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  class="px-3 py-2 rounded-md bg-[#232323] hover:bg-[#2b2b2b] text-sm font-medium transition"
+                  @click="editCategory(cat)"
+                >
+                  Editar
+                </button>
+                <button
+                  class="px-3 py-2 rounded-md bg-[#2a1313] hover:bg-[#341616] text-sm font-medium text-red-300 transition"
+                  @click="deleteCategory(cat.id)"
+                >
+                  Excluir
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      
+      <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
+        <button
+          class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
+          @click="$emit('close')"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -58,13 +161,23 @@ export default {
   setup() {
     const store = useMainStore();
     const { categories } = storeToRefs(store);
+
     const categoryForm = ref({ name: "", type: "" });
     const isEditing = ref(false);
     const editingId = ref(null);
 
+    const resetForm = () => {
+      categoryForm.value = { name: "", type: "" };
+      isEditing.value = false;
+      editingId.value = null;
+    };
+
     const handleSubmit = async () => {
       if (isEditing.value && editingId.value) {
-        await store.updateCategory({ ...categoryForm.value, id: editingId.value });
+        await store.updateCategory({
+          ...categoryForm.value,
+          id: editingId.value,
+        });
       } else {
         await store.addCategory({ ...categoryForm.value });
       }
@@ -79,17 +192,10 @@ export default {
 
     const deleteCategory = async (catId) => {
       await store.removeCategory(catId);
+      if (editingId.value === catId) resetForm();
     };
 
-    const cancelEdit = () => {
-      resetForm();
-    };
-
-    const resetForm = () => {
-      categoryForm.value = { name: "", type: "" };
-      isEditing.value = false;
-      editingId.value = null;
-    };
+    const cancelEdit = () => resetForm();
 
     return {
       categories,
@@ -103,154 +209,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-:root {
-  --cardbg: #161716;
-  --mainbg: #0f0e11;
-  --greenmain: #3ecf00;
-  --redmain: #e93030;
-  --textwhite: #c2c3c2;
-  --textgray: #aaaaaa;
-}
-
-.categorias-screen {
-  background-color: var(--cardbg);
-  padding: 1rem;
-  border-radius: 8px;
-  color: var(--textwhite);
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.title {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--greenmain);
-  text-align: center;
-}
-
-.form {
-  margin-bottom: 1rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--mainbg);
-  border-radius: 4px;
-  background-color: var(--mainbg);
-  color: var(--textwhite);
-}
-
-.form-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn {
-  flex: 1;
-  padding: 0.5rem;
-  background-color: var(--greenmain);
-  border: none;
-  border-radius: 4px;
-  color: var(--textwhite);
-  cursor: pointer;
-}
-
-.btn:hover {
-  background-color: #36b800;
-}
-
-.btn-cancel {
-  padding: 0.5rem;
-  background-color: var(--redmain);
-  border: none;
-  border-radius: 4px;
-  color: var(--textwhite);
-  cursor: pointer;
-}
-
-.btn-cancel:hover {
-  background-color: #d32f2f;
-}
-
-.categories-list {
-  margin-top: 1rem;
-}
-
-.list-title {
-  font-size: 1.125rem;
-  margin-bottom: 0.5rem;
-}
-
-.list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--mainbg);
-}
-
-.item-actions button {
-  background: none;
-  border: none;
-  margin-left: 0.5rem;
-  color: var(--textgray);
-  cursor: pointer;
-}
-
-.item-actions button:hover {
-  color: var(--textwhite);
-}
-
-.btn-edit {
-  color: var(--greenmain);
-}
-
-.btn-delete {
-  color: var(--redmain);
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-  gap: 0.5rem;
-}
-
-.page-btn {
-  padding: 0.25rem 0.5rem;
-  background-color: var(--mainbg);
-  border: 1px solid var(--cardbg);
-  border-radius: 4px;
-  color: var(--textwhite);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.page-btn.active,
-.page-btn:hover {
-  background-color: var(--cardbg);
-}
-
-.btn-close {
-  margin-top: 1rem;
-  padding: 0.5rem;
-  background-color: #444;
-  border: none;
-  border-radius: 4px;
-  width: 100%;
-  color: var(--textwhite);
-  cursor: pointer;
-}
-
-.btn-close:hover {
-  background-color: #333;
-}
-</style>

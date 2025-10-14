@@ -1,18 +1,19 @@
-
 <template>
-  <div class="app-container">
-    
+  <div class="min-h-screen bg-[#0f0f0f] text-white">
+    <!-- Topbar -->
     <TopBar
       @open-modal="openNewTransaction"
-      @open-calendar="(showCalendar = true)"
+      @open-calendar="() => (showCalendar = true)"
       @open-credit-cards="openCreditCardsRegistrationModal"
       @open-categories="openCategoriesModal"
       @open-credit-cards-list="openCreditCardsModal"
     />
 
-    <main class="main-container">
-      <div class="two-columns">
+    <!-- Main -->
+    <main class="max-w-screen-2xl mx-auto px-4 py-6">
+      <div class="grid gap-6 md:grid-cols-2">
         <DashboardLeft :expenses="expenses" @open-add="openNewTransaction" />
+
         <SimpleTransactionList
           :expenses="paginatedExpenses"
           @open-detail="openDetail"
@@ -23,45 +24,80 @@
       </div>
     </main>
 
-    
-    <transition name="modal">
-      <div v-if="showModal" class="modal-overlay" @click.self="closeFormModal">
-        <div class="modal-content" @click.stop>
-          <div class="modal-header">
-            <h2 class="modal-title">
-              {{ editingExpense ? "Editar Lançamento" : "Novo Lançamento" }}
-            </h2>
-            <button @click="closeFormModal" class="modal-close">&times;</button>
-          </div>
-          <ExpenseForm
-            :editingExpense="editingExpense"
-            :categories="categories"
-            :creditCards="creditCards"
-            @add-expense="handleAddExpense"
-            @close="closeFormModal"
-            @open-categories="openCategoriesModal"
-          />
-        </div>
-      </div>
-    </transition>
+    <!-- ============ MODALS (Tailwind only) ============ -->
 
-   
-    <transition name="modal">
-      <div v-if="showCalendar" class="modal-overlay" @click.self="showCalendar = false">
-        <div class="modal-content" @click.stop>
-          <div class="modal-header">
-            <h2 class="modal-title">Calendário</h2>
-            <button @click="showCalendar = false" class="modal-close">&times;</button>
-          </div>
+    <!-- Novo/Editar Lançamento -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      @click.self="closeFormModal"
+    >
+      <!-- A ExpenseForm já rende o cartão interno. Só limitamos o width. -->
+      <div class="w-full max-w-3xl" @click.stop>
+        <ExpenseForm
+          :editingExpense="editingExpense"
+          :categories="categories"
+          :creditCards="creditCards"
+          @add-expense="handleAddExpense"
+          @close="closeFormModal"
+          @open-categories="openCategoriesModal"
+        />
+      </div>
+    </div>
+
+    <!-- Calendário -->
+    <div
+      v-if="showCalendar"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      @click.self="showCalendar = false"
+    >
+      <div
+        class="w-full max-w-5xl bg-[#1b1b1b] ring-1 ring-[#2a2a2a] rounded-2xl shadow-xl overflow-hidden"
+        @click.stop
+      >
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]"
+        >
+          <h2 class="text-lg font-semibold tracking-tight">Calendário</h2>
+          <button
+            class="h-9 w-9 inline-flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/5"
+            @click="showCalendar = false"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-4">
           <ExpenseCalendar :expenses="expenses" />
         </div>
       </div>
-    </transition>
+    </div>
 
-    
-    <transition name="modal">
-      <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
-        <div class="modal-content" @click.stop>
+    <!-- Detalhe do Lançamento -->
+    <div
+      v-if="showDetailModal"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      @click.self="closeDetailModal"
+    >
+      <div
+        class="w-full max-w-3xl bg-[#1b1b1b] ring-1 ring-[#2a2a2a] rounded-2xl shadow-xl overflow-hidden"
+        @click.stop
+      >
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]"
+        >
+          <h2 class="text-lg font-semibold tracking-tight">Detalhes</h2>
+          <button
+            class="h-9 w-9 inline-flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/5"
+            @click="closeDetailModal"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-4">
           <ExpenseList
             :expenses="[selectedExpense]"
             @edit-expense="handleEditExpense"
@@ -69,21 +105,64 @@
           />
         </div>
       </div>
-    </transition>
+    </div>
 
-    
-    <transition name="modal">
-      <div v-if="showCategoriesModal" class="modal-overlay" @click.self="closeCategoriesModal">
-        <div class="modal-content" @click.stop>
-          <CategoriasScreen :categories="categories" @close="closeCategoriesModal" />
+    <!-- Categorias (CRUD) -->
+    <div
+      v-if="showCategoriesModal"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      @click.self="closeCategoriesModal"
+    >
+      <div
+        class="w-full max-w-xl bg-[#1b1b1b] ring-1 ring-[#2a2a2a] rounded-2xl shadow-xl overflow-hidden"
+        @click.stop
+      >
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]"
+        >
+          <h2 class="text-lg font-semibold tracking-tight">Categorias</h2>
+          <button
+            class="h-9 w-9 inline-flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/5"
+            @click="closeCategoriesModal"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-4">
+          <CategoriasScreen
+            :categories="categories"
+            @close="closeCategoriesModal"
+          />
         </div>
       </div>
-    </transition>
+    </div>
 
-   
-    <transition name="modal">
-      <div v-if="showCreditCardsModal" class="modal-overlay" @click.self="closeCreditCardsModal">
-        <div class="modal-content" @click.stop>
+    <!-- Lista de Cartões (Resumo de gastos/limite) -->
+    <div
+      v-if="showCreditCardsModal"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      @click.self="closeCreditCardsModal"
+    >
+      <div
+        class="w-full max-w-3xl bg-[#1b1b1b] ring-1 ring-[#2a2a2a] rounded-2xl shadow-xl overflow-hidden"
+        @click.stop
+      >
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]"
+        >
+          <h2 class="text-lg font-semibold tracking-tight">Cartões</h2>
+          <button
+            class="h-9 w-9 inline-flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/5"
+            @click="closeCreditCardsModal"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-4">
           <CreditCardList
             :creditCards="creditCards"
             :expenses="expenses"
@@ -91,16 +170,38 @@
           />
         </div>
       </div>
-    </transition>
+    </div>
 
-    
-    <transition name="modal">
-      <div v-if="showCreditCardsRegistrationModal" class="modal-overlay" @click.self="closeCreditCardsRegistrationModal">
-        <div class="modal-content" @click.stop>
+    <!-- Cadastro de Cartões -->
+    <div
+      v-if="showCreditCardsRegistrationModal"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      @click.self="closeCreditCardsRegistrationModal"
+    >
+      <div
+        class="w-full max-w-xl bg-[#1b1b1b] ring-1 ring-[#2a2a2a] rounded-2xl shadow-xl overflow-hidden"
+        @click.stop
+      >
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2a]"
+        >
+          <h2 class="text-lg font-semibold tracking-tight">
+            Cadastro de Cartões
+          </h2>
+          <button
+            class="h-9 w-9 inline-flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/5"
+            @click="closeCreditCardsRegistrationModal"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-4">
           <CartoesScreen @close="closeCreditCardsRegistrationModal" />
         </div>
       </div>
-    </transition>
+    </div>
   </div>
 </template>
 
@@ -156,15 +257,16 @@ export default {
 
     const currentPage = ref(1);
     const itemsPerPage = 5;
-    const totalPages = computed(() => Math.ceil(expenses.value.length / itemsPerPage));
+    const totalPages = computed(() =>
+      Math.ceil(expenses.value.length / itemsPerPage)
+    );
     const paginatedExpenses = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage;
       return expenses.value.slice(start, start + itemsPerPage);
     });
-    const changePage = (page) => {
-      currentPage.value = page;
-    };
+    const changePage = (page) => (currentPage.value = page);
 
+    // Modal handlers
     const openNewTransaction = () => {
       editingExpense.value = null;
       showModal.value = true;
@@ -175,11 +277,8 @@ export default {
     };
 
     const handleAddExpense = (expense) => {
-      if (editingExpense.value) {
-        store.updateExpense(expense);
-      } else {
-        store.addExpense(expense);
-      }
+      if (editingExpense.value) store.updateExpense(expense);
+      else store.addExpense(expense);
       closeFormModal();
     };
 
@@ -188,7 +287,6 @@ export default {
       showModal.value = true;
       closeDetailModal();
     };
-
     const handleDeleteExpense = (expense) => {
       store.removeExpense(expense.id);
       closeDetailModal();
@@ -203,25 +301,16 @@ export default {
       selectedExpense.value = null;
     };
 
-    const openCategoriesModal = () => {
-      showCategoriesModal.value = true;
-    };
-    const closeCategoriesModal = () => {
-      showCategoriesModal.value = false;
-    };
+    const openCategoriesModal = () => (showCategoriesModal.value = true);
+    const closeCategoriesModal = () => (showCategoriesModal.value = false);
 
-    const openCreditCardsModal = () => {
-      showCreditCardsModal.value = true;
-    };
-    const closeCreditCardsModal = () => {
-      showCreditCardsModal.value = false;
-    };
-    const openCreditCardsRegistrationModal = () => {
-      showCreditCardsRegistrationModal.value = true;
-    };
-    const closeCreditCardsRegistrationModal = () => {
-      showCreditCardsRegistrationModal.value = false;
-    };
+    const openCreditCardsModal = () => (showCreditCardsModal.value = true);
+    const closeCreditCardsModal = () => (showCreditCardsModal.value = false);
+
+    const openCreditCardsRegistrationModal = () =>
+      (showCreditCardsRegistrationModal.value = true);
+    const closeCreditCardsRegistrationModal = () =>
+      (showCreditCardsRegistrationModal.value = false);
 
     return {
       expenses,
@@ -258,89 +347,3 @@ export default {
   },
 };
 </script>
-
-<style>
-
-:root {
-  --cardbg: #161716;
-  --mainbg: #0f0e11;
-  --greenmain: #3ecf00;
-  --redmain: #e93030;
-  --textwhite: #c2c3c2;
-  --textgray: #aaaaaa;
-}
-
-.app-container {
-  background-color: var(--mainbg);
-  min-height: 100vh;
-}
-
-.main-container {
-  max-width: 96rem;
-  margin: 0 auto;
-  padding: 1.5rem 1rem;
-}
-
-.two-columns {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 768px) {
-  .two-columns {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  z-index: 50;
-}
-.modal-content {
-  background-color: var(--cardbg);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  width: 90%;
-  max-width: 50rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
-  position: relative;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: var(--textwhite);
-}
-.modal-close {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--textgray);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.modal-close:hover {
-  color: var(--textwhite);
-}
-
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-</style>

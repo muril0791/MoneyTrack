@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { supabase } from "@/lib/supabase";
 export default {
   name: "TopBar",
   emits: [
@@ -70,8 +71,12 @@ export default {
       this.$emit("open-categories");
       this.closeDropdown();
     },
-    logout() {
-      localStorage.removeItem("userToken");
+    async logout() {
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.error("Erro ao sair:", e);
+      }
       this.$router.push({ name: "Login" });
     },
   },

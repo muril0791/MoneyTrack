@@ -1,128 +1,102 @@
 <template>
-  <div class="login-container">
-    <h2 class="title">Login</h2>
-    <form @submit.prevent="handleLogin" class="form">
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input
-          type="email"
-          id="email"
-          v-model="credentials.email"
-          placeholder="Digite seu e-mail"
-          required
-          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-          v-trim
-        />
+  <div class="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <div class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] p-6 md:p-8">
+        <div class="mb-6 text-center">
+          <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Bem-vindo de volta</h1>
+          <p class="text-sm text-neutral-400 mt-1">Acesse sua conta para continuar</p>
+        </div>
+       
+        <form @submit.prevent="handleLogin" class="space-y-4">
+          <div>
+            <label for="email" class="block text-sm text-neutral-300 mb-1">E-mail</label>
+            <div class="relative">
+              <input
+                id="email"
+                v-model="credentials.email"
+                type="email"
+                required
+                inputmode="email"
+                autocomplete="email"
+                class="w-full bg-[#151515] border border-[#2a2a2a] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none rounded-lg px-4 py-3 text-[15px] placeholder:text-neutral-500 transition"
+                placeholder="voce@email.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm text-neutral-300 mb-1">Senha</label>
+            <div class="relative">
+              <input
+                id="password"
+                v-model="credentials.password"
+                :type="show ? 'text' : 'password'"
+                required
+                minlength="6"
+                autocomplete="current-password"
+                class="w-full bg-[#151515] border border-[#2a2a2a] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none rounded-lg px-4 py-3 text-[15px] placeholder:text-neutral-500 transition"
+                placeholder="••••••••"
+              />
+              <button type="button"
+                @click="show = !show"
+                class="absolute inset-y-0 right-0 pr-3 text-neutral-400 hover:text-neutral-200 text-sm">
+                {{ show ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+          </div>
+
+          <p v-if="error" class="text-sm text-red-400 -mb-2">{{ error }}</p>
+
+          <button
+            type="submit"
+            class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10">
+            Entrar
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-neutral-400">
+          Não possui conta?
+          <router-link to="/register" class="text-emerald-400 hover:text-emerald-300 font-medium">
+            Cadastre-se
+          </router-link>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <input
-          type="password"
-          id="password"
-          v-model="credentials.password"
-          placeholder="Digite sua senha"
-          required
-          minlength="6"
-          v-trim
-        />
+
+      <div class="text-center mt-6 text-xs text-neutral-500">
+        moneyTRACK •
       </div>
-      <div v-if="error" class="error">{{ error }}</div>
-      <div class="form-buttons">
-        <button type="submit" class="btn">Entrar</button>
-      </div>
-    </form>
-    <p class="redirect">
-      Não possui conta? <router-link to="/register">Cadastre-se</router-link>
-    </p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import authService from "../services/authService"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { supabase } from "@/lib/supabase";
 
-const credentials = ref({ email: "", password: "" })
-const error = ref("")
-const router = useRouter()
+const router = useRouter();
+const credentials = ref({ email: "", password: "" });
+const error = ref("");
+const show = ref(false);
 
 async function handleLogin() {
-  error.value = ""
-  try {
-    await authService.signIn(credentials.value)
-    router.push({ name: "Home" })
-  } catch (err) {
-    error.value = err?.message || "E-mail ou senha incorretos!"
+  error.value = "";
+  const { email, password } = credentials.value;
+
+  const { data, error: err } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (err) {
+    error.value = err.message || "Não foi possível entrar.";
+    return;
+  }
+
+  if (data?.session) {
+    router.push({ name: "Home" });
+  } else {
+    error.value = "Falha ao autenticar. Tente novamente.";
   }
 }
 </script>
-
-
-
-<style scoped>
-.login-container {
-  background-color: var(--cardbg);
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 400px;
-  height: 100%;
-  margin: 2rem auto;
-  color: var(--textwhite);
-}
-.title {
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--greenmain);
-}
-.form {
-  display: flex;
-  flex-direction: column;
-}
-.form-group {
-  margin-bottom: 1rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--textgray);
-}
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--mainbg);
-  border-radius: 4px;
-  background-color: var(--mainbg);
-  color: var(--textwhite);
-}
-.form-buttons {
-  margin-top: 1rem;
-}
-.btn {
-  padding: 0.75rem;
-  background-color: var(--greenmain);
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%;
-}
-.btn:hover {
-  background-color: #36b800;
-}
-.error {
-  color: var(--redmain);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-.redirect {
-  text-align: center;
-  margin-top: 1rem;
-  color: var(--textgray);
-}
-.redirect a {
-  color: var(--greenmain);
-  text-decoration: none;
-}
-</style>
