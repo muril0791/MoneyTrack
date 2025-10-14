@@ -1,38 +1,128 @@
 <template>
-  <div class="credit-card-list">
-    <div class="filter-section">
-      <label for="cardFilter">Filtrar por Cartão:</label>
-      <select id="cardFilter" v-model="selectedCardId" @change="applyFilter">
-        <option value="todos">Todos</option>
-        <option v-for="card in creditCards" :key="card.id" :value="card.id">
-          {{ card.name }}
-        </option>
-      </select>
-    </div>
-    <div class="summary">
-      <p>Total Usado: R$ {{ totalUsed.toFixed(2) }}</p>
-      <p>Limite Disponível: R$ {{ totalAvailable.toFixed(2) }}</p>
-      <p>Próximo Vencimento: R$ {{ totalNextDue.toFixed(2) }}</p>
-    </div>
-    <div class="transactions">
+  <div class="w-full max-w-3xl">
+    <div
+      class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
+    >
+      
       <div
-        v-for="(expense, index) in filteredExpenses"
-        :key="index"
-        class="transaction-item"
+        class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
       >
-        <div class="transaction-info">
-          <p class="transaction-value">Valor: R$ {{ expense.valor.toFixed(2) }}</p>
-          <p class="transaction-date">Data: {{ formatData(expense.data) }}</p>
-          <p class="transaction-payment-date">
-            Data de Pagamento: {{ computePaymentDate(expense) }}
-          </p>
-          <p v-if="expense.parcelas" class="transaction-installments">
-            Parcelas: {{ expense.parcelas }}
-          </p>
-          <p class="transaction-available-limit">
-            Limite Disponível: R$ {{ computeAvailableLimit(expense) }}
-          </p>
+        <h2 class="text-lg md:text-xl font-semibold tracking-tight">
+          Resumo de Cartões de Crédito
+        </h2>
+        <button
+          class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
+          @click="$emit('close')"
+        >
+          ✕
+        </button>
+      </div>
+
+     
+      <div class="p-6 grid gap-6">
+        
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        >
+          <label for="cardFilter" class="text-sm text-neutral-300"
+            >Filtrar por cartão:</label
+          >
+          <select
+            id="cardFilter"
+            v-model="selectedCardId"
+            @change="applyFilter"
+            class="w-full md:w-1/2 bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 text-neutral-200 outline-none transition"
+          >
+            <option value="todos">Todos</option>
+            <option v-for="card in creditCards" :key="card.id" :value="card.id">
+              {{ card.name }}
+            </option>
+          </select>
         </div>
+
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="summary-box">
+            <p class="summary-label">Total Usado</p>
+            <p class="summary-value text-red-400">
+              {{ formatCurrency(totalUsed) }}
+            </p>
+          </div>
+          <div class="summary-box">
+            <p class="summary-label">Limite Disponível</p>
+            <p class="summary-value text-emerald-400">
+              {{ formatCurrency(totalAvailable) }}
+            </p>
+          </div>
+          <div class="summary-box">
+            <p class="summary-label">Próximo Vencimento</p>
+            <p class="summary-value text-neutral-300">
+              {{ formatCurrency(totalNextDue) }}
+            </p>
+          </div>
+        </div>
+
+        
+        <div class="grid gap-3">
+          <h3 class="text-sm uppercase tracking-wider text-neutral-400">
+            Transações
+          </h3>
+
+          <div
+            v-if="filteredExpenses.length === 0"
+            class="text-sm text-neutral-400 bg-[#151515] border border-dashed border-[#2a2a2a] rounded-xl p-6 text-center"
+          >
+            Nenhuma transação encontrada.
+          </div>
+
+          <ul
+            v-else
+            class="divide-y divide-[#232323] rounded-xl overflow-hidden ring-1 ring-[#232323]"
+          >
+            <li
+              v-for="(expense, index) in filteredExpenses"
+              :key="index"
+              class="bg-[#161616] p-4 flex flex-col sm:flex-row sm:justify-between gap-2"
+            >
+              <div class="min-w-0">
+                <p class="text-[15px] font-medium">
+                  Valor:
+                  <span class="text-neutral-200">{{
+                    formatCurrency(expense.valor)
+                  }}</span>
+                </p>
+                <p class="text-sm text-neutral-400">
+                  Data: {{ formatData(expense.data) }}
+                </p>
+                <p class="text-sm text-neutral-400">
+                  Pagamento: {{ computePaymentDate(expense) }}
+                </p>
+                <p v-if="expense.parcelas" class="text-sm text-neutral-400">
+                  Parcelas: {{ expense.parcelas }}
+                </p>
+              </div>
+
+              <div class="text-right sm:text-left">
+                <p class="text-sm text-neutral-400">
+                  Limite disponível:
+                  <span class="text-emerald-400">{{
+                    formatCurrency(computeAvailableLimit(expense))
+                  }}</span>
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+     
+      <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
+        <button
+          class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
+          @click="$emit('close')"
+        >
+          Fechar
+        </button>
       </div>
     </div>
   </div>
@@ -44,16 +134,13 @@ export default {
   name: "CreditCardList",
   props: {
     creditCards: { type: Array, required: true },
-    expenses: { type: Array, required: true }
+    expenses: { type: Array, required: true },
   },
   setup(props) {
     const selectedCardId = ref("todos");
 
-    const applyFilter = () => {
-      
-    };
+    const applyFilter = () => {};
 
-   
     const filteredExpenses = computed(() => {
       let filtered = props.expenses.filter(
         (expense) =>
@@ -69,7 +156,6 @@ export default {
       return filtered;
     });
 
-    
     const totalUsed = computed(() => {
       return filteredExpenses.value.reduce(
         (acc, expense) => acc + Number(expense.valor),
@@ -77,10 +163,11 @@ export default {
       );
     });
 
-    
     const totalAvailable = computed(() => {
       if (selectedCardId.value !== "todos") {
-        const card = props.creditCards.find((c) => c.id === selectedCardId.value);
+        const card = props.creditCards.find(
+          (c) => c.id === selectedCardId.value
+        );
         if (card) {
           return card.limit - totalUsed.value;
         }
@@ -95,38 +182,47 @@ export default {
       }
     });
 
-   
-    const totalNextDue = computed(() => {
-      return totalUsed.value;
-    });
+    const totalNextDue = computed(() => totalUsed.value);
+
+    const formatCurrency = (v) =>
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(Number(v || 0));
 
     const formatData = (dataStr) => {
       const dateObj = new Date(dataStr);
       return dateObj.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
-        year: "numeric"
+        year: "numeric",
       });
     };
 
-   
     const computePaymentDate = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return "";
       const expenseDate = new Date(expense.data);
-      
-      let paymentDate = new Date(expenseDate.getFullYear(), expenseDate.getMonth(), card.dueDay);
+
+      let paymentDate = new Date(
+        expenseDate.getFullYear(),
+        expenseDate.getMonth(),
+        card.dueDay
+      );
       if (expenseDate.getDate() > card.dueDay) {
-        paymentDate = new Date(expenseDate.getFullYear(), expenseDate.getMonth() + 1, card.dueDay);
+        paymentDate = new Date(
+          expenseDate.getFullYear(),
+          expenseDate.getMonth() + 1,
+          card.dueDay
+        );
       }
       return paymentDate.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
-        year: "numeric"
+        year: "numeric",
       });
     };
 
-   
     const computeAvailableLimit = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return 0;
@@ -143,6 +239,7 @@ export default {
       totalUsed,
       totalAvailable,
       totalNextDue,
+      formatCurrency,
       formatData,
       computePaymentDate,
       computeAvailableLimit,
@@ -152,59 +249,22 @@ export default {
 </script>
 
 <style scoped>
-:root {
-  --cardbg: #161716;
-  --mainbg: #0f0e11;
-  --greenmain: #3ecf00;
-  --redmain: #e93030;
-  --textwhite: #c2c3c2;
-  --textgray: #aaaaaa;
-  --font-main: "Roboto", sans-serif;
-}
-
-.credit-card-list {
-  background-color: var(--cardbg);
+.summary-box {
+  background-color: #151515;
+  border: 1px solid #2a2a2a;
+  border-radius: 1rem;
   padding: 1rem;
-  border-radius: 8px;
-  color: var(--textwhite);
-  font-family: var(--font-main);
-  max-width: 800px;
-  margin: 0 auto;
+  text-align: center;
 }
 
-.filter-section {
-  margin-bottom: 1rem;
+.summary-label {
+  font-size: 0.875rem;
+  color: #a3a3a3;
 }
 
-.filter-section select {
-  padding: 0.5rem;
-  border: 1px solid var(--mainbg);
-  border-radius: 4px;
-  background-color: var(--mainbg);
-  color: var(--textwhite);
-}
-
-.summary {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-.transactions {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.transaction-item {
-  background-color: var(--mainbg);
-  padding: 1rem;
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-}
-
-.transaction-info p {
-  margin: 0.25rem 0;
+.summary-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
 }
 </style>

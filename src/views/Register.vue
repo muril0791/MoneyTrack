@@ -1,157 +1,129 @@
 <template>
-  <div class="register-container">
-    <h2 class="title">Cadastro de Usuário</h2>
-    <form @submit.prevent="handleRegister" class="form">
-      <div class="form-group">
-        <label for="username">Nome de Usuário</label>
-        <input
-          type="text"
-          id="username"
-          v-model="user.username"
-          placeholder="Digite seu nome de usuário"
-          required
-          v-trim
-        />
+  <div class="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+
+      <div class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] p-6 md:p-8">
+
+        <div class="mb-6 text-center">
+          <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Criar conta</h1>
+          <p class="text-sm text-neutral-400 mt-1">Comece a organizar suas finanças</p>
+        </div>
+
+
+        <form @submit.prevent="handleRegister" class="space-y-4">
+          <div>
+            <label for="username" class="block text-sm text-neutral-300 mb-1">Nome</label>
+            <input id="username" v-model="user.username" type="text" required
+              class="w-full bg-[#151515] border border-[#2a2a2a] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none rounded-lg px-4 py-3 text-[15px] placeholder:text-neutral-500 transition"
+              placeholder="Seu nome" />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm text-neutral-300 mb-1">E-mail</label>
+            <input id="email" v-model="user.email" type="email" required inputmode="email" autocomplete="email"
+              class="w-full bg-[#151515] border border-[#2a2a2a] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none rounded-lg px-4 py-3 text-[15px] placeholder:text-neutral-500 transition"
+              placeholder="voce@email.com" />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm text-neutral-300 mb-1">Senha</label>
+            <div class="relative">
+              <input id="password" v-model="user.password" :type="showPass ? 'text' : 'password'" required minlength="6"
+                autocomplete="new-password"
+                class="w-full bg-[#151515] border border-[#2a2a2a] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none rounded-lg px-4 py-3 pr-16 text-[15px] placeholder:text-neutral-500 transition"
+                placeholder="Mínimo 6 caracteres" />
+              <button type="button" @click="showPass = !showPass"
+                class="absolute inset-y-0 right-0 pr-3 text-neutral-400 hover:text-neutral-200 text-sm">
+                {{ showPass ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label for="confirm" class="block text-sm text-neutral-300 mb-1">Confirmar senha</label>
+            <div class="relative">
+              <input id="confirm" v-model="user.confirmPassword" :type="showConfirm ? 'text' : 'password'" required
+                minlength="6" autocomplete="new-password"
+                class="w-full bg-[#151515] border border-[#2a2a2a] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none rounded-lg px-4 py-3 pr-16 text-[15px] placeholder:text-neutral-500 transition"
+                placeholder="Repita a senha" />
+              <button type="button" @click="showConfirm = !showConfirm"
+                class="absolute inset-y-0 right-0 pr-3 text-neutral-400 hover:text-neutral-200 text-sm">
+                {{ showConfirm ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+          </div>
+
+          <p v-if="error" class="text-sm text-red-400 -mb-2">{{ error }}</p>
+
+          <button type="submit"
+            class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10">
+            Cadastrar
+          </button>
+        </form>
+
+
+        <div class="mt-6 text-center text-sm text-neutral-400">
+          Já possui conta?
+          <router-link to="/login" class="text-emerald-400 hover:text-emerald-300 font-medium">
+            Faça login
+          </router-link>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input
-          type="email"
-          id="email"
-          v-model="user.email"
-          placeholder="Digite seu e-mail"
-          required
-          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-          v-trim
-        />
+
+      <div class="text-center mt-6 text-xs text-neutral-500">
+        moneyTRACK •
       </div>
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <input
-          type="password"
-          id="password"
-          v-model="user.password"
-          placeholder="Digite sua senha"
-          required
-          minlength="6"
-          v-trim
-        />
-      </div>
-      <div class="form-group">
-        <label for="confirmPassword">Confirmar Senha</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          v-model="user.confirmPassword"
-          placeholder="Confirme sua senha"
-          required
-          minlength="6"
-          v-trim
-        />
-      </div>
-      <div v-if="error" class="error">{{ error }}</div>
-      <div class="form-buttons">
-        <button type="submit" class="btn">Cadastrar</button>
-      </div>
-      <p class="redirect">
-        Já possui conta? <router-link to="/login">Faça login</router-link>
-      </p>
-    </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import authService from "../services/authService"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { supabase } from "@/lib/supabase";
 
-const router = useRouter()
-const user = ref({ username:"", email:"", password:"", confirmPassword:"" })
-const error = ref("")
+const router = useRouter();
+const user = ref({
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+});
+const error = ref("");
+const showPass = ref(false);
+const showConfirm = ref(false);
 
 async function handleRegister() {
-  error.value = ""
+  error.value = "";
+
   if (user.value.password !== user.value.confirmPassword) {
-    error.value = "As senhas não conferem!"
-    return
+    error.value = "As senhas não conferem.";
+    return;
   }
-  try {
-    await authService.signUp({
-      email: user.value.email,
-      password: user.value.password,
-      username: user.value.username,
-    })
-    router.push({ name: "Login" })
-  } catch (err) {
-    error.value = err?.message || "Erro no cadastro."
+
+
+  const { data, error: err } = await supabase.auth.signUp({
+    email: user.value.email,
+    password: user.value.password,
+    options: {
+      data: { display_name: user.value.username },
+
+      emailRedirectTo: window.location.origin,
+    },
+  });
+
+  if (err) {
+    error.value = err.message || "Erro no cadastro.";
+    return;
   }
+
+
+  if (data?.session) {
+    router.push({ name: "Home" });
+    return;
+  }
+
+
+  router.push({ name: "Login" });
 }
 </script>
-
-
-
-<style scoped>
-.register-container {
-  background-color: var(--cardbg);
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 400px;
-  margin: 2rem auto;
-  color: var(--textwhite);
-}
-.title {
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--greenmain);
-}
-.form {
-  display: flex;
-  flex-direction: column;
-}
-.form-group {
-  margin-bottom: 1rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--textgray);
-}
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--mainbg);
-  border-radius: 4px;
-  background-color: var(--mainbg);
-  color: var(--textwhite);
-}
-.form-buttons {
-  margin-top: 1rem;
-}
-.btn {
-  padding: 0.75rem;
-  background-color: var(--greenmain);
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1rem;
-}
-.btn:hover {
-  background-color: #36b800;
-}
-.error {
-  color: var(--redmain);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-.redirect {
-  text-align: center;
-  margin-top: 1rem;
-  color: var(--textgray);
-}
-.redirect a {
-  color: var(--greenmain);
-  text-decoration: none;
-}
-</style>
