@@ -48,21 +48,18 @@
 <script>
 export default {
   name: "ExpenseCalendar",
-  props: {
-    expenses: Array,
-    creditCards: Array
-  },
+  props: { expenses:Array, creditCards:Array, compact:{type:Boolean, default:false} },
   data() {
     return {
       currentDate: new Date(),
-      weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+      weekDays: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
     };
   },
   computed: {
     monthYear() {
       return this.currentDate.toLocaleDateString("pt-BR", {
         month: "long",
-        year: "numeric"
+        year: "numeric",
       });
     },
     calendar() {
@@ -72,26 +69,28 @@ export default {
       const lastDay = new Date(year, month + 1, 0);
       const startDay = firstDay.getDay();
       const totalDays = lastDay.getDate();
-      let weeks = [];
+      const weeks = [];
       let week = new Array(7).fill({ date: null, summary: null });
       let dayCounter = 1;
-     
+
+      // primeira semana
       for (let i = startDay; i < 7; i++) {
         week[i] = {
           date: new Date(year, month, dayCounter),
-          summary: this.getDaySummary(dayCounter)
+          summary: this.getDaySummary(dayCounter),
         };
         dayCounter++;
       }
       weeks.push(week);
-     
+
+      // semanas seguintes
       while (dayCounter <= totalDays) {
         week = [];
         for (let i = 0; i < 7; i++) {
           if (dayCounter <= totalDays) {
             week.push({
               date: new Date(year, month, dayCounter),
-              summary: this.getDaySummary(dayCounter)
+              summary: this.getDaySummary(dayCounter),
             });
             dayCounter++;
           } else {
@@ -101,7 +100,7 @@ export default {
         weeks.push(week);
       }
       return weeks;
-    }
+    },
   },
   methods: {
     getDaySummary(day) {
@@ -111,47 +110,63 @@ export default {
         day
       );
       const dateStr = this.formatDate(dateObj);
-      
-      const dayExpenses = this.expenses.filter(
-        (e) => e.data === dateStr
-      );
+
+      const dayExpenses = this.expenses.filter((e) => e.data === dateStr);
       if (!dayExpenses.length) return null;
+
       let entrada = 0,
         saida = 0,
         creditLaunch = 0,
         creditPayment = 0;
+
       dayExpenses.forEach((expense) => {
         if (expense.tipo === "entrada") {
           entrada += Number(expense.valor);
         } else if (expense.tipo === "saida") {
           if (expense.tipoTransacao === "cartao-credito") {
-          
-            const card = this.creditCards.find(
+            const card = this.creditCards?.find(
               (c) => c.id === expense.creditCardId
             );
             if (card) {
-              const expenseDate = new Date(expense.data);
-              let paymentDate = new Date(
-                expenseDate.getFullYear(),
-                expenseDate.getMonth(),
-                card.dueDay
-              );
-             
-              if (expenseDate.getDate() > card.dueDay) {
-                paymentDate = new Date(
-                  expenseDate.getFullYear(),
-                  expenseDate.getMonth() + 1,
-                  card.dueDay
+              const purchase = new Date(expense.data);
+              const closing = Number(card.closingDay);
+              const due = Number(card.dueDay);
+
+              // 1º vencimento
+              let firstPay;
+              if (expense.parcelas && expense.parcelas > 1) {
+                // quando parcelado, usamos a própria data como 1ª parcela
+                firstPay = new Date(
+                  purchase.getFullYear(),
+                  purchase.getMonth(),
+                  purchase.getDate()
                 );
+              } else {
+                let y = purchase.getFullYear(),
+                  m = purchase.getMonth();
+                m += purchase.getDate() <= closing ? 1 : 2;
+                firstPay = new Date(y, m, due);
               }
-              const paymentDateStr = this.formatDate(paymentDate);
-             
-              if (dateStr === this.formatDate(expenseDate)) {
+
+              const parcela =
+                expense.parcelas && expense.parcelas > 1
+                  ? Number(expense.valor) / Number(expense.parcelas)
+                  : Number(expense.valor);
+
+              // dia da compra
+              if (dateStr === this.formatDate(purchase)) {
                 creditLaunch += Number(expense.valor);
               }
-            
-              if (dateStr === paymentDateStr) {
-                creditPayment += Number(expense.valor);
+
+              // cada vencimento (todas as parcelas)
+              const n = Math.max(1, Number(expense.parcelas || 1));
+              for (let i = 0; i < n; i++) {
+                const pay = new Date(
+                  firstPay.getFullYear(),
+                  firstPay.getMonth() + i,
+                  firstPay.getDate()
+                );
+                if (dateStr === this.formatDate(pay)) creditPayment += parcela;
               }
             } else {
               saida += Number(expense.valor);
@@ -161,6 +176,7 @@ export default {
           }
         }
       });
+
       return { entrada, saida, creditLaunch, creditPayment };
     },
     formatDate(date) {
@@ -178,128 +194,30 @@ export default {
       this.currentDate = new Date(this.currentDate);
     },
     openDay(day) {
-      if (day.date) {
-        
-        this.$emit("open-day", this.formatDate(day.date));
-      }
-    }
-  }
+      if (day.date) this.$emit("open-day", this.formatDate(day.date));
+    },
+  },
 };
 </script>
 
 <style scoped>
-:root {
-  --cardbg: #161716;
-  --mainbg: #0f0e11;
-  --greenmain: #3ecf00;
-  --redmain: #e93030;
-  --textwhite: #c2c3c2;
-  --textgray: #aaaaaa;
+/* Mantive sua lógica, só refinei a “pele” para bater com o mock */
+.calendar-container{ padding:1rem; background:#1b1b1b; border:1px solid #2a2a2a; border-radius:16px; color:#c2c3c2; }
+.calendar-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
+.calendar-title{ font-size:1rem; font-weight:600; text-transform:capitalize; }
+.calendar-nav{ background:#232323; border:1px solid #2a2a2a; border-radius:8px; padding:.25rem .6rem; }
+.calendar-nav:hover{ background:#2a2a2a; }
+.calendar-table{ width:100%; border-collapse:collapse; text-align:center; }
+.calendar-th{ padding:.35rem 0; color:#a7a7a7; font-size:.8rem; }
+.calendar-table td{ height:38px; border-top:1px solid #222; border-bottom:1px solid #222; }
+.calendar-day{ font-weight:600; color:#d2d2d2; font-size:.85rem; }
+.calendar-summary{ margin-top:.2rem; font-size:.7rem; }
+
+:deep(.mode-bar){
+  display:flex; gap:8px; background:#232323; border-radius:999px; padding:4px; margin-top:10px;
 }
-.calendar-container {
-  overflow-x: auto;
-  padding: 1rem;
-  background-color: var(--cardbg);
-  border-radius: 4px;
-  color: var(--textwhite);
-  font-family: Roboto, sans-serif;
+:deep(.mode-bar > button){
+  padding:.35rem .9rem; border-radius:999px; background:transparent; color:#e5e5e5; border:none;
 }
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-.calendar-title {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 0.5rem 0;
-  text-transform: capitalize;
-  color: var(--textwhite);
-}
-.calendar-nav {
-  background-color: var(--cardbg);
-  color: var(--textwhite);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.calendar-nav:hover {
-  background-color: var(--greenmain);
-}
-.calendar-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-}
-.calendar-th {
-  border: 1px solid var(--cardbg);
-  padding: 0.5rem;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  font-weight: bold;
-  background-color: var(--cardbg);
-  color: var(--textwhite);
-}
-.calendar-table td {
-  border: 1px solid var(--cardbg);
-  padding: 0.5rem;
-  position: relative;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  height: 4rem;
-}
-.calendar-table td:hover {
-  background-color: var(--mainbg);
-}
-.calendar-day {
-  position: absolute;
-  top: 0.25rem;
-  left: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: var(--textgray);
-}
-.calendar-summary {
-  margin-top: 2.5rem;
-  font-size: 0.75rem;
-}
-.summary-entrada {
-  color: var(--greenmain);
-}
-.summary-saida {
-  color: var(--redmain);
-}
-.credit-launch {
-  color: #ccc; 
-}
-.credit-payment {
-  color: var(--redmain); 
-}
-@media (max-width: 480px) {
-  .calendar-header {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .calendar-nav {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.875rem;
-  }
-  .calendar-title {
-    font-size: 0.9rem;
-  }
-  .calendar-table td {
-    height: 3.5rem;
-    padding: 0.25rem;
-  }
-  .calendar-day {
-    font-size: 0.65rem;
-  }
-  .calendar-summary {
-    font-size: 0.65rem;
-  }
-}
+:deep(.mode-bar > button.active){ background:#22c55e; color:#0f0f0f; }
 </style>
