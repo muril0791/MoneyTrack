@@ -1,6 +1,6 @@
 <template>
     <div class="space-y-6">
-        <!-- Transações -->
+      
         <div class="card">
             <div class="card-header">
                 <h3>Transações</h3>
@@ -8,7 +8,7 @@
             </div>
         </div>
 
-        <!-- Cartões -->
+       
         <div class="card">
             <div class="card-header">
                 <h3>Cartões</h3>
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <!-- Objetivos -->
+        
         <div class="card">
             <div class="card-header">
                 <h3>Objetivos</h3>

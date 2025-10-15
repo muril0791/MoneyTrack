@@ -139,9 +139,9 @@ export default {
   },
   setup(props) {
     const selectedCardId = ref("todos");
-    const applyFilter = () => {}; // reservado para futuros filtros
+    const applyFilter = () => {}; 
 
-    // Filtra despesas de cartão
+   
     const filteredExpenses = computed(() => {
       let filtered = props.expenses.filter(
         (expense) =>
@@ -157,13 +157,12 @@ export default {
       return filtered;
     });
 
-    // === Regras de fatura (fechamento / vencimento) e parcelas
     const firstPaymentDate = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return null;
 
       const d = new Date(expense.data);
-      // Parcelado: data já é a 1ª parcela (do form)
+     
       if (expense.parcelas && expense.parcelas > 1) {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
       }
@@ -192,7 +191,7 @@ export default {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      // Parcelas: soma apenas as parcelas com vencimento >= hoje
+     
       if (expense.parcelas && expense.parcelas > 1) {
         const parcela = Number(expense.valor) / Number(expense.parcelas);
         let total = 0;
@@ -206,11 +205,10 @@ export default {
         }
         return total;
       }
-      // À vista
+     
       return first >= today ? Number(expense.valor) : 0;
     };
 
-    // Totais
     const totalUsed = computed(() =>
       filteredExpenses.value.reduce((acc, e) => acc + outstandingValue(e), 0)
     );
@@ -240,10 +238,10 @@ export default {
       }, 0);
     });
 
-    // para simplicidade, igual ao que ainda vai vencer
+   
     const totalNextDue = computed(() => totalUsed.value);
 
-    // utilitários
+  
     const formatCurrency = (v) =>
       new Intl.NumberFormat("pt-BR", {
         style: "currency",

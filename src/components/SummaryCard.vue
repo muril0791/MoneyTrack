@@ -1,10 +1,10 @@
 <template>
   <section class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-6 py-6 font-sans">
-    <!-- cabeçalho -->
+   
     <div class="flex items-start justify-between">
       <h3 class="text-[15px] text-neutral-300">Saldo total</h3>
 
-      <!-- badge do total -->
+     
       <span
         :class="[
           'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none',
@@ -28,7 +28,7 @@
       </span>
     </div>
 
-    <!-- cifra grande -->
+   
     <div class="mt-3 flex items-baseline gap-2">
       <span class="text-neutral-400 text-[1.05rem] font-medium">R$</span>
       <span
@@ -38,9 +38,9 @@
       </span>
     </div>
 
-    <!-- métricas -->
+   
     <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-8">
-      <!-- Entrada -->
+    
       <div>
         <p class="text-neutral-400 text-[23px]">Entrada</p>
         <p class="mt-1 flex items-baseline gap-2">
@@ -51,7 +51,7 @@
         </p>
       </div>
 
-      <!-- Saída -->
+      
       <div>
         <p class="text-neutral-400 text-[23px]">Saida</p>
         <p class="mt-1 flex items-baseline gap-2">
@@ -62,7 +62,7 @@
         </p>
       </div>
 
-      <!-- Balanço + badge pequeno à direita do rótulo -->
+     
       <div>
         <div class="flex items-center gap-2">
           <p class="text-neutral-400 text-[23px]">Balanço</p>
@@ -106,7 +106,7 @@ export default {
   name: "SummaryCard",
   props: { expenses: { type: Array, required: true } },
   setup(props) {
-    // agrupa por mês
+   
     const monthOf = (d) =>
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 
@@ -139,7 +139,7 @@ export default {
     const totalOut = computed(() => totalsNow.value.out);
     const balance = computed(() => totalIn.value - totalOut.value);
 
-    // variação percentual do balanço contra o mês anterior
+   
     const pctChange = computed(() => {
       const curr = totalsNow.value.in - totalsNow.value.out;
       const prev = totalsPrev.value.in - totalsPrev.value.out;
@@ -147,7 +147,7 @@ export default {
       return ((curr - prev) / Math.abs(prev)) * 100;
     });
 
-    // helpers de formatação
+   
     const currencyBR = (v) =>
       new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -157,7 +157,7 @@ export default {
     const formatCurrency = (v) =>
       new Intl.NumberFormat("pt-BR").format(Number(v || 0));
 
-    // apenas os dígitos (sem "R$")
+    
     const numberOnly = (v) =>
       new Intl.NumberFormat("pt-BR").format(Number(v || 0));
 

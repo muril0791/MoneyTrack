@@ -42,7 +42,6 @@ export default{
   props:{ expenses:{type:Array,required:true}, categories:{type:Array,default:()=>[]}, creditCards:{type:Array,default:()=>[]} },
   computed:{
     normalized(){
-      // ordem do mock: mais antigas em cima? vamos manter por data ASC
       return [...this.expenses].sort((a,b)=> new Date(a.data) - new Date(b.data));
     }
   },

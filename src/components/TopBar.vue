@@ -1,15 +1,14 @@
 <template>
-  <!-- container geral da topbar -->
+ 
   <header class="px-5 pt-3">
     <div class="flex items-center gap-3">
 
-      <!-- PILHA ESQUERDA: grande pill com logo + navegação e botão Logout à direita -->
+      
       <div
         class="flex-1 flex items-center justify-between rounded-2xl bg-[#242424] ring-1 ring-[#2d2d2d] px-3 py-2"
-      >
-        <!-- logo + navegação -->
+      > 
         <div class="flex items-center gap-3">
-          <!-- LOGO (não clica) -->
+        
           <div
             aria-label="Logo"
             class="select-none rounded-xl bg-neutral-300 text-neutral-900 font-semibold px-4 py-2 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.12)]"
@@ -17,9 +16,9 @@
             Logo
           </div>
 
-          <!-- LINKS -->
+         
           <nav class="flex items-center gap-1">
-            <!-- Cartões: abre *lista de cartões* -->
+          
             <button
               type="button"
               @click="$emit('open-credit-cards-list')"
@@ -28,7 +27,7 @@
               Cartões
             </button>
 
-            <!-- Cadastros: dropdown -->
+           
             <div
               class="relative"
               tabindex="0"
@@ -47,7 +46,7 @@
                 </svg>
               </button>
 
-              <!-- menu -->
+              
               <div
                 v-if="dropdownOpen"
                 class="absolute left-0 top-full mt-2 w-56 rounded-xl bg-[#1b1b1b] ring-1 ring-[#2a2a2a] shadow-2xl p-2 z-50"
@@ -75,7 +74,7 @@
           </nav>
         </div>
 
-        <!-- Logout (fica dentro do mesmo pill, à direita) -->
+        
         <button
           type="button"
           @click="logout"
@@ -85,7 +84,7 @@
         </button>
       </div>
 
-      <!-- PILHA DIREITA: welcome pill com avatar + nome -->
+      
       <div
         class="flex items-center gap-3 rounded-2xl bg-[#242424] ring-1 ring-[#2d2d2d] pl-2 pr-4 py-2"
       >

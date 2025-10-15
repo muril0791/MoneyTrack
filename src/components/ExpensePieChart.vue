@@ -2,7 +2,6 @@
   <div ref="wrap" class="w-full h-72 lg:h-80 font-sans">
     <canvas ref="cv"></canvas>
 
-    <!-- legenda simples -->
     <div class="mt-3 flex items-center gap-6 justify-center text-xs text-neutral-300">
       <div class="flex items-center gap-2">
         <span class="inline-block w-3 h-3 rounded-full" :style="{ background: colorIn }"></span>

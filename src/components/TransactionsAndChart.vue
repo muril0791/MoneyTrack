@@ -1,8 +1,8 @@
 <template>
   <section class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-5">
-    <!-- 2 colunas: tabela (2fr) + gráfico (1fr) -->
+ 
     <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-      <!-- Tabela -->
+     
       <div>
         <h3 class="text-neutral-300 mb-3">Transações</h3>
         <div class="overflow-hidden rounded-xl ring-1 ring-[#232323]">
@@ -48,12 +48,12 @@
         </div>
       </div>
 
-      <!-- Gráfico: borda-esquerda vira o “separador” -->
+      
       <div class="min-h-[180px] lg:border-l lg:border-[#262626] lg:pl-6">
         <h3 class="text-neutral-300 mb-3">Grafico</h3>
 
         <div class="flex flex-col items-center">
-          <!-- passa as despesas para o gráfico -->
+       
           <ExpensePieChart :expenses="expenses" class="w-full" />
 
           <div class="mt-3 flex items-center gap-6 text-xs text-neutral-300">
