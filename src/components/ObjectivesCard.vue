@@ -7,7 +7,7 @@
 
     <div class="text-sm text-neutral-400">Casa na praia</div>
 
-    <!-- barra segmentada -->
+  
     <div
       class="h-3 rounded-md mt-2 ring-1 ring-[#2a2a2a] bg-[#141414] overflow-hidden"
       :style="segmentStyle"
@@ -24,11 +24,11 @@ export default {
   name: "ObjectivesCard",
   props: { valor: { type: Number, default: 440000 }, pct: { type: Number, default: 28 } },
   computed: {
-    // cria segmentos tipo “listras” como na ref
+    
     segmentStyle() {
       return {
         backgroundImage: `repeating-linear-gradient(90deg, #1f1f1f 0 10px, #141414 10px 20px)`,
-        // preenchimento verde por cima
+       
         '--tw-gradient-to': '#3ecf00',
         position: 'relative'
       };
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style scoped>
-/* cor da parte preenchida (verde) */
+
 div[style*="--tw-gradient-to"] > div {
   background: #3ecf00;
 }
