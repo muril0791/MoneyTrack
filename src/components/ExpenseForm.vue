@@ -212,6 +212,7 @@
       </div>
     </section>
 
+    <!-- Passo 2 -->
     <section
       v-else-if="currentStep === 2"
       class="border border-[#2a2a2a] bg-[#1b1b1b] rounded-2xl shadow-xl"
@@ -228,12 +229,9 @@
       </div>
 
       <div class="p-4 space-y-2">
-        <ItemRow label="Tipo" :value="form.tipo" />
-        <ItemRow
-          label="Valor"
-          :value="`R$ ${Number(form.valor || 0).toFixed(2)}`"
-        />
-        <ItemRow label="Transação" :value="form.tipoTransacao" />
+        <ItemRow label="Tipo" :text="labelTipo" />
+        <ItemRow label="Valor" :text="money(form.valor)" />
+        <ItemRow label="Transação" :text="labelTransacao" />
 
         <template
           v-if="
@@ -242,23 +240,23 @@
         >
           <ItemRow
             label="Cartão"
-            :value="getCreditCardName(form.creditCardId) || '—'"
+            :text="getCreditCardName(form.creditCardId) || '—'"
           />
           <ItemRow
             v-if="form.parcelas"
             label="Parcelas"
-            :value="`${form.parcelas}x`"
+            :text="`${form.parcelas}x`"
           />
           <ItemRow
             v-if="form.dataPrimeiraParcela"
             label="1ª Parcela"
-            :value="form.dataPrimeiraParcela"
+            :text="brDate(form.dataPrimeiraParcela)"
           />
         </template>
 
-        <ItemRow label="Data" :value="form.data" />
-        <ItemRow label="Categoria" :value="selectedCategoryName || '—'" />
-        <ItemRow label="Descrição" :value="form.descricao || '—'" />
+        <ItemRow label="Data" :text="brDate(form.data)" />
+        <ItemRow label="Categoria" :text="selectedCategoryName || '—'" />
+        <ItemRow label="Descrição" :text="form.descricao || '—'" />
       </div>
 
       <div class="flex items-center justify-end gap-2 px-4 py-3">
@@ -271,7 +269,7 @@
         </button>
         <button
           type="button"
-          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold transition"
+          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-[#2a2a2a] text-white font-semibold transition"
           @click="handleSubmit"
         >
           Confirmar
@@ -282,18 +280,26 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, defineComponent } from "vue";
+import { ref, reactive, computed, watch, h } from "vue";
 
-const ItemRow = defineComponent({
-  props: { label: String, value: String },
-  template: `
-    <div class="flex items-center justify-between border border-dashed border-[#2a2a2a]
-                rounded-lg px-3 py-2 bg-[#171717]">
-      <span class="text-neutral-400 text-sm">{{ label }}</span>
-      <span class="font-semibold">{{ value }}</span>
-    </div>
-  `,
-});
+const ItemRow = (props) =>
+  h(
+    "div",
+    {
+      class:
+        "flex items-center justify-between border border-dashed border-[#2a2a2a] rounded-lg px-3 py-2 bg-[#171717]",
+    },
+    [
+      h("span", { class: "text-neutral-400 text-sm" }, props.label),
+      h(
+        "span",
+        { class: "font-semibold truncate max-w-[60%] text-right" },
+        String(props.text ?? "")
+      ),
+    ]
+  );
+
+ItemRow.props = { label: String, text: [String, Number] };
 
 export default {
   name: "ExpenseForm",
@@ -306,6 +312,7 @@ export default {
   },
   setup(props, { emit }) {
     const currentStep = ref(0);
+
     const form = reactive({
       tipo: "",
       tipoTransacao: "",
@@ -320,8 +327,8 @@ export default {
 
     watch(
       () => form.categoria,
-      (newVal) => {
-        if (newVal === "adicionar") {
+      (v) => {
+        if (v === "adicionar") {
           emit("open-categories");
           form.categoria = "";
         }
@@ -333,7 +340,48 @@ export default {
       currentStep.value = 1;
     };
 
+    const computeFirstPaymentDate = () => {
+      if (
+        !(
+          form.tipo === "saida" &&
+          form.tipoTransacao === "cartao-credito" &&
+          form.parcelas &&
+          form.parcelas > 1
+        )
+      ) {
+        form.dataPrimeiraParcela = "";
+        return;
+      }
+      if (!form.data) {
+        form.dataPrimeiraParcela = "";
+        return;
+      }
+      const d = new Date(form.data + "T00:00:00");
+      form.dataPrimeiraParcela = `${d.getFullYear()}-${String(
+        d.getMonth() + 1
+      ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+
     const nextStep = () => {
+      if (currentStep.value === 1) {
+        if (
+          !form.tipo ||
+          !form.valor ||
+          !form.tipoTransacao ||
+          !form.data ||
+          !form.categoria
+        ) {
+          alert("Preencha os campos obrigatórios.");
+          return;
+        }
+        if (form.tipo === "saida" && form.tipoTransacao === "cartao-credito") {
+          if (!form.creditCardId) {
+            alert("Selecione um cartão de crédito.");
+            return;
+          }
+          computeFirstPaymentDate();
+        }
+      }
       if (currentStep.value < 2) currentStep.value++;
     };
 
@@ -372,35 +420,46 @@ export default {
       } else {
         emit("add-expense", { ...form });
       }
-
       emit("close");
-      currentStep.value = 0;
-      Object.assign(form, {
-        tipo: "",
-        tipoTransacao: "",
-        parcelas: null,
-        data: "",
-        valor: null,
-        categoria: "",
-        descricao: "",
-        creditCardId: "",
-        dataPrimeiraParcela: "",
-      });
+      goBackToStep0();
     };
 
     const filteredCategories = computed(() =>
       props.categories.filter((cat) => cat.type === form.tipo)
     );
+    const selectedCategoryName = computed(
+      () => props.categories.find((c) => c.id === form.categoria)?.name || ""
+    );
+    const getCreditCardName = (id) =>
+      props.creditCards.find((c) => c.id === id)?.name || "";
 
-    const selectedCategoryName = computed(() => {
-      const cat = props.categories.find((c) => c.id === form.categoria);
-      return cat ? cat.name : "";
+    const money = (v) =>
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(Number(v || 0));
+    const brDate = (s) =>
+      s
+        ? new Date(s + "T00:00:00").toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
+        : "";
+    const labelTipo = computed(() =>
+      form.tipo === "entrada" ? "Entrada" : "Saída"
+    );
+    const labelTransacao = computed(() => {
+      const map = {
+        dinheiro: "Dinheiro",
+        deposito: "Depósito",
+        pix: "Pix",
+        transferencia: "Transferência",
+        "cartao-debito": "Cartão de Débito",
+        "cartao-credito": "Cartão de Crédito",
+      };
+      return map[form.tipoTransacao] || form.tipoTransacao || "—";
     });
-
-    const getCreditCardName = (id) => {
-      const card = props.creditCards.find((c) => c.id === id);
-      return card ? card.name : "";
-    };
 
     return {
       currentStep,
@@ -413,6 +472,10 @@ export default {
       filteredCategories,
       selectedCategoryName,
       getCreditCardName,
+      money,
+      brDate,
+      labelTipo,
+      labelTransacao,
     };
   },
 };

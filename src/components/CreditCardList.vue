@@ -3,7 +3,7 @@
     <div
       class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
     >
-      
+      <!-- Header -->
       <div
         class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
       >
@@ -18,9 +18,9 @@
         </button>
       </div>
 
-     
+      <!-- Body -->
       <div class="p-6 grid gap-6">
-        
+        <!-- Filtro -->
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
@@ -40,7 +40,7 @@
           </select>
         </div>
 
-        
+        <!-- Resumos -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="summary-box">
             <p class="summary-label">Total Usado</p>
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        
+        <!-- Lista -->
         <div class="grid gap-3">
           <h3 class="text-sm uppercase tracking-wider text-neutral-400">
             Transações
@@ -115,7 +115,7 @@
         </div>
       </div>
 
-     
+      <!-- Footer -->
       <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
         <button
           class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
@@ -130,6 +130,7 @@
 
 <script>
 import { computed, ref } from "vue";
+
 export default {
   name: "CreditCardList",
   props: {
@@ -138,9 +139,9 @@ export default {
   },
   setup(props) {
     const selectedCardId = ref("todos");
+    const applyFilter = () => {}; 
 
-    const applyFilter = () => {};
-
+   
     const filteredExpenses = computed(() => {
       let filtered = props.expenses.filter(
         (expense) =>
@@ -156,34 +157,91 @@ export default {
       return filtered;
     });
 
-    const totalUsed = computed(() => {
-      return filteredExpenses.value.reduce(
-        (acc, expense) => acc + Number(expense.valor),
-        0
-      );
-    });
+    const firstPaymentDate = (expense) => {
+      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
+      if (!card) return null;
+
+      const d = new Date(expense.data);
+     
+      if (expense.parcelas && expense.parcelas > 1) {
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      }
+
+      const closing = Number(card.closingDay);
+      const due = Number(card.dueDay);
+      let y = d.getFullYear(),
+        m = d.getMonth();
+      m += d.getDate() <= closing ? 1 : 2;
+      return new Date(y, m, due);
+    };
+
+    const computePaymentDate = (expense) => {
+      const first = firstPaymentDate(expense);
+      if (!first) return "";
+      return first.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    };
+
+    const outstandingValue = (expense) => {
+      const first = firstPaymentDate(expense);
+      if (!first) return 0;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+     
+      if (expense.parcelas && expense.parcelas > 1) {
+        const parcela = Number(expense.valor) / Number(expense.parcelas);
+        let total = 0;
+        for (let i = 0; i < expense.parcelas; i++) {
+          const pay = new Date(
+            first.getFullYear(),
+            first.getMonth() + i,
+            first.getDate()
+          );
+          if (pay >= today) total += parcela;
+        }
+        return total;
+      }
+     
+      return first >= today ? Number(expense.valor) : 0;
+    };
+
+    const totalUsed = computed(() =>
+      filteredExpenses.value.reduce((acc, e) => acc + outstandingValue(e), 0)
+    );
+
+    const computeAvailableLimit = (expense) => {
+      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
+      if (!card) return 0;
+      const used = filteredExpenses.value
+        .filter((exp) => exp.creditCardId === card.id)
+        .reduce((sum, exp) => sum + outstandingValue(exp), 0);
+      return card.limit - used;
+    };
 
     const totalAvailable = computed(() => {
       if (selectedCardId.value !== "todos") {
         const card = props.creditCards.find(
           (c) => c.id === selectedCardId.value
         );
-        if (card) {
-          return card.limit - totalUsed.value;
-        }
+        if (card) return card.limit - totalUsed.value;
         return 0;
-      } else {
-        return props.creditCards.reduce((acc, card) => {
-          const used = filteredExpenses.value
-            .filter((exp) => exp.creditCardId === card.id)
-            .reduce((sum, exp) => sum + Number(exp.valor), 0);
-          return acc + (card.limit - used);
-        }, 0);
       }
+      return props.creditCards.reduce((acc, card) => {
+        const used = filteredExpenses.value
+          .filter((exp) => exp.creditCardId === card.id)
+          .reduce((s, e) => s + outstandingValue(e), 0);
+        return acc + (card.limit - used);
+      }, 0);
     });
 
+   
     const totalNextDue = computed(() => totalUsed.value);
 
+  
     const formatCurrency = (v) =>
       new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -197,39 +255,6 @@ export default {
         month: "long",
         year: "numeric",
       });
-    };
-
-    const computePaymentDate = (expense) => {
-      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
-      if (!card) return "";
-      const expenseDate = new Date(expense.data);
-
-      let paymentDate = new Date(
-        expenseDate.getFullYear(),
-        expenseDate.getMonth(),
-        card.dueDay
-      );
-      if (expenseDate.getDate() > card.dueDay) {
-        paymentDate = new Date(
-          expenseDate.getFullYear(),
-          expenseDate.getMonth() + 1,
-          card.dueDay
-        );
-      }
-      return paymentDate.toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      });
-    };
-
-    const computeAvailableLimit = (expense) => {
-      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
-      if (!card) return 0;
-      const used = filteredExpenses.value
-        .filter((exp) => exp.creditCardId === card.id)
-        .reduce((sum, exp) => sum + Number(exp.valor), 0);
-      return card.limit - used;
     };
 
     return {
@@ -256,12 +281,10 @@ export default {
   padding: 1rem;
   text-align: center;
 }
-
 .summary-label {
   font-size: 0.875rem;
   color: #a3a3a3;
 }
-
 .summary-value {
   font-size: 1.125rem;
   font-weight: 600;
