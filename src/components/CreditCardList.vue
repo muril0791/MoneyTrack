@@ -3,7 +3,7 @@
     <div
       class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
     >
-      <!-- Header -->
+    
       <div
         class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
       >
@@ -18,9 +18,9 @@
         </button>
       </div>
 
-      <!-- Body -->
+     
       <div class="p-6 grid gap-6">
-        <!-- Filtro -->
+        
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
@@ -40,7 +40,7 @@
           </select>
         </div>
 
-        <!-- Resumos -->
+        
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="summary-box">
             <p class="summary-label">Total Usado</p>
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <!-- Lista -->
+        
         <div class="grid gap-3">
           <h3 class="text-sm uppercase tracking-wider text-neutral-400">
             Transações
@@ -115,7 +115,7 @@
         </div>
       </div>
 
-      <!-- Footer -->
+      
       <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
         <button
           class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"

@@ -212,7 +212,6 @@
       </div>
     </section>
 
-    <!-- Passo 2 -->
     <section
       v-else-if="currentStep === 2"
       class="border border-[#2a2a2a] bg-[#1b1b1b] rounded-2xl shadow-xl"
