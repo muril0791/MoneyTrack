@@ -3,7 +3,6 @@
     <div
       class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
     >
-      
       <div
         class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
       >
@@ -19,9 +18,7 @@
         </button>
       </div>
 
-     
       <div class="p-6 grid gap-6">
-       
         <form
           @submit.prevent="handleSubmit"
           class="grid grid-cols-1 md:grid-cols-3 gap-4"
@@ -37,6 +34,7 @@
               v-model="categoryForm.name"
               type="text"
               required
+              :disabled="submitting"
               placeholder="Ex.: Salário, Moradia, Mercado…"
               class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
             />
@@ -52,6 +50,7 @@
               id="categoryType"
               v-model="categoryForm.type"
               required
+              :disabled="submitting"
               class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
             >
               <option disabled value="">Selecione</option>
@@ -63,23 +62,27 @@
           <div class="md:col-span-3 flex gap-3">
             <button
               type="submit"
-              class="flex-1 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10"
+              :disabled="submitting"
+              class="flex-1 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {{ isEditing ? "Atualizar" : "Adicionar" }}
+              <span v-if="!submitting">{{
+                isEditing ? "Atualizar" : "Adicionar"
+              }}</span>
+              <span v-else>Salvando…</span>
             </button>
 
             <button
               v-if="isEditing"
               type="button"
               @click="cancelEdit"
-              class="px-4 py-3 rounded-lg bg-[#262626] hover:bg-[#2f2f2f] text-neutral-200 font-medium transition"
+              :disabled="submitting"
+              class="px-4 py-3 rounded-lg bg-[#262626] hover:bg-[#2f2f2f] text-neutral-200 font-medium transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
           </div>
         </form>
 
-        
         <div class="grid gap-3">
           <h3 class="text-sm uppercase tracking-wider text-neutral-400">
             Categorias cadastradas
@@ -121,12 +124,14 @@
               <div class="flex items-center gap-2 shrink-0">
                 <button
                   class="px-3 py-2 rounded-md bg-[#232323] hover:bg-[#2b2b2b] text-sm font-medium transition"
+                  :disabled="submitting"
                   @click="editCategory(cat)"
                 >
                   Editar
                 </button>
                 <button
                   class="px-3 py-2 rounded-md bg-[#2a1313] hover:bg-[#341616] text-sm font-medium text-red-300 transition"
+                  :disabled="submitting"
                   @click="deleteCategory(cat.id)"
                 >
                   Excluir
@@ -137,7 +142,6 @@
         </div>
       </div>
 
-      
       <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
         <button
           class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
@@ -165,34 +169,60 @@ export default {
     const categoryForm = ref({ name: "", type: "" });
     const isEditing = ref(false);
     const editingId = ref(null);
+    const submitting = ref(false);
 
     const resetForm = () => {
       categoryForm.value = { name: "", type: "" };
       isEditing.value = false;
       editingId.value = null;
+      submitting.value = false;
     };
 
     const handleSubmit = async () => {
-      if (isEditing.value && editingId.value) {
-        await store.updateCategory({
-          ...categoryForm.value,
-          id: editingId.value,
-        });
-      } else {
-        await store.addCategory({ ...categoryForm.value });
+      if (submitting.value) return;
+      const name = String(categoryForm.value.name || "")
+        .trim()
+        .slice(0, 80);
+      const type =
+        categoryForm.value.type === "entrada"
+          ? "entrada"
+          : categoryForm.value.type === "saida"
+          ? "saida"
+          : "";
+      if (!name || !type) return;
+
+      submitting.value = true;
+      try {
+        if (isEditing.value && editingId.value) {
+          await store.updateCategory({ id: editingId.value, name, type });
+        } else {
+          await store.addCategory({ name, type });
+        }
+        resetForm();
+      } finally {
+        submitting.value = false;
       }
-      resetForm();
     };
 
     const editCategory = (cat) => {
+      if (submitting.value) return;
       isEditing.value = true;
       editingId.value = cat.id;
-      categoryForm.value = { name: cat.name, type: cat.type };
+      categoryForm.value = {
+        name: String(cat.name || "").slice(0, 80),
+        type: cat.type,
+      };
     };
 
     const deleteCategory = async (catId) => {
-      await store.removeCategory(catId);
-      if (editingId.value === catId) resetForm();
+      if (submitting.value) return;
+      submitting.value = true;
+      try {
+        await store.removeCategory(catId);
+        if (editingId.value === catId) resetForm();
+      } finally {
+        submitting.value = false;
+      }
     };
 
     const cancelEdit = () => resetForm();
@@ -201,6 +231,8 @@ export default {
       categories,
       categoryForm,
       isEditing,
+      editingId,
+      submitting,
       handleSubmit,
       editCategory,
       deleteCategory,

@@ -4,7 +4,7 @@ import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-
+import { supabase } from "@/lib/supabase";
 import { pinia } from "./stores/store";
 import router from "./router/router";
 import "./index.css";
@@ -19,6 +19,15 @@ const vuetify = createVuetify({
 
 const app = createApp(App).use(router).use(pinia).use(vuetify);
 
+supabase.auth.onAuthStateChange((_event, session) => {
+  const store = useMainStore();
+  if (!session) {
+    store.reset();
+    if (router.currentRoute.value.name !== "Login") {
+      router.push({ name: "Login" });
+    }
+  }
+});
 
 app.config.errorHandler = (err, vm, info) => {
   console.error("Vue error handler:", err, info);

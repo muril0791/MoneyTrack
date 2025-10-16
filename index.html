@@ -1,42 +1,54 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
 
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="
-        default-src 'self';
-        connect-src 'self'
-          http://localhost:5173
-          ws://localhost:5173
-          https://*.supabase.co
-          https://*.supabase.in
-          wss://*.supabase.co;
-        img-src 'self' data: https:;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        font-src 'self' https://fonts.gstatic.com data:;
-        script-src 'self' 'wasm-unsafe-eval';
-        frame-src 'self' https://*.supabase.co;
-      "
-    />
+<head>
+  <meta charset="UTF-8" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Teko:wght@300..700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    base-uri 'self';
+    object-src 'none';
+    connect-src
+      'self'
+      https://*.supabase.co
+      https://*.supabase.in
+      wss://*.supabase.co;
+    img-src 'self' data: https:;
+    script-src 'self';
+    script-src-attr 'none';
+    style-src
+      'self'
+      'unsafe-inline'
+      https://fonts.googleapis.com;
+    font-src
+      'self'
+      https://fonts.gstatic.com
+      data:;
+    frame-src 'self' https://*.supabase.co;
+    frame-ancestors 'none';
+    form-action 'self';
+    upgrade-insecure-requests;
+  " />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>moneyTRACK</title>
-  </head>
 
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Teko:wght@300..700&display=swap"
+    rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>moneyTRACK</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

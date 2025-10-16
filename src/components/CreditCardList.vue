@@ -3,7 +3,6 @@
     <div
       class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
     >
-    
       <div
         class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
       >
@@ -17,10 +16,7 @@
           ✕
         </button>
       </div>
-
-     
       <div class="p-6 grid gap-6">
-        
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
@@ -39,8 +35,6 @@
             </option>
           </select>
         </div>
-
-        
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="summary-box">
             <p class="summary-label">Total Usado</p>
@@ -61,20 +55,16 @@
             </p>
           </div>
         </div>
-
-        
         <div class="grid gap-3">
           <h3 class="text-sm uppercase tracking-wider text-neutral-400">
             Transações
           </h3>
-
           <div
             v-if="filteredExpenses.length === 0"
             class="text-sm text-neutral-400 bg-[#151515] border border-dashed border-[#2a2a2a] rounded-xl p-6 text-center"
           >
             Nenhuma transação encontrada.
           </div>
-
           <ul
             v-else
             class="divide-y divide-[#232323] rounded-xl overflow-hidden ring-1 ring-[#232323]"
@@ -101,7 +91,6 @@
                   Parcelas: {{ expense.parcelas }}
                 </p>
               </div>
-
               <div class="text-right sm:text-left">
                 <p class="text-sm text-neutral-400">
                   Limite disponível:
@@ -114,8 +103,6 @@
           </ul>
         </div>
       </div>
-
-      
       <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
         <button
           class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
@@ -139,9 +126,29 @@ export default {
   },
   setup(props) {
     const selectedCardId = ref("todos");
-    const applyFilter = () => {}; 
+    const applyFilter = () => {};
 
-   
+    const clampDay = (y, m, d) => {
+      const last = new Date(y, m + 1, 0).getDate();
+      return new Date(y, m, Math.min(d, last));
+    };
+    const nextClosingAfter = (purchase, closingDay) => {
+      const y = purchase.getFullYear();
+      const m = purchase.getMonth();
+      const closeThis = clampDay(y, m, closingDay);
+      if (purchase.getDate() >= closeThis.getDate())
+        return clampDay(y, m + 1, closingDay);
+      return closeThis;
+    };
+    const dueDateFrom = (purchase, card) => {
+      const closing = nextClosingAfter(purchase, Number(card.closingDay));
+      const y = closing.getFullYear();
+      const m = closing.getMonth();
+      const dueMonth =
+        Number(card.dueDay) > Number(card.closingDay) ? m : m + 1;
+      return clampDay(y, dueMonth, Number(card.dueDay));
+    };
+
     const filteredExpenses = computed(() => {
       let filtered = props.expenses.filter(
         (expense) =>
@@ -157,27 +164,11 @@ export default {
       return filtered;
     });
 
-    const firstPaymentDate = (expense) => {
-      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
-      if (!card) return null;
-
-      const d = new Date(expense.data);
-     
-      if (expense.parcelas && expense.parcelas > 1) {
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      }
-
-      const closing = Number(card.closingDay);
-      const due = Number(card.dueDay);
-      let y = d.getFullYear(),
-        m = d.getMonth();
-      m += d.getDate() <= closing ? 1 : 2;
-      return new Date(y, m, due);
-    };
-
     const computePaymentDate = (expense) => {
-      const first = firstPaymentDate(expense);
-      if (!first) return "";
+      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
+      if (!card) return "";
+      const purchase = new Date(expense.data);
+      const first = dueDateFrom(purchase, card);
       return first.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
@@ -186,27 +177,24 @@ export default {
     };
 
     const outstandingValue = (expense) => {
-      const first = firstPaymentDate(expense);
-      if (!first) return 0;
+      const card = props.creditCards.find((c) => c.id === expense.creditCardId);
+      if (!card) return 0;
+      const purchase = new Date(expense.data);
+      const firstDue = dueDateFrom(purchase, card);
+      const n = Math.max(1, Number(expense.parcelas || 1));
+      const parcela = Number(expense.valor) / n;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
-     
-      if (expense.parcelas && expense.parcelas > 1) {
-        const parcela = Number(expense.valor) / Number(expense.parcelas);
-        let total = 0;
-        for (let i = 0; i < expense.parcelas; i++) {
-          const pay = new Date(
-            first.getFullYear(),
-            first.getMonth() + i,
-            first.getDate()
-          );
-          if (pay >= today) total += parcela;
-        }
-        return total;
+      let total = 0;
+      for (let i = 0; i < n; i++) {
+        const pay = new Date(
+          firstDue.getFullYear(),
+          firstDue.getMonth() + i,
+          firstDue.getDate()
+        );
+        if (pay >= today) total += parcela;
       }
-     
-      return first >= today ? Number(expense.valor) : 0;
+      return total;
     };
 
     const totalUsed = computed(() =>
@@ -238,24 +226,19 @@ export default {
       }, 0);
     });
 
-   
     const totalNextDue = computed(() => totalUsed.value);
 
-  
     const formatCurrency = (v) =>
       new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
       }).format(Number(v || 0));
-
-    const formatData = (dataStr) => {
-      const dateObj = new Date(dataStr);
-      return dateObj.toLocaleDateString("pt-BR", {
+    const formatData = (s) =>
+      new Date(s).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       });
-    };
 
     return {
       selectedCardId,

@@ -1,13 +1,9 @@
-
+// src/stores/store.js
 import { defineStore, createPinia } from "pinia";
 import * as expenseService from "@/services/expenseService";
 import * as categoryService from "@/services/categoryService";
 import * as creditCardService from "@/services/creditCardService";
 
-/**
- * Helpers para garantir que os dados estejam no formato esperado pelos componentes,
- * mesmo que algum service retorne snake_case.
- */
 function normalizeCard(row) {
   if (!row) return row;
   return {
@@ -27,9 +23,9 @@ function normalizeExpense(row) {
     tipo: row.tipo,
     tipoTransacao: row.tipoTransacao ?? row.tipo_transacao,
     parcelas: row.parcelas ?? null,
-    data: row.data, 
+    data: row.data,
     valor: Number(row.valor ?? 0),
-    categoria: row.categoria ?? null, 
+    categoria: row.categoria ?? null,
     descricao: row.descricao ?? "",
     creditCardId: row.creditCardId ?? row.credit_card_id ?? null,
     created_at: row.created_at,
@@ -44,13 +40,18 @@ export const useMainStore = defineStore("main", {
   }),
 
   actions: {
-    
+    reset() {
+      this.expenses = [];
+      this.categories = [];
+      this.creditCards = [];
+    },
+
     async fetchExpenses() {
       try {
         const list = await expenseService.listExpenses();
         this.expenses = (list || []).map(normalizeExpense);
       } catch (error) {
-        console.error("Erro ao buscar Expenses:", error);
+        if (import.meta.env.DEV) console.error("Erro ao buscar Expenses:", error);
       }
     },
 
@@ -59,7 +60,7 @@ export const useMainStore = defineStore("main", {
         const created = await expenseService.createExpense(expense);
         this.expenses.unshift(normalizeExpense(created));
       } catch (error) {
-        console.error("Erro ao adicionar Expense:", error);
+        if (import.meta.env.DEV) console.error("Erro ao adicionar Expense:", error);
       }
     },
 
@@ -70,7 +71,7 @@ export const useMainStore = defineStore("main", {
         const index = this.expenses.findIndex((e) => e.id === expense.id);
         if (index !== -1) this.expenses[index] = norm;
       } catch (error) {
-        console.error("Erro ao atualizar Expense:", error);
+        if (import.meta.env.DEV) console.error("Erro ao atualizar Expense:", error);
       }
     },
 
@@ -79,18 +80,16 @@ export const useMainStore = defineStore("main", {
         await expenseService.removeExpense(expenseId);
         this.expenses = this.expenses.filter((e) => e.id !== expenseId);
       } catch (error) {
-        console.error("Erro ao remover Expense:", error);
+        if (import.meta.env.DEV) console.error("Erro ao remover Expense:", error);
       }
     },
 
-    
     async fetchCategories() {
       try {
         const list = await categoryService.listCategories();
-       
         this.categories = list || [];
       } catch (error) {
-        console.error("Erro ao buscar Categories:", error);
+        if (import.meta.env.DEV) console.error("Erro ao buscar Categories:", error);
       }
     },
 
@@ -99,7 +98,7 @@ export const useMainStore = defineStore("main", {
         const created = await categoryService.createCategory(category);
         this.categories.unshift(created);
       } catch (error) {
-        console.error("Erro ao adicionar Category:", error);
+        if (import.meta.env.DEV) console.error("Erro ao adicionar Category:", error);
       }
     },
 
@@ -109,7 +108,7 @@ export const useMainStore = defineStore("main", {
         const index = this.categories.findIndex((c) => c.id === category.id);
         if (index !== -1) this.categories[index] = updated;
       } catch (error) {
-        console.error("Erro ao atualizar Category:", error);
+        if (import.meta.env.DEV) console.error("Erro ao atualizar Category:", error);
       }
     },
 
@@ -118,18 +117,16 @@ export const useMainStore = defineStore("main", {
         await categoryService.removeCategory(categoryId);
         this.categories = this.categories.filter((c) => c.id !== categoryId);
       } catch (error) {
-        console.error("Erro ao remover Category:", error);
+        if (import.meta.env.DEV) console.error("Erro ao remover Category:", error);
       }
     },
 
-    
     async fetchCreditCards() {
       try {
         const rows = await creditCardService.listCreditCards();
-       
         this.creditCards = (rows || []).map(normalizeCard);
       } catch (error) {
-        console.error("Erro ao buscar Credit Cards:", error);
+        if (import.meta.env.DEV) console.error("Erro ao buscar Credit Cards:", error);
       }
     },
 
@@ -138,7 +135,7 @@ export const useMainStore = defineStore("main", {
         const created = await creditCardService.createCreditCard(card);
         this.creditCards.unshift(normalizeCard(created));
       } catch (error) {
-        console.error("Erro ao adicionar Credit Card:", error);
+        if (import.meta.env.DEV) console.error("Erro ao adicionar Credit Card:", error);
       }
     },
 
@@ -149,7 +146,7 @@ export const useMainStore = defineStore("main", {
         const index = this.creditCards.findIndex((c) => c.id === card.id);
         if (index !== -1) this.creditCards[index] = norm;
       } catch (error) {
-        console.error("Erro ao atualizar Credit Card:", error);
+        if (import.meta.env.DEV) console.error("Erro ao atualizar Credit Card:", error);
       }
     },
 
@@ -158,7 +155,7 @@ export const useMainStore = defineStore("main", {
         await creditCardService.removeCreditCard(cardId);
         this.creditCards = this.creditCards.filter((c) => c.id !== cardId);
       } catch (error) {
-        console.error("Erro ao remover Credit Card:", error);
+        if (import.meta.env.DEV) console.error("Erro ao remover Credit Card:", error);
       }
     },
   },

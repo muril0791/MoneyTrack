@@ -1,7 +1,10 @@
 import { supabase } from '@/lib/supabase'
 
 export async function listCreditCards() {
-  const { data, error } = await supabase.from('credit_cards').select('*').order('created_at', { ascending: false })
+  const { data, error } = await supabase
+    .from('credit_cards')
+    .select('*')
+    .order('created_at', { ascending: false })
   if (error) throw error
   return data.map(mapCard)
 }
@@ -15,7 +18,7 @@ export async function createCreditCard({ name, limit, closingDay, dueDay }) {
     .insert({
       user_id: user.id,
       name,
-      limit,
+      credit_limit: limit,
       closing_day: closingDay,
       due_day: dueDay,
     })
@@ -29,7 +32,12 @@ export async function createCreditCard({ name, limit, closingDay, dueDay }) {
 export async function updateCreditCard(id, { name, limit, closingDay, dueDay }) {
   const { data, error } = await supabase
     .from('credit_cards')
-    .update({ name, limit, closing_day: closingDay, due_day: dueDay })
+    .update({
+      name,
+      credit_limit: limit,
+      closing_day: closingDay,
+      due_day: dueDay,
+    })
     .eq('id', id)
     .select('*')
     .single()
@@ -47,9 +55,9 @@ function mapCard(row) {
   return {
     id: row.id,
     name: row.name,
-    limit: Number(row.limit),
-    closingDay: row.closing_day,
-    dueDay: row.due_day,
+    limit: Number(row.credit_limit ?? row.limit ?? 0),
+    closingDay: row.closing_day ?? row.closingDay,
+    dueDay: row.due_day ?? row.dueDay,
     created_at: row.created_at,
   }
 }

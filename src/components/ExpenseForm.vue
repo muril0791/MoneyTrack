@@ -89,6 +89,7 @@
             min="0"
             required
             placeholder="0,00"
+            :disabled="submitting"
             class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
           />
         </div>
@@ -98,6 +99,7 @@
           <select
             v-model="form.tipoTransacao"
             required
+            :disabled="submitting"
             class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
           >
             <option disabled value="">Selecione</option>
@@ -126,6 +128,7 @@
             <select
               v-model="form.creditCardId"
               required
+              :disabled="submitting"
               class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
             >
               <option disabled value="">Selecione</option>
@@ -146,6 +149,7 @@
               type="number"
               min="2"
               placeholder="ex.: 3"
+              :disabled="submitting"
               class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
             />
             <small class="text-neutral-400 text-xs"
@@ -160,6 +164,7 @@
             v-model="form.data"
             type="date"
             required
+            :disabled="submitting"
             class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
           />
         </div>
@@ -169,6 +174,7 @@
           <select
             v-model="form.categoria"
             required
+            :disabled="submitting"
             class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
           >
             <option disabled value="">Selecione</option>
@@ -189,6 +195,8 @@
             v-model="form.descricao"
             type="text"
             placeholder="Opcional"
+            maxlength="140"
+            :disabled="submitting"
             class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
           />
         </div>
@@ -197,14 +205,16 @@
       <div class="flex items-center justify-end gap-2 px-4 py-3">
         <button
           type="button"
-          class="px-4 py-2 rounded-lg border border-[#2a2a2a] bg-[#222] text-neutral-300 hover:bg-[#262626] hover:text-white transition"
+          :disabled="submitting"
+          class="px-4 py-2 rounded-lg border border-[#2a2a2a] bg-[#222] text-neutral-300 hover:bg-[#262626] hover:text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
           @click="goBackToStep0"
         >
           Voltar
         </button>
         <button
           type="button"
-          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold transition"
+          :disabled="submitting"
+          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
           @click="nextStep"
         >
           Próximo
@@ -231,7 +241,6 @@
         <ItemRow label="Tipo" :text="labelTipo" />
         <ItemRow label="Valor" :text="money(form.valor)" />
         <ItemRow label="Transação" :text="labelTransacao" />
-
         <template
           v-if="
             form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'
@@ -252,7 +261,6 @@
             :text="brDate(form.dataPrimeiraParcela)"
           />
         </template>
-
         <ItemRow label="Data" :text="brDate(form.data)" />
         <ItemRow label="Categoria" :text="selectedCategoryName || '—'" />
         <ItemRow label="Descrição" :text="form.descricao || '—'" />
@@ -261,17 +269,20 @@
       <div class="flex items-center justify-end gap-2 px-4 py-3">
         <button
           type="button"
-          class="px-4 py-2 rounded-lg border border-[#2a2a2a] bg-[#222] text-neutral-300 hover:bg-[#262626] hover:text-white transition"
+          :disabled="submitting"
+          class="px-4 py-2 rounded-lg border border-[#2a2a2a] bg-[#222] text-neutral-300 hover:bg-[#262626] hover:text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
           @click="prevStep"
         >
           Voltar
         </button>
         <button
           type="button"
-          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-[#2a2a2a] text-white font-semibold transition"
+          :disabled="submitting"
+          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-[#2a2a2a] text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
           @click="handleSubmit"
         >
-          Confirmar
+          <span v-if="!submitting">Confirmar</span>
+          <span v-else>Salvando…</span>
         </button>
       </div>
     </section>
@@ -297,7 +308,6 @@ const ItemRow = (props) =>
       ),
     ]
   );
-
 ItemRow.props = { label: String, text: [String, Number] };
 
 export default {
@@ -311,6 +321,7 @@ export default {
   },
   setup(props, { emit }) {
     const currentStep = ref(0);
+    const submitting = ref(false);
 
     const form = reactive({
       tipo: "",
@@ -335,7 +346,7 @@ export default {
     );
 
     const selectType = (tipo) => {
-      form.tipo = tipo;
+      form.tipo = tipo === "entrada" ? "entrada" : "saida";
       currentStep.value = 1;
     };
 
@@ -362,26 +373,44 @@ export default {
     };
 
     const nextStep = () => {
-      if (currentStep.value === 1) {
-        if (
-          !form.tipo ||
-          !form.valor ||
-          !form.tipoTransacao ||
-          !form.data ||
-          !form.categoria
-        ) {
-          alert("Preencha os campos obrigatórios.");
-          return;
-        }
-        if (form.tipo === "saida" && form.tipoTransacao === "cartao-credito") {
-          if (!form.creditCardId) {
-            alert("Selecione um cartão de crédito.");
-            return;
-          }
-          computeFirstPaymentDate();
-        }
+      if (currentStep.value !== 1) return;
+      const tipo = form.tipo === "entrada" ? "entrada" : "saida";
+      let tipoTransacao = form.tipoTransacao;
+      const allowEntrada = ["dinheiro", "deposito", "pix", "transferencia"];
+      const allowSaida = ["dinheiro", "pix", "cartao-debito", "cartao-credito"];
+      if (tipo === "entrada" && !allowEntrada.includes(tipoTransacao))
+        tipoTransacao = "";
+      if (tipo === "saida" && !allowSaida.includes(tipoTransacao))
+        tipoTransacao = "";
+      const valor = Math.max(0, Number(form.valor || 0));
+      const descricao = String(form.descricao || "")
+        .slice(0, 140)
+        .trim();
+      const dataStr = form.data;
+      const validDate =
+        !!dataStr && !Number.isNaN(new Date(dataStr + "T00:00:00").getTime());
+      let parcelaInt = form.parcelas ? Math.floor(Number(form.parcelas)) : null;
+      if (!parcelaInt || parcelaInt < 2) parcelaInt = null;
+      let categoria = form.categoria;
+      const catOk = props.categories.some(
+        (c) => c.id === categoria && c.type === tipo
+      );
+
+      if (!tipo || !valor || !tipoTransacao || !validDate || !catOk) return;
+
+      if (tipo === "saida" && tipoTransacao === "cartao-credito") {
+        if (!form.creditCardId) return;
+        computeFirstPaymentDate();
       }
-      if (currentStep.value < 2) currentStep.value++;
+
+      form.tipo = tipo;
+      form.tipoTransacao = tipoTransacao;
+      form.valor = valor;
+      form.descricao = descricao;
+      form.parcelas = parcelaInt;
+      if (!parcelaInt) form.dataPrimeiraParcela = "";
+
+      currentStep.value = 2;
     };
 
     const prevStep = () => {
@@ -401,26 +430,67 @@ export default {
         dataPrimeiraParcela: "",
       });
       currentStep.value = 0;
+      submitting.value = false;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+      if (submitting.value) return;
+      const payloadBase = {
+        tipo: form.tipo === "entrada" ? "entrada" : "saida",
+        tipoTransacao: form.tipoTransacao,
+        valor: Math.max(0, Number(form.valor || 0)),
+        data: form.data,
+        categoria: form.categoria,
+        descricao: String(form.descricao || "")
+          .slice(0, 140)
+          .trim(),
+      };
+
       if (
-        form.tipo === "saida" &&
-        form.tipoTransacao === "cartao-credito" &&
-        form.parcelas &&
-        form.parcelas > 1
-      ) {
-        const finalDate = form.dataPrimeiraParcela || form.data;
-        emit("add-expense", {
-          ...form,
-          data: finalDate,
-          parcelas: form.parcelas,
-        });
-      } else {
-        emit("add-expense", { ...form });
+        !payloadBase.tipo ||
+        !payloadBase.tipoTransacao ||
+        !payloadBase.valor ||
+        !payloadBase.data ||
+        !payloadBase.categoria
+      )
+        return;
+      const validCat = props.categories.some(
+        (c) => c.id === payloadBase.categoria && c.type === payloadBase.tipo
+      );
+      if (!validCat) return;
+
+      const isCredit =
+        payloadBase.tipo === "saida" &&
+        payloadBase.tipoTransacao === "cartao-credito";
+      let payload = { ...payloadBase };
+
+      if (isCredit) {
+        const parcelas = form.parcelas
+          ? Math.max(2, Math.floor(Number(form.parcelas)))
+          : null;
+        if (parcelas) {
+          const finalDate = form.dataPrimeiraParcela || form.data;
+          payload = {
+            ...payload,
+            parcelas,
+            data: finalDate,
+            creditCardId: form.creditCardId || "",
+          };
+          if (!payload.creditCardId) return;
+        } else {
+          payload = { ...payload, creditCardId: form.creditCardId || "" };
+          if (!payload.creditCardId) return;
+        }
       }
-      emit("close");
-      goBackToStep0();
+
+      submitting.value = true;
+      try {
+        emit("add-expense", { ...payload });
+        emit("close");
+        goBackToStep0();
+      } finally {
+        submitting.value = false;
+      }
     };
 
     const filteredCategories = computed(() =>
@@ -462,6 +532,7 @@ export default {
 
     return {
       currentStep,
+      submitting,
       form,
       selectType,
       nextStep,
@@ -480,5 +551,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

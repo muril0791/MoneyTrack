@@ -140,14 +140,18 @@ export default {
       this.$emit("open-categories");
       this.closeDropdown();
     },
+   
     async logout() {
       try {
         await supabase.auth.signOut();
       } catch (e) {
-        console.error(e);
+        if (import.meta.env.DEV) console.error(e);
       }
+      const { useMainStore } = await import("@/stores/store");
+      useMainStore().reset();
       this.$router.push({ name: "Login" });
-    },
+    }
+
   },
 };
 </script>
