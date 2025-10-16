@@ -71,7 +71,7 @@
       </div>
 
       <div class="text-center mt-6 text-xs text-neutral-500">
-        moneyTRACK •
+        Aurora •
       </div>
     </div>
   </div>

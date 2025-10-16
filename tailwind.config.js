@@ -1,22 +1,23 @@
-module.exports = {
-  purge: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+/** @type {import('tailwindcss').Config} */
+export default {
   darkMode: "class",
   theme: {
     extend: {
       colors: {
-        mainbg: "#0f0e11", // Fundo principal
-        cardbg: "#161716", // Fundo dos cards e seções
-        positive: "#3ecf00", // Saldo positivo e hover
-        negative: "#e93030", // Saldo negativo
-        fontcolor: "#c2c3c2", // Cor das fontes
+        mainbg: "#0f0e11",
+        cardbg: "#161716",
+        positive: "#3ecf00",
+        negative: "#e93030",
+        fontcolor: "#c2c3c2",
       },
       fontFamily: {
-        sans: ["Roboto", "sans-serif"],
+        sans: ["Inter", "Quicksand", "Roboto", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 };

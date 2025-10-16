@@ -16,6 +16,7 @@
           ✕
         </button>
       </div>
+
       <div class="p-6 grid gap-6">
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
@@ -35,22 +36,29 @@
             </option>
           </select>
         </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="summary-box">
-            <p class="summary-label">Total Usado</p>
-            <p class="summary-value text-red-400">
+          <div
+            class="bg-[#151515] border border-[#2a2a2a] rounded-xl p-4 text-center"
+          >
+            <p class="text-sm text-neutral-400">Total Usado</p>
+            <p class="text-lg font-semibold text-red-400 mt-1">
               {{ formatCurrency(totalUsed) }}
             </p>
           </div>
-          <div class="summary-box">
-            <p class="summary-label">Limite Disponível</p>
-            <p class="summary-value text-emerald-400">
+          <div
+            class="bg-[#151515] border border-[#2a2a2a] rounded-xl p-4 text-center"
+          >
+            <p class="text-sm text-neutral-400">Limite Disponível</p>
+            <p class="text-lg font-semibold text-emerald-400 mt-1">
               {{ formatCurrency(totalAvailable) }}
             </p>
           </div>
-          <div class="summary-box">
-            <p class="summary-label">Próximo Vencimento</p>
-            <p class="summary-value text-neutral-300">
+          <div
+            class="bg-[#151515] border border-[#2a2a2a] rounded-xl p-4 text-center"
+          >
+            <p class="text-sm text-neutral-400">Próximo Vencimento</p>
+            <p class="text-lg font-semibold text-neutral-300 mt-1">
               {{ formatCurrency(totalNextDue) }}
             </p>
           </div>
@@ -255,22 +263,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.summary-box {
-  background-color: #151515;
-  border: 1px solid #2a2a2a;
-  border-radius: 1rem;
-  padding: 1rem;
-  text-align: center;
-}
-.summary-label {
-  font-size: 0.875rem;
-  color: #a3a3a3;
-}
-.summary-value {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-top: 0.25rem;
-}
-</style>

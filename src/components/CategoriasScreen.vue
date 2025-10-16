@@ -102,7 +102,7 @@
             <li
               v-for="cat in categories"
               :key="cat.id"
-              class="flex items-center justify-between gap-4 bg-[#161616] px-4 py-3"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 bg-[#161616] px-4 py-3"
             >
               <div class="min-w-0">
                 <p class="font-medium truncate">{{ cat.name }}</p>
