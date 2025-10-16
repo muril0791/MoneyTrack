@@ -26,14 +26,12 @@
                   </span>
                 </td>
                 <td class="px-4 py-3">
-                  <span
-                    :class="[
+                  <span :class="[
                       'inline-flex items-center rounded-full px-2 py-0.5 text-xs',
                       e.tipo==='entrada'
                         ? 'bg-emerald-500/20 text-emerald-300'
                         : 'bg-rose-500/20 text-rose-300'
-                    ]"
-                  >
+                    ]">
                     {{ e.tipo==='entrada' ? 'Entrada' : 'Saída' }}
                   </span>
                 </td>
@@ -49,21 +47,12 @@
       </div>
 
       
+
       <div class="min-h-[180px] lg:border-l lg:border-[#262626] lg:pl-6">
-        <h3 class="text-neutral-300 mb-3">Grafico</h3>
+        <h3 class="text-neutral-300 mb-7">Grafico</h3>
 
         <div class="flex flex-col items-center">
-       
-          <ExpensePieChart :expenses="expenses" class="w-full" />
-
-          <div class="mt-3 flex items-center gap-6 text-xs text-neutral-300">
-            <div class="flex items-center gap-2">
-              <span class="inline-block w-3 h-3 rounded-full bg-[#3ecf00]"></span> Entrada
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="inline-block w-3 h-3 rounded-full bg-[#e93030]"></span> Saída
-            </div>
-          </div>
+          <ExpensePieChart :expenses="expenses" :categories="categories" class="w-full" />
         </div>
       </div>
     </div>
