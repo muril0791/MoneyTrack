@@ -187,25 +187,9 @@
                 >
                   <div v-if="day.date" class="flex flex-col items-center gap-1">
                     <div class="calendar-day">{{ day.date.getDate() }}</div>
-                    <div v-if="day.summary" class="calendar-summary">
-                      <div v-if="day.summary.entrada" class="summary-entrada">
-                        +{{ day.summary.entrada.toFixed(2) }}
-                      </div>
-                      <div v-if="day.summary.saida" class="summary-saida">
-                        -{{ day.summary.saida.toFixed(2) }}
-                      </div>
-                      <div
-                        v-if="day.summary.creditLaunch"
-                        class="credit-launch"
-                      >
-                        {{ day.summary.creditLaunch.toFixed(2) }}
-                      </div>
-                      <div
-                        v-if="day.summary.creditPayment"
-                        class="credit-payment"
-                      >
-                        {{ day.summary.creditPayment.toFixed(2) }}
-                      </div>
+                    <div v-if="day.summary" class="flex gap-1 mt-1">
+                      <div v-if="day.summary.entrada" class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/20"></div>
+                      <div v-if="day.summary.saida" class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-sm shadow-rose-500/20"></div>
                     </div>
                   </div>
                 </td>
@@ -214,48 +198,41 @@
           </table>
         </div>
       </div>
-      <div v-else>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div v-else class="animate-in fade-in duration-300">
+        <div class="grid grid-cols-2 gap-2.5">
           <button
             v-for="m in 12"
             :key="m"
             type="button"
-            class="text-left bg-[#151515] ring-1 ring-[#252525] rounded-xl p-3 hover:bg-[#1a1a1a] transition"
+            class="group relative text-left bg-[#151515] border border-[#252525] rounded-xl p-3 transition-all hover:border-emerald-500/30 hover:bg-[#1a1a1a]"
+            :class="{ 'ring-1 ring-emerald-500/50 border-emerald-500/50': isCurrentMonth(m-1) }"
             @click="goToMonth(m - 1)"
           >
-            <div class="flex items-center justify-between mb-1">
-              <span class="capitalize font-semibold text-neutral-200">{{
-                monthNameOf(m - 1)
-              }}</span>
-              <span class="text-xs text-neutral-500">{{
-                currentDate.getFullYear()
-              }}</span>
+            <div class="flex items-center justify-between mb-3">
+              <span class="capitalize font-bold text-white text-[13px] tracking-tight group-hover:text-emerald-400 transition-colors">
+                {{ monthNameOf(m - 1) }}
+              </span>
+              <span class="text-[9px] text-neutral-500 font-medium uppercase">{{ currentDate.getFullYear() }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <div class="text-neutral-400">Entrada</div>
-                <div class="text-emerald-400 font-semibold mt-0.5">
-                  {{ money(yearSummaryByMonth[m - 1]?.entrada || 0) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-neutral-400">Saída</div>
-                <div class="text-rose-400 font-semibold mt-0.5">
-                  {{ money(yearSummaryByMonth[m - 1]?.saida || 0) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-neutral-400">Compra</div>
-                <div class="text-violet-300 font-semibold mt-0.5">
-                  {{ money(yearSummaryByMonth[m - 1]?.creditLaunch || 0) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-neutral-400">Pagamento</div>
-                <div class="text-amber-300 font-semibold mt-0.5">
-                  {{ money(yearSummaryByMonth[m - 1]?.creditPayment || 0) }}
-                </div>
-              </div>
+            
+            <div class="flex items-center gap-4">
+               <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                  <span class="text-[11px] font-bold" :class="yearSummaryByMonth[m-1]?.entrada > 0 ? 'text-emerald-400' : 'text-neutral-700'">
+                    {{ money(yearSummaryByMonth[m-1]?.entrada || 0).replace('R$', '').trim() }}
+                  </span>
+               </div>
+               <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
+                  <span class="text-[11px] font-bold" :class="yearSummaryByMonth[m-1]?.saida > 0 ? 'text-rose-400' : 'text-neutral-700'">
+                    {{ money(yearSummaryByMonth[m-1]?.saida || 0).replace('R$', '').trim() }}
+                  </span>
+               </div>
+            </div>
+
+            <!-- Indicator of current month -->
+            <div v-if="isCurrentMonth(m-1)" class="absolute top-1 right-1">
+              <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
             </div>
           </button>
         </div>
@@ -497,6 +474,13 @@ export default {
         currentDate: this.currentDate,
         selectedDate: this.selectedDate,
       });
+    },
+    isCurrentMonth(m) {
+      const today = new Date();
+      return (
+        today.getMonth() === m &&
+        today.getFullYear() === this.currentDate.getFullYear()
+      );
     },
   },
 };

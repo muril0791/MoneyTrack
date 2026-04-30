@@ -1,74 +1,83 @@
 <template>
   <section
-    class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 sm:px-6 py-5 font-sans"
+    class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] font-sans h-full flex flex-col"
   >
-    <div class="flex items-start justify-between">
-      <h3 class="text-[15px] text-neutral-300">Saldo no período</h3>
-      <span
-        :class="badgeClass"
-        class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none"
-      >
-        {{ badgeText }}
-        <svg
-          v-if="isUp"
-          class="w-3 h-3"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-        >
-          <path d="M12 4l6 6h-4v10h-4V10H6l6-6z" />
-        </svg>
-        <svg v-else class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 20l-6-6h4V4h4v10h4l-6 6z" />
-        </svg>
-      </span>
-    </div>
-
-    <div class="mt-3 flex items-end gap-2 min-w-0">
-      <span class="text-neutral-400 text-base sm:text-lg font-medium">R$</span>
-      <span
-        class="block max-w-full whitespace-nowrap overflow-hidden text-ellipsis text-5xl md:text-6xl lg:text-7xl leading-none font-semibold tracking-tight text-neutral-100"
-      >
-        {{ formatCurrency(balance) }}
-      </span>
-    </div>
-
-    <div class="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-      <div>
-        <p class="text-neutral-400 text-lg sm:text-xl">Entrada</p>
-        <p class="mt-1 flex items-end gap-2">
-          <span class="text-neutral-400 text-lg sm:text-xl font-medium"
-            >R$</span
-          >
-          <span class="text-2xl sm:text-3xl md:text-4xl font-semibold text-emerald-400">{{
-            numberOnly(totalIn)
-          }}</span>
-        </p>
+    <!-- Top Section: Balance (Padded manually) -->
+    <div class="w-full pt-8 px-8">
+      <div class="flex items-start justify-between mb-4">
+        <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Saldo total</h3>
       </div>
 
-      <div>
-        <p class="text-neutral-400 text-lg sm:text-xl">Saída</p>
-        <p class="mt-1 flex items-end gap-2">
-          <span class="text-neutral-400 text-lg sm:text-xl font-medium"
-            >R$</span
-          >
-          <span class="text-2xl sm:text-3xl md:text-4xl font-semibold text-rose-400">{{
-            numberOnly(totalOut)
-          }}</span>
-        </p>
-      </div>
-
-      <div>
-        <div class="flex items-center gap-2">
-          <p class="text-neutral-400 text-lg sm:text-xl">Balanço</p>
+      <div class="flex items-center gap-4">
+        <div class="flex items-baseline gap-2">
+          <span class="text-neutral-500 text-3xl font-light">R$</span>
+          <span class="text-7xl md:text-8xl font-light text-white tracking-tighter">
+            {{ formatCurrency(balance) }}
+          </span>
         </div>
-        <p class="mt-1 flex items-end gap-2">
-          <span class="text-neutral-400 text-lg sm:text-xl font-medium"
-            >R$</span
+        
+        <!-- Main Percentage Badge -->
+        <div 
+          :class="isUp ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
+          class="flex items-center gap-1 px-3 py-1 rounded-full text-[12px] font-bold h-fit mt-4"
+        >
+          <span>{{ percent }}%</span>
+          <svg v-if="isUp" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+          <svg v-else class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spacer to push everything down -->
+    <div class="flex-1"></div>
+
+    <!-- Bottom Section: Details (Forced to the bottom with 10px margin) -->
+    <div class="w-full px-8 pb-18">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-24 text-center">
+        <!-- Entrada -->
+        <div class="space-y-1">
+          <p class="text-neutral-500 text-[12px] font-medium uppercase tracking-wider">Entrada</p>
+          <p class="text-[36px] font-medium uppercase text-emerald-400">
+            <span class="text-xs opacity-50 mr-1">R$</span>{{ numberOnly(totalIn) }}
+          </p>
+        </div>
+
+        <!-- Saida -->
+        <div class="space-y-1">
+          <p class="text-neutral-500 text-[18px] font-medium uppercase tracking-wider">Saída</p>
+          <p class="text-[36px] font-medium uppercase text-rose-400">
+            <span class="text-xs opacity-50 mr-1">R$</span>{{ numberOnly(totalOut) }}
+          </p>
+        </div>
+
+        <!-- Balanço -->
+        <div class="space-y-1">
+          <div class="flex items-center justify-center gap-2">
+            <p class="text-neutral-500 text-[18px] font-medium uppercase tracking-wider">Balanço</p>
+            <div 
+              :class="isUp ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
+              class="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
+            >
+              <span>{{ percent }}%</span>
+              <svg v-if="isUp" class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+              <svg v-else class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
+            </div>
+          </div>
+          <p 
+            class="text-[36px] font-medium uppercase"
+            :class="isUp ? 'text-emerald-400' : 'text-rose-400'"
           >
-          <span class="text-2xl sm:text-3xl md:text-4xl font-semibold">{{
-            numberOnly(balance)
-          }}</span>
-        </p>
+            <span class="text-xs opacity-50 mr-1">R$</span>{{ numberOnly(balance) }}
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -96,22 +105,25 @@ export default {
     });
 
     const balance = computed(() => totalIn.value - totalOut.value);
-
     const isUp = computed(() => balance.value >= 0);
     
-    // Simplificando o badge para mostrar o estado do período selecionado
-    const badgeText = computed(() => {
-      return isUp.value ? "Positivo" : "Negativo";
+    // Calculate a dynamic percentage based on current balance vs total income
+    const percent = computed(() => {
+      if (totalIn.value === 0) return totalOut.value > 0 ? "100" : "0";
+      const p = (Math.abs(balance.value) / totalIn.value) * 100;
+      return p > 100 ? "100" : p.toFixed(1);
     });
+
+    const badgeText = computed(() => isUp.value ? "Positivo" : "Negativo");
 
     const badgeClass = computed(() =>
       isUp.value
-        ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30"
-        : "bg-rose-500/15 text-rose-400 ring-1 ring-rose-500/30"
+        ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
+        : "bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20"
     );
 
     const formatCurrency = (v) =>
-      new Intl.NumberFormat("pt-BR").format(Number(v || 0));
+      new Intl.NumberFormat("pt-BR").format(Math.abs(Number(v || 0)));
       
     const numberOnly = (v) =>
       new Intl.NumberFormat("pt-BR").format(Number(v || 0));
@@ -121,6 +133,7 @@ export default {
       totalOut,
       balance,
       isUp,
+      percent,
       badgeText,
       badgeClass,
       formatCurrency,
