@@ -18,7 +18,12 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-[#232323]">
-              <tr v-for="(e, i) in firstRows" :key="i" class="bg-[#161616]">
+              <tr
+                v-for="(e, i) in firstRows"
+                :key="i"
+                class="bg-[#161616] cursor-pointer hover:bg-[#202020] transition-colors"
+                @click="emit('open-expense-detail', e)"
+              >
                 <td class="px-4 py-3 truncate">{{ e.descricao || "—" }}</td>
                 <td class="px-4 py-3">
                   <span
@@ -75,7 +80,8 @@ export default {
     expenses: { type: Array, required: true },
     categories: { type: Array, default: () => [] },
   },
-  setup(props) {
+  emits: ["open-expense-detail"],
+  setup(props, { emit }) {
     const firstRows = ref([]);
 
     const refreshRows = () => {
@@ -102,7 +108,7 @@ export default {
 
     watch(() => props.expenses, refreshRows, { immediate: true, deep: true });
 
-    return { firstRows, money, dateBR, categoryName };
+    return { firstRows, money, dateBR, categoryName, emit };
   },
 };
 </script>

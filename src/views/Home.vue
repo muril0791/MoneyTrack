@@ -71,7 +71,15 @@
             <TransactionsAndChart
               :expenses="expenses"
               :categories="categories"
-            />
+           
+            @open-expense-detail="openExpenseDetail" />
+          <div v-if="showExpenseDetailModal"
+            class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            @click.self="closeExpenseDetail">
+            <div class="w-full max-w-xl" @click.stop>
+              <EditExpense :expense="selectedExpense" @close="closeExpenseDetail" />
+            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -145,6 +153,7 @@ import ExpenseCalendar from "@/components/ExpenseCalendar.vue";
 import CategoriasScreen from "@/components/CategoriasScreen.vue";
 import CartoesScreen from "@/components/CartoesScreen.vue";
 import CreditCardList from "@/components/CreditCardList.vue";
+import EditExpense from "@/components/EditExpense.vue";
 
 export default {
   name: "Home",
@@ -158,6 +167,7 @@ export default {
     CategoriasScreen,
     CartoesScreen,
     CreditCardList,
+    EditExpense,
   },
   setup() {
     const store = useMainStore();
@@ -213,6 +223,10 @@ export default {
       closeCreditCardsModal,
       openCreditCardsRegistrationModal,
       closeCreditCardsRegistrationModal,
+      showExpenseDetailModal,
+      selectedExpense,
+      openExpenseDetail,
+      closeExpenseDetail
     };
   },
 };
