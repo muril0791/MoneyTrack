@@ -46,8 +46,8 @@
                 </td>
                 <td class="px-4 py-3">{{ money(e.valor) }}</td>
                 <td class="px-4 py-3">{{ dateBR(e.data) }}</td>
-                <td class="px-4 py-3">
-                  {{ e.tipo === "entrada" ? money(e.valor) : money(0) }}
+                <td class="px-4 py-3" :class="e.runningBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+                  {{ money(e.runningBalance) }}
                 </td>
               </tr>
             </tbody>
@@ -85,7 +85,18 @@ export default {
     const firstRows = ref([]);
 
     const refreshRows = () => {
-      firstRows.value = (props.expenses || []).slice(0, 6);
+      // Sort by date ascending to calculate running balance correctly
+      const sorted = [...(props.expenses || [])].sort((a, b) => a.data.localeCompare(b.data));
+      
+      let currentBalance = 0;
+      const mapped = sorted.map(e => {
+        if (e.tipo === 'entrada') currentBalance += Number(e.valor || 0);
+        else currentBalance -= Number(e.valor || 0);
+        return { ...e, runningBalance: currentBalance };
+      });
+
+      // Show the most recent transactions first
+      firstRows.value = mapped.reverse().slice(0, 10);
     };
 
     const money = (v) =>
@@ -95,12 +106,10 @@ export default {
       }).format(Number(v || 0));
 
     const dateBR = (s) => {
-      const d = new Date(s);
-      return d.toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-      });
+      if (!s || typeof s !== 'string') return "—";
+      const [y, m, d] = s.split("-");
+      if (!y || !m || !d) return s;
+      return `${d}/${m}/${y.slice(-2)}`;
     };
 
     const categoryName = (id) =>

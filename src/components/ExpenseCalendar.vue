@@ -76,6 +76,20 @@
       >
         Ano
       </button>
+      <button
+        type="button"
+        role="tab"
+        @click="mode = 'all'"
+        :aria-selected="mode === 'all'"
+        class="px-4 py-1.5 rounded-full text-sm transition"
+        :class="
+          mode === 'all'
+            ? 'bg-emerald-500 text-[#0f0f0f]'
+            : 'text-[#e5e5e5] hover:bg-white/5'
+        "
+      >
+        Tudo
+      </button>
     </div>
     <div class="content-viewport">
       <div v-if="mode === 'day'">
@@ -267,6 +281,15 @@ export default {
       selectedDate: new Date(today),
     };
   },
+  watch: {
+    mode() { this.emitFilter(); },
+    currentDate() { this.emitFilter(); },
+    selectedDate() { this.emitFilter(); },
+    expenses: { deep: true, handler() { this.emitFilter(); } }
+  },
+  mounted() {
+    this.emitFilter();
+  },
   computed: {
     weekDays() {
       return ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -328,9 +351,11 @@ export default {
         creditPayment: 0,
       }));
       for (const e of this.expenses) {
-        const d = new Date(e.data);
-        if (d.getFullYear() !== y) continue;
-        const m = d.getMonth();
+        if (!e.data) continue;
+        const [year, month, day] = e.data.split('-').map(Number);
+        if (year !== y) continue;
+        const m = month - 1;
+        const d = new Date(year, m, day);
         const s = this.getDaySummaryByDate(d);
         byMonth[m].entrada += s.entrada;
         byMonth[m].saida += s.saida;
@@ -439,7 +464,8 @@ export default {
             (c) => c.id === expense.creditCardId
           );
           if (card) {
-            const purchase = new Date(expense.data);
+            const [pY, pM, pD] = expense.data.split('-').map(Number);
+            const purchase = new Date(pY, pM - 1, pD);
             const n = Math.max(1, Number(expense.parcelas || 1));
             const parcela = Number(expense.valor || 0) / n;
             const isSameDay = refDate
@@ -464,6 +490,13 @@ export default {
         saida += Number(expense.valor || 0);
       }
       return { entrada, saida, creditLaunch, creditPayment };
+    },
+    emitFilter() {
+      this.$emit("filter-change", {
+        mode: this.mode,
+        currentDate: this.currentDate,
+        selectedDate: this.selectedDate,
+      });
     },
   },
 };

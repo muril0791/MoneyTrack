@@ -80,7 +80,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { supabase } from "@/lib/supabase";
+import authService from "@/services/authService";
 
 const router = useRouter();
 const user = ref({
@@ -101,29 +101,15 @@ async function handleRegister() {
     return;
   }
 
-
-  const { data, error: err } = await supabase.auth.signUp({
-    email: user.value.email,
-    password: user.value.password,
-    options: {
-      data: { display_name: user.value.username },
-
-      emailRedirectTo: window.location.origin,
-    },
-  });
-
-  if (err) {
-    error.value = err.message || "Erro no cadastro.";
-    return;
-  }
-
-
-  if (data?.session) {
+  try {
+    await authService.signUp({
+      email: user.value.email,
+      password: user.value.password,
+      username: user.value.username,
+    });
     router.push({ name: "Home" });
-    return;
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || "Erro no cadastro.";
   }
-
-
-  router.push({ name: "Login" });
 }
 </script>

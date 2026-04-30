@@ -485,6 +485,9 @@ export default {
 
       submitting.value = true;
       try {
+        if (props.editingExpense?.id) {
+          payload.id = props.editingExpense.id;
+        }
         emit("add-expense", { ...payload });
         emit("close");
         goBackToStep0();

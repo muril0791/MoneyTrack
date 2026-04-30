@@ -7,7 +7,7 @@
       >
       
         <div aria-label="Logo" class="select-none rounded-xl px-2 py-1">
-          <img src="../assets/logo.svg" class="block h-7 w-auto" />
+          <img src="../assets/logo_moneytrack.png" class="block h-7 w-auto rounded" />
         </div>
 
        
@@ -94,7 +94,7 @@
       <div class="flex-1 flex items-center justify-between rounded-2xl bg-[#242424] ring-1 ring-[#2d2d2d] px-3 py-2 max-h-15 min-h-15">
         <div class="flex items-center gap-3">
           <div aria-label="Logo" class="select-none rounded-xl text-neutral-900 font-semibold px-4 py-2">
-            <img src="../assets/logo.svg" class="bg-[#242424]">
+            <img src="../assets/logo_moneytrack.png" class="bg-[#242424] h-8 w-auto rounded">
           </div>
 
           <nav class="flex items-center gap-1">
@@ -161,7 +161,7 @@
 </template>
 
 <script>
-import { supabase } from "@/lib/supabase";
+import authService from "@/services/authService";
 
 export default {
   name: "TopBar",
@@ -187,10 +187,18 @@ export default {
     },
   },
   async mounted() {
-    const { data: { user } } = await supabase.auth.getUser();
+    let email = "";
+    try {
+      const token = localStorage.getItem("userToken");
+      if (token) {
+        const payload = JSON.parse(window.atob(token.split('.')[1]));
+        email = payload.email || "";
+      }
+    } catch (e) {}
+
     this.userMeta = {
-      display_name: user?.user_metadata?.display_name || "",
-      email: user?.email || "",
+      display_name: "",
+      email: email,
     };
 
     document.addEventListener("click", this.onDocumentClick);
@@ -250,7 +258,7 @@ export default {
 
     async logout() {
       try {
-        await supabase.auth.signOut();
+        await authService.signOut();
       } catch (e) {
         if (import.meta.env.DEV) console.error(e);
       }

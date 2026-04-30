@@ -72,7 +72,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { supabase } from "@/lib/supabase";
+import authService from "@/services/authService";
 
 const router = useRouter();
 const credentials = ref({ email: "", password: "" });
@@ -83,20 +83,11 @@ async function handleLogin() {
   error.value = "";
   const { email, password } = credentials.value;
 
-  const { data, error: err } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (err) {
-    error.value = err.message || "Não foi possível entrar.";
-    return;
-  }
-
-  if (data?.session) {
+  try {
+    await authService.signIn({ email, password });
     router.push({ name: "Home" });
-  } else {
-    error.value = "Falha ao autenticar. Tente novamente.";
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || "Não foi possível entrar.";
   }
 }
 </script>

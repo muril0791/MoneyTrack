@@ -1,26 +1,19 @@
-import { supabase } from '@/lib/supabase'
+import api from '@/api';
 
 export async function signUp({ email, password, username }) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { display_name: username }, 
-    },
-  })
-  if (error) throw error
-  return data
+  const { data } = await api.post('/auth/signup', { email, password, displayName: username });
+  localStorage.setItem('userToken', data.access_token);
+  return data.user;
 }
 
 export async function signIn({ email, password }) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw error
-  return data
+  const { data } = await api.post('/auth/login', { email, password });
+  localStorage.setItem('userToken', data.access_token);
+  return data.user;
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
+  localStorage.removeItem('userToken');
 }
 
-export default { signUp, signIn, signOut }
+export default { signUp, signIn, signOut };

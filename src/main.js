@@ -5,7 +5,6 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
-import { supabase } from "@/lib/supabase";
 import { pinia, useMainStore } from "./stores/store";
 import router from "./router/router";
 import "./index.css";
@@ -20,16 +19,8 @@ app.use(router);
 app.use(pinia);
 app.use(vuetify);
 
-const store = useMainStore();
-
-supabase.auth.onAuthStateChange((_event, session) => {
-  if (!session) {
-    store.reset();
-    if (router.currentRoute.value.name !== "Login") {
-      router.push({ name: "Login" });
-    }
-  }
-});
+// Note: Removed Supabase auth state change hook. 
+// Token expiration or auth errors will be handled via Axios interceptors or router guards.
 
 app.config.errorHandler = (err, vm, info) => {
   console.error("Vue error handler:", err, info);

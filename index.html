@@ -10,11 +10,10 @@
     object-src 'none';
     connect-src
       'self'
-      https://*.supabase.co
-      https://*.supabase.in
-      wss://*.supabase.co;
+      http://localhost:3000
+      ws://localhost:*;
     img-src 'self' data: https:;
-    script-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval';
     script-src-attr 'none';
     style-src
       'self'
@@ -24,10 +23,9 @@
       'self'
       https://fonts.gstatic.com
       data:;
-    frame-src 'self' https://*.supabase.co;
+    frame-src 'self';
     frame-ancestors 'none';
     form-action 'self';
-    upgrade-insecure-requests;
   " />
 
 

@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-4 bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden p-6">
     <div class="expense-edit-container">
-      <h3 class="expense-edit-title">Editar despesa</h3>
+      <h3 class="expense-edit-title">Editar {{ expense.tipo === 'entrada' ? 'entrada' : 'despesa' }}</h3>
 
       <div class="form-group">
-        <label for="nome">Transação	</label>
+        <label for="nome">Descrição</label>
         <input
           type="text"
           id="nome"
@@ -16,7 +16,8 @@
       <div class="form-group">
         <label for="valor">Valor</label>
         <input
-          type="text"
+          type="number"
+          step="0.01"
           id="valor"
           v-model="editableExpense.valor"
           placeholder="R$ 0,00"
@@ -24,40 +25,72 @@
       </div>
 
       <div class="button-group">
-        <button class="save-btn" @click="saveExpense">Salvar</button>
-        <button class="delete-btn" @click="deleteExpense">Excluir</button>
+        <button class="save-btn" @click="saveExpense" :disabled="loading">
+          {{ loading ? 'Salvando...' : 'Salvar' }}
+        </button>
+        <button class="delete-btn" @click="deleteExpense" :disabled="loading">
+          Excluir
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { useMainStore } from "@/stores/store";
+
 export default {
   name: "ExpenseEdit",
   props: {
-    expense: Object,
+    expense: { type: Object, required: true },
   },
   data() {
     return {
+      loading: false,
       editableExpense: {
-        descricao: this.expense.descricao || '',
-        valor: this.expense.valor || '',
+        descricao: this.expense.descricao || "",
+        valor: this.expense.valor || "",
       },
     };
   },
   methods: {
-    saveExpense() {
-      //editar no BD
+    async saveExpense() {
+      if (!this.editableExpense.descricao || !this.editableExpense.valor) return;
+      
+      this.loading = true;
+      try {
+        const store = useMainStore();
+        await store.updateExpense({
+          ...this.expense,
+          descricao: this.editableExpense.descricao,
+          valor: Number(this.editableExpense.valor),
+        });
+        this.$emit("close");
+      } catch (err) {
+        console.error("Erro ao atualizar:", err);
+      } finally {
+        this.loading = false;
+      }
     },
-    deleteExpense() {
-      // deletar despesa no BD
+    async deleteExpense() {
+      if (!confirm("Deseja realmente excluir esta transação?")) return;
+      
+      this.loading = true;
+      try {
+        const store = useMainStore();
+        await store.removeExpense(this.expense.id);
+        this.$emit("close");
+      } catch (err) {
+        console.error("Erro ao excluir:", err);
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-
 .expense-edit-container {
   background-color: #1b1b1b;
   border-radius: 8px;
@@ -110,8 +143,13 @@ export default {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 .save-btn:hover {
   background-color: #218838;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
 }
 
 .delete-btn {
@@ -124,7 +162,12 @@ export default {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 .delete-btn:hover {
   background-color: #d32f2f;
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
 }
 </style>
