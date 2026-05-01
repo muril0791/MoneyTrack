@@ -1,5 +1,5 @@
 <template>
-  <header class="px-5 pt-3">
+  <header class="px-5 pt-2">
   
     <div class="md:hidden">
       <div

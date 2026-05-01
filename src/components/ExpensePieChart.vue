@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrap" class="w-full  font-sans">
+  <div ref="wrap" class="w-full font-sans flex flex-col items-center">
     <canvas ref="cv"></canvas>
 
     <div class="mt-10 flex flex-wrap justify-center gap-4 text-xs text-neutral-300">
@@ -34,8 +34,9 @@ export default {
     const safeDPR = () => Math.min(window.devicePixelRatio || 1, 2);
 
     const measure = () => {
-      const w = Math.max(wrap.value?.clientWidth || 0, 120);
-      const h = Math.max(wrap.value?.clientHeight || 0, 120);
+      // Use a smaller size for the chart so it doesn't look giant
+      const w = Math.min(wrap.value?.clientWidth || 200, 220);
+      const h = w; 
       const dpr = safeDPR();
       cv.value.width = Math.floor(w * dpr);
       cv.value.height = Math.floor(h * dpr);
@@ -103,7 +104,8 @@ export default {
         },
         options: {
           responsive: false,
-          maintainAspectRatio: false,
+          maintainAspectRatio: true,
+          aspectRatio: 1,
           devicePixelRatio: dpr,
           animation: { duration: 250 },
           plugins: {

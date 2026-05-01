@@ -4,7 +4,7 @@
       <div class="min-w-0">
         <h3 class="text-neutral-400 text-2xl font-medium mb-10">Transações</h3>
         
-        <div class="overflow-x-auto overflow-y-auto max-h-[600px] pr-2 custom-scrollbar relative">
+        <div class="overflow-x-auto overflow-y-auto max-h-[40rem] pr-2 custom-scrollbar relative">
           <table class="w-full text-left border-collapse min-w-[720px]">
             <thead class="sticky top-0 bg-[#1b1b1b] z-10">
               <tr class="text-neutral-500 text-[12px] uppercase font-bold tracking-widest border-b border-white/5">
