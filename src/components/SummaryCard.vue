@@ -3,10 +3,10 @@
     class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] font-sans h-full flex flex-col overflow-hidden"
   >
     <!-- Top Section: Balance & Detailed Chart -->
-    <div class="w-full pt-8 px-8 flex flex-col lg:flex-row gap-4">
+    <div class="w-full pt-6 px-6 flex flex-col lg:flex-row gap-4">
       <!-- Left Side: Main Balance -->
       <div class="flex-shrink-0">
-        <div class="flex items-start justify-between mb-4">
+        <div class="flex items-start justify-between mb-2">
           <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Saldo total</h3>
         </div>
 
@@ -34,7 +34,7 @@
       </div>
 
       <!-- Right Side: Comparison Chart -->
-      <div class="flex-1 min-h-[220px] relative mt-4 lg:mt-0">
+      <div class="flex-1 min-h-[180px] relative mt-4 lg:mt-0">
         <canvas ref="cv"></canvas>
       </div>
     </div>
@@ -55,7 +55,7 @@
     <div class="flex-1"></div>
 
     <!-- Bottom Section: Details -->
-    <div class="w-full px-8 pb-10 mt-6">
+    <div class="w-full px-8 pb-6 mt-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-24 text-center">
         <!-- Entrada -->
         <div class="space-y-1">

@@ -8,6 +8,10 @@
 *::before,
 *::after { box-sizing: border-box; }
 
+html {
+  font-size: 14px; /* Scales down all rem-based units to simulate 90% zoom */
+}
+
 html, body, #app { width: 100%; max-width: 100%; }
 
 html, body {

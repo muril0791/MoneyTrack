@@ -30,7 +30,6 @@ dist-ssr/
 .env.development
 .env.local
 .env.*.local
-
 # Vercel
 .vercel
 

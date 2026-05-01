@@ -8,8 +8,8 @@
       @open-credit-cards-list="openCreditCardsModal"
     />
 
-    <main class="mx-auto w-full px-4 md:px-8 py-4 md:py-6">
-      <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
+    <main class="mx-auto w-full px-4 md:px-8 py-3 md:py-4">
+      <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4">
         <div class="space-y-6 min-w-0">
           <section
             class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
@@ -71,8 +71,8 @@
           </section>
         </div>
 
-        <div class="space-y-6 min-w-0">
-          <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
+        <div class="space-y-4 min-w-0">
+          <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
             <SummaryCard :expenses="filteredExpenses" :filter="activeFilter" />
             <section
               class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
@@ -287,7 +287,8 @@ export default {
       openExpenseDetail,
       closeExpenseDetail,
       filteredExpenses,
-      handleFilterChange
+      handleFilterChange,
+      activeFilter
     };
   },
 };
