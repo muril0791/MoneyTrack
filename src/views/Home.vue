@@ -73,7 +73,7 @@
 
         <div class="space-y-6 min-w-0">
           <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
-            <SummaryCard :expenses="filteredExpenses" />
+            <SummaryCard :expenses="filteredExpenses" :filter="activeFilter" />
             <section
               class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
             >

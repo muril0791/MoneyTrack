@@ -4,23 +4,23 @@
       <div class="min-w-0">
         <h3 class="text-neutral-400 text-2xl font-medium mb-10">Transações</h3>
         
-        <div class="overflow-x-auto overflow-y-auto max-h-[520px] pr-2 custom-scrollbar">
+        <div class="overflow-x-auto overflow-y-auto max-h-[600px] pr-2 custom-scrollbar relative">
           <table class="w-full text-left border-collapse min-w-[720px]">
-            <thead>
+            <thead class="sticky top-0 bg-[#1b1b1b] z-10">
               <tr class="text-neutral-500 text-[12px] uppercase font-bold tracking-widest border-b border-white/5">
-                <th class="pb-4 font-bold">Transação</th>
-                <th class="pb-4 font-bold">Categoria</th>
-                <th class="pb-4 font-bold">Tipo</th>
-                <th class="pb-4 font-bold">Valor</th>
-                <th class="pb-4 font-bold">Data</th>
-                <th class="pb-4 font-bold text-right">Saldo</th>
+                <th class="pb-4 font-bold bg-[#1b1b1b]">Transação</th>
+                <th class="pb-4 font-bold bg-[#1b1b1b]">Categoria</th>
+                <th class="pb-4 font-bold bg-[#1b1b1b]">Tipo</th>
+                <th class="pb-4 font-bold bg-[#1b1b1b]">Valor</th>
+                <th class="pb-4 font-bold bg-[#1b1b1b]">Data</th>
+                <th class="pb-4 font-bold text-right bg-[#1b1b1b]">Saldo</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-white/5">
               <tr
                 v-for="(e, i) in firstRows"
                 :key="i"
-                class="group cursor-pointer hover:bg-white/[0.02] transition-colors border-b border-white/5"
+                class="group cursor-pointer hover:bg-white/[0.02] transition-colors"
                 @click="emit('open-expense-detail', e)"
               >
                 <td class="py-5 pr-4">

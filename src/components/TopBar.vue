@@ -188,16 +188,18 @@ export default {
   },
   async mounted() {
     let email = "";
+    let name = "";
     try {
       const token = localStorage.getItem("userToken");
       if (token) {
         const payload = JSON.parse(window.atob(token.split('.')[1]));
         email = payload.email || "";
+        name = payload.displayName || "";
       }
     } catch (e) {}
-
+    
     this.userMeta = {
-      display_name: "",
+      display_name: name,
       email: email,
     };
 

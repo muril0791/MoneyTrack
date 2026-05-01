@@ -1,42 +1,61 @@
 <template>
   <section
-    class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] font-sans h-full flex flex-col"
+    class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] font-sans h-full flex flex-col overflow-hidden"
   >
-    <!-- Top Section: Balance (Padded manually) -->
-    <div class="w-full pt-8 px-8">
-      <div class="flex items-start justify-between mb-4">
-        <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Saldo total</h3>
+    <!-- Top Section: Balance & Detailed Chart -->
+    <div class="w-full pt-8 px-8 flex flex-col lg:flex-row gap-4">
+      <!-- Left Side: Main Balance -->
+      <div class="flex-shrink-0">
+        <div class="flex items-start justify-between mb-4">
+          <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Saldo total</h3>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="flex items-baseline gap-2">
+            <span class="text-neutral-500 text-3xl font-light">R$</span>
+            <span class="text-7xl md:text-8xl font-light text-white tracking-tighter">
+              {{ formatCurrency(balance) }}
+            </span>
+          </div>
+          
+          <div 
+            :class="isUp ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
+            class="flex items-center gap-1 px-3 py-1 rounded-full text-[12px] font-bold h-fit mt-4"
+          >
+            <span>{{ percent }}%</span>
+            <svg v-if="isUp" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+            <svg v-else class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+          </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-4">
-        <div class="flex items-baseline gap-2">
-          <span class="text-neutral-500 text-3xl font-light">R$</span>
-          <span class="text-7xl md:text-8xl font-light text-white tracking-tighter">
-            {{ formatCurrency(balance) }}
-          </span>
-        </div>
-        
-        <!-- Main Percentage Badge -->
-        <div 
-          :class="isUp ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
-          class="flex items-center gap-1 px-3 py-1 rounded-full text-[12px] font-bold h-fit mt-4"
-        >
-          <span>{{ percent }}%</span>
-          <svg v-if="isUp" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="M12 19V5M5 12l7-7 7 7" />
-          </svg>
-          <svg v-else class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="M12 5v14M5 12l7 7 7-7" />
-          </svg>
-        </div>
+      <!-- Right Side: Comparison Chart -->
+      <div class="flex-1 min-h-[220px] relative mt-4 lg:mt-0">
+        <canvas ref="cv"></canvas>
       </div>
     </div>
 
-    <!-- Spacer to push everything down -->
+    <!-- Legend -->
+    <div class="px-8 mt-2 flex justify-end gap-6">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full border-2 border-white bg-emerald-500"></span>
+        <span class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest">Entradas</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full border-2 border-white bg-rose-500"></span>
+        <span class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest">Saídas</span>
+      </div>
+    </div>
+
+    <!-- Spacer -->
     <div class="flex-1"></div>
 
-    <!-- Bottom Section: Details (Forced to the bottom with 10px margin) -->
-    <div class="w-full px-8 pb-18">
+    <!-- Bottom Section: Details -->
+    <div class="w-full px-8 pb-10 mt-6">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-24 text-center">
         <!-- Entrada -->
         <div class="space-y-1">
@@ -84,14 +103,30 @@
 </template>
 
 <script>
-import { computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch, computed } from "vue";
+import { 
+  Chart, 
+  LineController, 
+  LineElement, 
+  PointElement, 
+  LinearScale, 
+  CategoryScale, 
+  Filler,
+  Tooltip
+} from "chart.js";
+
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Filler, Tooltip);
 
 export default {
   name: "SummaryCard",
   props: {
     expenses: { type: Array, required: true },
+    filter: { type: Object, default: () => ({ mode: 'month', currentDate: new Date() }) }
   },
   setup(props) {
+    const cv = ref(null);
+    let chart = null;
+
     const totalIn = computed(() => {
       return props.expenses
         .filter((e) => e.tipo === "entrada")
@@ -106,21 +141,11 @@ export default {
 
     const balance = computed(() => totalIn.value - totalOut.value);
     const isUp = computed(() => balance.value >= 0);
-    
-    // Calculate a dynamic percentage based on current balance vs total income
     const percent = computed(() => {
       if (totalIn.value === 0) return totalOut.value > 0 ? "100" : "0";
       const p = (Math.abs(balance.value) / totalIn.value) * 100;
       return p > 100 ? "100" : p.toFixed(1);
     });
-
-    const badgeText = computed(() => isUp.value ? "Positivo" : "Negativo");
-
-    const badgeClass = computed(() =>
-      isUp.value
-        ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
-        : "bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20"
-    );
 
     const formatCurrency = (v) =>
       new Intl.NumberFormat("pt-BR").format(Math.abs(Number(v || 0)));
@@ -128,17 +153,163 @@ export default {
     const numberOnly = (v) =>
       new Intl.NumberFormat("pt-BR").format(Number(v || 0));
 
-    return {
-      totalIn,
-      totalOut,
-      balance,
-      isUp,
-      percent,
-      badgeText,
-      badgeClass,
-      formatCurrency,
-      numberOnly,
+    const draw = () => {
+      if (!cv.value) return;
+
+      const dataIn = [];
+      const dataOut = [];
+      const labels = [];
+      const { mode, currentDate } = props.filter;
+      
+      const dailyData = {};
+      const monthlyData = {};
+
+      if (mode === 'month' || mode === 'day') {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        props.expenses.forEach(e => {
+          if (!e.data) return;
+          // Use split with regex to handle both - and /
+          const parts = e.data.split(/[-/]/);
+          const eDay = parseInt(parts[2]);
+          if (!dailyData[eDay]) dailyData[eDay] = { in: 0, out: 0 };
+          if (e.tipo === 'entrada') dailyData[eDay].in += Number(e.valor || 0);
+          else dailyData[eDay].out += Number(e.valor || 0);
+        });
+
+        for (let i = 1; i <= daysInMonth; i++) {
+          dataIn.push(dailyData[i]?.in || 0);
+          dataOut.push(dailyData[i]?.out || 0);
+          labels.push(i % 5 === 0 || i === 1 || i === daysInMonth ? i : "");
+        }
+      } else {
+        const year = currentDate.getFullYear();
+        props.expenses.forEach(e => {
+          if (!e.data) return;
+          const parts = e.data.split(/[-/]/);
+          const eMonth = parseInt(parts[1]);
+          if (!monthlyData[eMonth]) monthlyData[eMonth] = { in: 0, out: 0 };
+          if (e.tipo === 'entrada') monthlyData[eMonth].in += Number(e.valor || 0);
+          else monthlyData[eMonth].out += Number(e.valor || 0);
+        });
+
+        for (let i = 1; i <= 12; i++) {
+          dataIn.push(monthlyData[i]?.in || 0);
+          dataOut.push(monthlyData[i]?.out || 0);
+          labels.push(new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(new Date(year, i - 1, 1)));
+        }
+      }
+
+      if (chart) chart.destroy();
+
+      const ctx = cv.value.getContext("2d");
+      const gradIn = ctx.createLinearGradient(0, 0, 0, 200);
+      gradIn.addColorStop(0, "rgba(16, 185, 129, 0.1)");
+      gradIn.addColorStop(1, "rgba(16, 185, 129, 0)");
+
+      const gradOut = ctx.createLinearGradient(0, 0, 0, 200);
+      gradOut.addColorStop(0, "rgba(244, 63, 94, 0.1)");
+      gradOut.addColorStop(1, "rgba(244, 63, 94, 0)");
+
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Entradas",
+              data: dataIn,
+              borderColor: "#10b981",
+              backgroundColor: gradIn,
+              fill: true,
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: "#10b981",
+              pointBorderColor: "#fff",
+              pointBorderWidth: 1.5,
+              pointRadius: (context) => dataIn[context.dataIndex] > 0 ? 3.5 : 0,
+              pointHoverRadius: 6,
+            },
+            {
+              label: "Saídas",
+              data: dataOut,
+              borderColor: "#f43f5e",
+              backgroundColor: gradOut,
+              fill: true,
+              borderWidth: 2,
+              tension: 0.4,
+              pointBackgroundColor: "#f43f5e",
+              pointBorderColor: "#fff",
+              pointBorderWidth: 1.5,
+              pointRadius: (context) => dataOut[context.dataIndex] > 0 ? 3.5 : 0,
+              pointHoverRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#1b1b1b',
+              titleColor: '#737373',
+              bodyColor: '#fff',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              callbacks: {
+                title: (context) => {
+                  const label = context[0].label;
+                  if (mode === 'month' || mode === 'day') return `Dia ${label || context[0].dataIndex + 1}`;
+                  return label;
+                },
+                label: (context) => {
+                  return `${context.dataset.label}: R$ ${Number(context.raw).toLocaleString('pt-BR')}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: true,
+              reverse: true,
+              grid: { display: false },
+              ticks: { color: '#525252', font: { size: 9 }, maxRotation: 0, autoSkip: false }
+            },
+            y: {
+              display: true,
+              position: 'right',
+              grid: { color: 'rgba(255,255,255,0.03)', drawTicks: false },
+              ticks: { 
+                color: '#525252', 
+                font: { size: 9 },
+                callback: (v) => v >= 1000 ? (v/1000).toFixed(0) + 'k' : v
+              },
+              grace: '15%'
+            }
+          }
+        }
+      });
     };
+
+    onMounted(() => {
+      draw();
+      window.addEventListener('resize', draw);
+    });
+
+    onBeforeUnmount(() => {
+      if (chart) chart.destroy();
+      window.removeEventListener('resize', draw);
+    });
+
+    watch([() => props.expenses, () => props.filter], () => draw(), { deep: true });
+
+    return { cv, totalIn, totalOut, balance, isUp, percent, formatCurrency, numberOnly };
   },
 };
 </script>
