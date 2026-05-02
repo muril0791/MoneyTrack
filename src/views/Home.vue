@@ -39,7 +39,7 @@
             </div>
             <div v-if="creditCards.length > 0" class="mt-3 space-y-3">
               <div v-for="card in creditCards.slice(0, 3)" :key="card.id" 
-                class="flex items-center justify-between p-3 rounded-xl bg-[#222] ring-1 ring-[#2d2d2d] hover:ring-emerald-500/30 transition-all cursor-pointer">
+                class="flex items-center justify-between p-3 rounded-xl bg-[#222] ring-1 ring-[#2d2d2d] hover:ring-emerald-500/30 transition-all group relative">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                     <svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -47,13 +47,23 @@
                       <line x1="2" y1="10" x2="22" y2="10" />
                     </svg>
                   </div>
-                  <div>
-                    <div class="text-xs font-medium text-white">{{ card.name }}</div>
+                  <div class="min-w-0">
+                    <div class="text-xs font-medium text-white truncate max-w-[100px]">{{ card.name }}</div>
                     <div class="text-[10px] text-neutral-500">Fecha dia {{ card.closingDay }}</div>
                   </div>
                 </div>
-                <div class="text-xs font-semibold text-neutral-300">
-                  R$ {{ card.limit.toLocaleString('pt-BR') }}
+                <div class="flex items-center gap-2">
+                  <div class="text-xs font-semibold text-neutral-300 group-hover:hidden">
+                    R$ {{ card.limit.toLocaleString('pt-BR') }}
+                  </div>
+                  <div class="hidden group-hover:flex items-center gap-1">
+                    <button @click.stop="openEditCard(card)" class="p-1 text-neutral-500 hover:text-emerald-400 transition-colors">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                    </button>
+                    <button @click.stop="handleDeleteCard(card.id)" class="p-1 text-neutral-500 hover:text-rose-400 transition-colors">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -69,6 +79,14 @@
               </button>
             </div>
           </section>
+
+          <ObjectivesCard 
+            :goals="goals" 
+            @open-new-goal="openNewGoalModal"
+            @add-value="openAddValueModal"
+            @edit-goal="openEditGoalModal"
+            @delete-goal="handleDeleteGoal"
+          />
         </div>
 
         <div class="space-y-4 min-w-0">
@@ -153,9 +171,26 @@
       @click.self="closeCreditCardsRegistrationModal"
     >
       <div class="p-3 md:p-4 w-full max-w-xl max-h-[90vh] overflow-y-auto">
-        <CartoesScreen @close="closeCreditCardsRegistrationModal" />
+        <CartoesScreen :initialEditCard="selectedCardToEdit" @close="closeCreditCardsRegistrationModal" />
       </div>
     </div>
+
+    <!-- New Goal Modal -->
+    <CreateGoalModal 
+      v-if="showNewGoalModal" 
+      :editingGoal="editingGoal"
+      @close="closeGoalModal"
+      @create="handleCreateGoal"
+      @update="handleUpdateGoal"
+    />
+
+    <!-- Add Value Modal -->
+    <AddValueGoalModal 
+      v-if="showAddValueGoalModal"
+      :goal="selectedGoal"
+      @close="showAddValueGoalModal = false"
+      @add="handleAddValueToGoal"
+    />
   </div>
 </template>
 
@@ -172,6 +207,8 @@ import CategoriasScreen from "@/components/CategoriasScreen.vue";
 import CartoesScreen from "@/components/CartoesScreen.vue";
 import CreditCardList from "@/components/CreditCardList.vue";
 import EditExpense from "@/components/EditExpense.vue";
+import CreateGoalModal from "@/components/CreateGoalModal.vue";
+import AddValueGoalModal from "@/components/AddValueGoalModal.vue";
 
 export default {
   name: "Home",
@@ -186,6 +223,8 @@ export default {
     CartoesScreen,
     CreditCardList,
     EditExpense,
+    CreateGoalModal,
+    AddValueGoalModal,
   },
   setup() {
     const store = useMainStore();
@@ -193,6 +232,7 @@ export default {
       store.fetchExpenses();
       store.fetchCategories();
       store.fetchCreditCards();
+      store.fetchGoals();
     });
     const expenses = computed(() => store.expenses);
     const categories = computed(() => store.categories);
@@ -201,8 +241,15 @@ export default {
     const showCategoriesModal = ref(false);
     const showCreditCardsModal = ref(false);
     const showCreditCardsRegistrationModal = ref(false);
+    const selectedCardToEdit = ref(null);
+    const showNewGoalModal = ref(false);
+    const showAddValueGoalModal = ref(false);
+    const selectedGoal = ref(null);
+    const editingGoal = ref(null);
     const editingExpense = ref(null);
     const activeFilter = ref({ mode: 'month', currentDate: new Date(), selectedDate: new Date() });
+    
+    const goals = computed(() => store.goals);
 
     const filteredExpenses = computed(() => {
       const { mode, currentDate, selectedDate } = activeFilter.value;
@@ -260,10 +307,67 @@ export default {
     const closeCategoriesModal = () => (showCategoriesModal.value = false);
     const openCreditCardsModal = () => (showCreditCardsModal.value = true);
     const closeCreditCardsModal = () => (showCreditCardsModal.value = false);
-    const openCreditCardsRegistrationModal = () =>
-      (showCreditCardsRegistrationModal.value = true);
-    const closeCreditCardsRegistrationModal = () =>
-      (showCreditCardsRegistrationModal.value = false);
+    const openCreditCardsRegistrationModal = () => {
+      selectedCardToEdit.value = null;
+      showCreditCardsRegistrationModal.value = true;
+    };
+    const closeCreditCardsRegistrationModal = () => {
+      showCreditCardsRegistrationModal.value = false;
+      selectedCardToEdit.value = null;
+    };
+
+    const openEditCard = (card) => {
+      selectedCardToEdit.value = card;
+      showCreditCardsRegistrationModal.value = true;
+    };
+
+    const handleDeleteCard = async (cardId) => {
+      if (confirm('Tem certeza que deseja excluir este cartão? Todas as transações vinculadas a ele ficarão sem cartão.')) {
+        await store.removeCreditCard(cardId);
+      }
+    };
+
+    const handleCreateGoal = async (goalData) => {
+      await store.addGoal(goalData);
+      showNewGoalModal.value = false;
+    };
+
+    const handleUpdateGoal = async (goalData) => {
+      await store.updateGoal(goalData.id, goalData);
+      closeGoalModal();
+    };
+
+    const openNewGoalModal = () => {
+      editingGoal.value = null;
+      showNewGoalModal.value = true;
+    };
+
+    const openEditGoalModal = (goal) => {
+      editingGoal.value = goal;
+      showNewGoalModal.value = true;
+    };
+
+    const closeGoalModal = () => {
+      showNewGoalModal.value = false;
+      editingGoal.value = null;
+    };
+
+    const handleDeleteGoal = async (goalId) => {
+      if (confirm('Tem certeza que deseja excluir esta meta?')) {
+        await store.removeGoal(goalId);
+      }
+    };
+
+    const openAddValueModal = (goal) => {
+      selectedGoal.value = goal;
+      showAddValueGoalModal.value = true;
+    };
+
+    const handleAddValueToGoal = async ({ goalId, value }) => {
+      await store.addValueToGoal(goalId, value);
+      showAddValueGoalModal.value = false;
+      selectedGoal.value = null;
+    };
     return {
       expenses,
       categories,
@@ -288,7 +392,23 @@ export default {
       closeExpenseDetail,
       filteredExpenses,
       handleFilterChange,
-      activeFilter
+      activeFilter,
+      goals,
+      showNewGoalModal,
+      showAddValueGoalModal,
+      selectedGoal,
+      editingGoal,
+      handleCreateGoal,
+      handleUpdateGoal,
+      openNewGoalModal,
+      openEditGoalModal,
+      closeGoalModal,
+      handleDeleteGoal,
+      openAddValueModal,
+      handleAddValueToGoal,
+      selectedCardToEdit,
+      openEditCard,
+      handleDeleteCard
     };
   },
 };

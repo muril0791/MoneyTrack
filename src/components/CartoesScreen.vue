@@ -158,14 +158,17 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useMainStore } from "../stores/store";
 import { storeToRefs } from "pinia";
 
 export default {
   name: "CartoesScreen",
   emits: ["close"],
-  setup() {
+  props: {
+    initialEditCard: { type: Object, default: null }
+  },
+  setup(props) {
     const store = useMainStore();
     const { creditCards } = storeToRefs(store);
 
@@ -185,6 +188,24 @@ export default {
       editingId.value = null;
       submitting.value = false;
     };
+
+    const editCard = (card) => {
+      if (!card || submitting.value) return;
+      isEditing.value = true;
+      editingId.value = card.id;
+      cardForm.value = {
+        name: String(card.name ?? "").slice(0, 80),
+        limit: Number(card.limit ?? 0),
+        closingDay: card.closingDay ?? null,
+        dueDay: card.dueDay ?? null,
+      };
+    };
+
+    // Auto-edit if prop is provided
+    watch(() => props.initialEditCard, (newCard) => {
+      if (newCard) editCard(newCard);
+      else resetForm();
+    }, { immediate: true });
 
     const handleSubmit = async () => {
       if (submitting.value) return;
@@ -216,20 +237,9 @@ export default {
       }
     };
 
-    const editCard = (card) => {
-      if (submitting.value) return;
-      isEditing.value = true;
-      editingId.value = card.id;
-      cardForm.value = {
-        name: String(card.name ?? "").slice(0, 80),
-        limit: Number(card.limit ?? 0),
-        closingDay: card.closingDay ?? null,
-        dueDay: card.dueDay ?? null,
-      };
-    };
-
     const deleteCard = async (cardId) => {
       if (submitting.value) return;
+      if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
       submitting.value = true;
       try {
         await store.removeCreditCard(cardId);
