@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-5 overflow-hidden relative group">
+  <div class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5 overflow-hidden relative group">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">

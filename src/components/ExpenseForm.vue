@@ -84,9 +84,8 @@
               <div class="relative group">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-medium">R$</span>
                 <input
-                  v-model.number="form.valor"
-                  type="number"
-                  step="0.01"
+                  v-model="valorDisplay"
+                  type="text"
                   required
                   placeholder="0,00"
                   class="w-full bg-[#151515] border border-[#2a2a2a] rounded-2xl pl-12 pr-4 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
@@ -279,6 +278,24 @@ export default {
       creditCardId: "",
       dataPrimeiraParcela: "",
     });
+
+    const valorDisplay = ref("");
+    
+    const parseValueBR = (val) => {
+      if (!val) return 0;
+      // Remove thousands dots, then replace decimal comma with dot
+      const clean = String(val).replace(/\./g, "").replace(",", ".");
+      return parseFloat(clean) || 0;
+    };
+
+    watch(valorDisplay, (v) => {
+      form.valor = parseValueBR(v);
+    });
+
+    // To handle initial value if editing
+    watch(() => props.editingExpense, (exp) => {
+      if (exp) valorDisplay.value = String(exp.valor || "").replace(".", ",");
+    }, { immediate: true });
 
     watch(
       () => form.categoria,

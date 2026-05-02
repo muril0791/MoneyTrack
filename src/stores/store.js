@@ -4,6 +4,7 @@ import * as expenseService from "@/services/expenseService";
 import * as categoryService from "@/services/categoryService";
 import * as creditCardService from "@/services/creditCardService";
 import goalService from "@/services/goalService";
+import fixedBillService from "@/services/fixedBillService";
 
 function normalizeGoal(row) {
   if (!row) return row;
@@ -15,6 +16,22 @@ function normalizeGoal(row) {
     color: row.color || '#10b981',
     icon: row.icon || 'target',
     deadline: row.deadline,
+    created_at: row.createdAt || row.created_at,
+  };
+}
+
+function normalizeFixedBill(row) {
+  if (!row) return row;
+  return {
+    id: row.id || row._id,
+    title: row.title,
+    amount: Number(row.amount ?? 0),
+    dueDay: Number(row.dueDay ?? 1),
+    isVariable: row.isVariable || false,
+    totalInstallments: row.totalInstallments || null,
+    remainingInstallments: row.remainingInstallments || null,
+    lastPaidDate: row.lastPaidDate,
+    status: row.status || 'pending',
     created_at: row.createdAt || row.created_at,
   };
 }
@@ -53,6 +70,7 @@ export const useMainStore = defineStore("main", {
     categories: [],
     creditCards: [],
     goals: [],
+    fixedBills: [],
   }),
 
   actions: {
@@ -224,6 +242,55 @@ export const useMainStore = defineStore("main", {
         if (import.meta.env.DEV) console.error("Erro ao remover Goal:", error);
       }
     },
+
+    async fetchFixedBills() {
+      try {
+        const rows = await fixedBillService.getAll();
+        this.fixedBills = rows.map(normalizeFixedBill);
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Erro ao buscar Fixed Bills:", error);
+      }
+    },
+
+    async addFixedBill(bill) {
+      try {
+        const created = await fixedBillService.create(bill);
+        this.fixedBills.push(normalizeFixedBill(created));
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Erro ao adicionar Fixed Bill:", error);
+      }
+    },
+
+    async updateFixedBill(id, billData) {
+      try {
+        const updated = await fixedBillService.update(id, billData);
+        const norm = normalizeFixedBill(updated);
+        const index = this.fixedBills.findIndex((b) => b.id === id);
+        if (index !== -1) this.fixedBills[index] = norm;
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Erro ao atualizar Fixed Bill:", error);
+      }
+    },
+
+    async removeFixedBill(id) {
+      try {
+        await fixedBillService.delete(id);
+        this.fixedBills = this.fixedBills.filter((b) => b.id !== id);
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Erro ao remover Fixed Bill:", error);
+      }
+    },
+
+    async payFixedBill(id) {
+      try {
+        const updated = await fixedBillService.pay(id);
+        const norm = normalizeFixedBill(updated);
+        const index = this.fixedBills.findIndex((b) => b.id === id);
+        if (index !== -1) this.fixedBills[index] = norm;
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Erro ao pagar Fixed Bill:", error);
+      }
+    }
   },
 });
 

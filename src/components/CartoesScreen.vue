@@ -35,13 +35,11 @@
             <div class="space-y-2">
               <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Limite (R$)</label>
               <input
-                v-model.number="cardForm.limit"
-                type="number"
-                min="0"
-                step="0.01"
+                v-model="limitDisplay"
+                type="text"
                 required
                 placeholder="0,00"
-                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
               />
             </div>
 
@@ -181,12 +179,24 @@ export default {
     const isEditing = ref(false);
     const editingId = ref(null);
     const submitting = ref(false);
+    const limitDisplay = ref("");
+
+    const parseValueBR = (val) => {
+      if (!val) return 0;
+      const clean = String(val).replace(/\./g, "").replace(",", ".");
+      return parseFloat(clean) || 0;
+    };
+
+    watch(limitDisplay, (v) => {
+      cardForm.value.limit = parseValueBR(v);
+    });
 
     const resetForm = () => {
       cardForm.value = { name: "", limit: 0, closingDay: null, dueDay: null };
       isEditing.value = false;
       editingId.value = null;
       submitting.value = false;
+      limitDisplay.value = "";
     };
 
     const editCard = (card) => {
@@ -199,6 +209,7 @@ export default {
         closingDay: card.closingDay ?? null,
         dueDay: card.dueDay ?? null,
       };
+      limitDisplay.value = String(card.limit ?? "").replace(".", ",");
     };
 
     // Auto-edit if prop is provided

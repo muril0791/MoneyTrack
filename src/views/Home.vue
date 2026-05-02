@@ -1,45 +1,35 @@
 <template>
   <div
-    class="min-h-screen overflow-x-hidden bg-[#0f0f0f] text-white font-sans antialiased"
+    class="h-screen overflow-hidden bg-[#0f0f0f] text-white font-sans antialiased flex flex-col"
   >
     <TopBar
       @open-credit-cards="openCreditCardsRegistrationModal"
       @open-categories="openCategoriesModal"
       @open-credit-cards-list="openCreditCardsModal"
+      @open-fixed-bills="showFixedBillsModal = true"
     />
 
-    <main class="mx-auto w-full px-4 md:px-8 py-3 md:py-4">
-      <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4">
-        <div class="space-y-4 min-w-0">
+    <main class="flex-1 overflow-hidden mx-auto w-full px-4 md:px-8 py-3 md:py-4">
+      <div class="h-full grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4">
+        <!-- Sidebar Column -->
+        <div class="h-full overflow-hidden space-y-4 min-w-0">
           <section
-            class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
+            class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5"
           >
             <div class="flex items-center justify-between gap-3">
               <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Lançamentos</h3>
-              <button
-                class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-3 md:px-4 py-2 rounded-xl"
-                @click="openNewTransaction"
-              >
+              <button class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-3 md:px-4 py-2 rounded-xl" @click="openNewTransaction">
                 Adicionar <span class="text-lg leading-none">+</span>
               </button>
             </div>
           </section>
-
-          <section
-            class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
-          >
+          <section class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Meus Cartões</h3>
-              <button
-                class="text-emerald-400 text-xs"
-                @click="openCreditCardsModal"
-              >
-                Ver todos
-              </button>
+              <button class="text-emerald-400 text-xs" @click="openCreditCardsModal">Ver todos</button>
             </div>
             <div v-if="creditCards.length > 0" class="mt-3 space-y-3">
-              <div v-for="card in creditCards.slice(0, 3)" :key="card.id" 
-                class="flex items-center justify-between p-3 rounded-xl bg-[#222] ring-1 ring-[#2d2d2d] hover:ring-emerald-500/30 transition-all group relative">
+              <div v-for="card in creditCards.slice(0, 3)" :key="card.id" class="flex items-center justify-between p-3 rounded-xl bg-[#222] ring-1 ring-[#2d2d2d] hover:ring-emerald-500/30 transition-all group relative">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                     <svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -53,9 +43,7 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="text-xs font-semibold text-neutral-300 group-hover:hidden">
-                    R$ {{ card.limit.toLocaleString('pt-BR') }}
-                  </div>
+                  <div class="text-xs font-semibold text-neutral-300 group-hover:hidden">R$ {{ card.limit.toLocaleString('pt-BR') }}</div>
                   <div class="hidden group-hover:flex items-center gap-1">
                     <button @click.stop="openEditCard(card)" class="p-1 text-neutral-500 hover:text-emerald-400 transition-colors">
                       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
@@ -67,33 +55,19 @@
                 </div>
               </div>
             </div>
-            <p v-else class="text-xs text-neutral-500 mt-4 text-center py-4 border-2 border-dashed border-[#2a2a2a] rounded-xl">
-              Nenhum cartão cadastrado.
-            </p>
+            <p v-else class="text-xs text-neutral-500 mt-4 text-center py-4 border-2 border-dashed border-[#2a2a2a] rounded-xl">Nenhum cartão cadastrado.</p>
             <div class="mt-4 flex gap-2">
-              <button
-                class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl py-2.5 text-xs transition shadow-lg shadow-emerald-500/10"
-                @click="openCreditCardsRegistrationModal"
-              >
-                Novo Cartão
-              </button>
+              <button class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl py-2.5 text-xs transition shadow-lg shadow-emerald-500/10" @click="openCreditCardsRegistrationModal">Novo Cartão</button>
             </div>
           </section>
-
-          <ObjectivesCard 
-            :goals="goals" 
-            @open-new-goal="openNewGoalModal"
-            @add-value="openAddValueModal"
-            @edit-goal="openEditGoalModal"
-            @delete-goal="handleDeleteGoal"
-          />
+          <ObjectivesCard :goals="goals" @open-new-goal="openNewGoalModal" @add-value="openAddValueModal" @edit-goal="openEditGoalModal" @delete-goal="handleDeleteGoal" class="px-4 py-5" />
         </div>
 
-        <div class="space-y-4 min-w-0">
+        <div class="h-full overflow-hidden space-y-4 min-w-0">
           <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
             <SummaryCard :expenses="filteredExpenses" :filter="activeFilter" />
             <section
-              class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
+              class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5"
             >
               <ExpenseCalendar
                 :expenses="expenses"
@@ -191,6 +165,12 @@
       @close="showAddValueGoalModal = false"
       @add="handleAddValueToGoal"
     />
+
+    <!-- Fixed Bills Modal -->
+    <FixedBillsModal
+      v-if="showFixedBillsModal"
+      @close="showFixedBillsModal = false"
+    />
   </div>
 </template>
 
@@ -209,6 +189,7 @@ import CreditCardList from "@/components/CreditCardList.vue";
 import EditExpense from "@/components/EditExpense.vue";
 import CreateGoalModal from "@/components/CreateGoalModal.vue";
 import AddValueGoalModal from "@/components/AddValueGoalModal.vue";
+import FixedBillsModal from "@/components/FixedBillsModal.vue";
 
 export default {
   name: "Home",
@@ -225,6 +206,7 @@ export default {
     EditExpense,
     CreateGoalModal,
     AddValueGoalModal,
+    FixedBillsModal,
   },
   setup() {
     const store = useMainStore();
@@ -233,6 +215,7 @@ export default {
       store.fetchCategories();
       store.fetchCreditCards();
       store.fetchGoals();
+      store.fetchFixedBills();
     });
     const expenses = computed(() => store.expenses);
     const categories = computed(() => store.categories);
@@ -241,6 +224,7 @@ export default {
     const showCategoriesModal = ref(false);
     const showCreditCardsModal = ref(false);
     const showCreditCardsRegistrationModal = ref(false);
+    const showFixedBillsModal = ref(false);
     const selectedCardToEdit = ref(null);
     const showNewGoalModal = ref(false);
     const showAddValueGoalModal = ref(false);
@@ -408,8 +392,31 @@ export default {
       handleAddValueToGoal,
       selectedCardToEdit,
       openEditCard,
-      handleDeleteCard
+      handleDeleteCard,
+      showFixedBillsModal
     };
   },
 };
 </script>
+
+<style>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+</style>

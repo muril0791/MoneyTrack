@@ -29,9 +29,8 @@
               <div class="relative group">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-medium">R$</span>
                 <input 
-                  v-model.number="form.targetAmount"
-                  type="number"
-                  step="0.01"
+                  v-model="targetAmountDisplay"
+                  type="text"
                   placeholder="0,00"
                   required
                   class="w-full bg-[#151515] border border-[#2a2a2a] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
@@ -44,9 +43,8 @@
               <div class="relative group">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-medium">R$</span>
                 <input 
-                  v-model.number="form.currentAmount"
-                  type="number"
-                  step="0.01"
+                  v-model="currentAmountDisplay"
+                  type="text"
                   placeholder="0,00"
                   class="w-full bg-[#151515] border border-[#2a2a2a] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
                 />
@@ -98,7 +96,7 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 
 const props = defineProps({
   editingGoal: {
@@ -118,6 +116,18 @@ const form = reactive({
   endDate: '',
 });
 
+const targetAmountDisplay = ref("");
+const currentAmountDisplay = ref("");
+
+const parseValueBR = (val) => {
+  if (!val) return 0;
+  const clean = String(val).replace(/\./g, "").replace(",", ".");
+  return parseFloat(clean) || 0;
+};
+
+watch(targetAmountDisplay, (v) => { form.targetAmount = parseValueBR(v); });
+watch(currentAmountDisplay, (v) => { form.currentAmount = parseValueBR(v); });
+
 onMounted(() => {
   if (props.editingGoal) {
     form.title = props.editingGoal.title;
@@ -130,6 +140,9 @@ onMounted(() => {
     if (props.editingGoal.endDate) {
       form.endDate = new Date(props.editingGoal.endDate).toISOString().split('T')[0];
     }
+
+    targetAmountDisplay.value = String(props.editingGoal.targetAmount || "").replace(".", ",");
+    currentAmountDisplay.value = String(props.editingGoal.currentAmount || "").replace(".", ",");
   }
 });
 
