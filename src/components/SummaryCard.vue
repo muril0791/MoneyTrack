@@ -3,7 +3,7 @@
     class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] font-sans h-full flex flex-col overflow-hidden"
   >
     <!-- Top Section: Balance & Detailed Chart -->
-    <div class="w-full pt-6 px-6 flex flex-col lg:flex-row gap-4">
+    <div class="w-full pt-6 px-4 flex flex-col lg:flex-row gap-4">
       <!-- Left Side: Main Balance -->
       <div class="flex-shrink-0">
         <div class="flex items-start justify-between mb-2">
@@ -40,7 +40,7 @@
     </div>
 
     <!-- Legend -->
-    <div class="px-8 mt-2 flex justify-end gap-6">
+    <div class="px-4 mt-2 flex justify-end gap-6">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full border border-white/20 bg-emerald-500"></span>
         <span class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest">Entradas</span>
@@ -55,7 +55,7 @@
     <div class="flex-1"></div>
 
     <!-- Bottom Section: Details -->
-    <div class="w-full px-8 pb-6 mt-4">
+    <div class="w-full px-4 pb-6 mt-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-24 text-center">
         <!-- Entrada -->
         <div class="space-y-1">

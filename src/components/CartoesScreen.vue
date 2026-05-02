@@ -35,13 +35,11 @@
             <div class="space-y-2">
               <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Limite (R$)</label>
               <input
-                v-model.number="cardForm.limit"
-                type="number"
-                min="0"
-                step="0.01"
+                v-model="limitDisplay"
+                type="text"
                 required
                 placeholder="0,00"
-                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
               />
             </div>
 
@@ -158,14 +156,17 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useMainStore } from "../stores/store";
 import { storeToRefs } from "pinia";
 
 export default {
   name: "CartoesScreen",
   emits: ["close"],
-  setup() {
+  props: {
+    initialEditCard: { type: Object, default: null }
+  },
+  setup(props) {
     const store = useMainStore();
     const { creditCards } = storeToRefs(store);
 
@@ -178,13 +179,44 @@ export default {
     const isEditing = ref(false);
     const editingId = ref(null);
     const submitting = ref(false);
+    const limitDisplay = ref("");
+
+    const parseValueBR = (val) => {
+      if (!val) return 0;
+      const clean = String(val).replace(/\./g, "").replace(",", ".");
+      return parseFloat(clean) || 0;
+    };
+
+    watch(limitDisplay, (v) => {
+      cardForm.value.limit = parseValueBR(v);
+    });
 
     const resetForm = () => {
       cardForm.value = { name: "", limit: 0, closingDay: null, dueDay: null };
       isEditing.value = false;
       editingId.value = null;
       submitting.value = false;
+      limitDisplay.value = "";
     };
+
+    const editCard = (card) => {
+      if (!card || submitting.value) return;
+      isEditing.value = true;
+      editingId.value = card.id;
+      cardForm.value = {
+        name: String(card.name ?? "").slice(0, 80),
+        limit: Number(card.limit ?? 0),
+        closingDay: card.closingDay ?? null,
+        dueDay: card.dueDay ?? null,
+      };
+      limitDisplay.value = String(card.limit ?? "").replace(".", ",");
+    };
+
+    // Auto-edit if prop is provided
+    watch(() => props.initialEditCard, (newCard) => {
+      if (newCard) editCard(newCard);
+      else resetForm();
+    }, { immediate: true });
 
     const handleSubmit = async () => {
       if (submitting.value) return;
@@ -216,20 +248,9 @@ export default {
       }
     };
 
-    const editCard = (card) => {
-      if (submitting.value) return;
-      isEditing.value = true;
-      editingId.value = card.id;
-      cardForm.value = {
-        name: String(card.name ?? "").slice(0, 80),
-        limit: Number(card.limit ?? 0),
-        closingDay: card.closingDay ?? null,
-        dueDay: card.dueDay ?? null,
-      };
-    };
-
     const deleteCard = async (cardId) => {
       if (submitting.value) return;
+      if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
       submitting.value = true;
       try {
         await store.removeCreditCard(cardId);

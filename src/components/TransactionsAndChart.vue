@@ -1,19 +1,19 @@
 <template>
-  <section class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] p-8">
+  <section class="bg-[#1b1b1b] rounded-3xl ring-1 ring-[#2a2a2a] px-4 py-6">
     <div class="grid grid-cols-1 lg:grid-cols-[2.5fr_1fr] gap-12">
       <div class="min-w-0">
-        <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium mb-10">Transações recentes</h3>
+        <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium mb-10 pl-4">Transações recentes</h3>
         
-        <div class="overflow-x-auto overflow-y-auto max-h-[40rem] pr-2 custom-scrollbar relative">
+        <div class="overflow-x-auto overflow-y-auto max-h-[280px] pt-2 pr-2 custom-scrollbar relative border border-white/5 rounded-2xl bg-[#151515]/30">
           <table class="w-full text-left border-collapse min-w-[720px]">
             <thead class="sticky top-0 bg-[#1b1b1b] z-10">
               <tr class="text-neutral-500 text-[12px] uppercase font-medium tracking-widest border-b border-white/5">
-                <th class="pb-4 bg-[#1b1b1b]">Transação</th>
-                <th class="pb-4 bg-[#1b1b1b]">Categoria</th>
-                <th class="pb-4 bg-[#1b1b1b]">Tipo</th>
-                <th class="pb-4 bg-[#1b1b1b]">Valor</th>
-                <th class="pb-4 bg-[#1b1b1b]">Data</th>
-                <th class="pb-4 text-right bg-[#1b1b1b]">Saldo</th>
+                <th class="py-4 px-4 bg-[#1b1b1b]">Transação</th>
+                <th class="py-4 px-4 bg-[#1b1b1b]">Categoria</th>
+                <th class="py-4 px-4 bg-[#1b1b1b]">Tipo</th>
+                <th class="py-4 px-4 bg-[#1b1b1b]">Valor</th>
+                <th class="py-4 px-4 bg-[#1b1b1b]">Data</th>
+                <th class="py-4 px-4 text-right bg-[#1b1b1b]">Saldo</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-white/5">
@@ -23,11 +23,11 @@
                 class="group cursor-pointer hover:bg-white/[0.02] transition-colors"
                 @click="emit('open-expense-detail', e)"
               >
-                <td class="py-5 pr-4">
+                <td class="py-5 px-6">
                   <span class="text-neutral-100 font-medium text-[13px] uppercase tracking-wider">{{ e.descricao || "—" }}</span>
                 </td>
                 
-                <td class="py-5 px-4">
+                <td class="py-5 px-6">
                   <span
                     :class="getCategoryColor(e.categoria)"
                     class="inline-flex items-center justify-center min-w-[80px] rounded-full px-3 py-1 text-[10px] font-bold text-white shadow-sm uppercase tracking-wider"
@@ -36,30 +36,30 @@
                   </span>
                 </td>
 
-                <td class="py-5 px-4">
+                <td class="py-5 px-6">
                   <span
                     :class="[
                       'inline-flex items-center justify-center min-w-[80px] rounded-full px-3 py-1 text-[10px] font-bold ring-1 uppercase tracking-wider',
                       e.tipo === 'entrada'
                         ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/30'
-                        : 'bg-rose-500/10 text-rose-400 ring-rose-500/30',
+                        : 'bg-rose-500/10 text-rose-400 ring-rose-500/20',
                     ]"
                   >
                     {{ e.tipo === "entrada" ? "Entrada" : "Saída" }}
                   </span>
                 </td>
 
-                <td class="py-5 px-4">
+                <td class="py-5 px-6">
                   <span :class="['font-medium text-[16px] uppercase tracking-tight', e.tipo === 'entrada' ? 'text-emerald-400' : 'text-rose-400']">
                     {{ money(e.valor) }}
                   </span>
                 </td>
 
-                <td class="py-5 px-4">
+                <td class="py-5 px-6">
                   <span class="text-neutral-500 text-[12px] font-medium uppercase tracking-wider">{{ dateBR(e.data) }}</span>
                 </td>
 
-                <td class="py-5 pl-4 text-right">
+                <td class="py-5 px-6 text-right">
                   <span class="text-neutral-300 font-medium text-[14px] uppercase tracking-tight">{{ money(e.runningBalance) }}</span>
                 </td>
               </tr>
@@ -74,7 +74,7 @@
 
       <!-- Chart Section -->
       <div class="lg:border-l lg:border-white/5 lg:pl-10">
-        <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium mb-10">Distribuição</h3>
+        <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium mb-10 pl-6">Distribuição</h3>
         <div class="flex flex-col items-center">
           <ExpensePieChart
             :expenses="expenses"
