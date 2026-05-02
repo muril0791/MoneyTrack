@@ -11,6 +11,7 @@ import "./index.css";
 import "@mdi/font/css/materialdesignicons.css";
 
 import App from "./App.vue";
+import { initIdleTracker } from "./services/idle-timeout";
 
 const vuetify = createVuetify({ components, directives });
 
@@ -18,6 +19,9 @@ const app = createApp(App);
 app.use(router);
 app.use(pinia);
 app.use(vuetify);
+
+// Initialize Security Services
+initIdleTracker();
 
 // Note: Removed Supabase auth state change hook. 
 // Token expiration or auth errors will be handled via Axios interceptors or router guards.

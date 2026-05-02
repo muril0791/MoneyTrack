@@ -7,13 +7,13 @@
       <!-- Left Side: Main Balance -->
       <div class="flex-shrink-0">
         <div class="flex items-start justify-between mb-2">
-          <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Saldo total</h3>
+          <h3 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Saldo total disponível</h3>
         </div>
 
         <div class="flex items-center gap-4">
           <div class="flex items-baseline gap-2">
-            <span class="text-neutral-500 text-3xl font-light">R$</span>
-            <span class="text-7xl md:text-8xl font-light text-white tracking-tighter">
+            <span class="text-neutral-600 text-2xl font-light">R$</span>
+            <span class="text-7xl md:text-8xl font-semibold text-white tracking-[-0.05em]">
               {{ formatCurrency(balance) }}
             </span>
           </div>
@@ -42,11 +42,11 @@
     <!-- Legend -->
     <div class="px-8 mt-2 flex justify-end gap-6">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full border-2 border-white bg-emerald-500"></span>
+        <span class="w-2 h-2 rounded-full border border-white/20 bg-emerald-500"></span>
         <span class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest">Entradas</span>
       </div>
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full border-2 border-white bg-rose-500"></span>
+        <span class="w-2 h-2 rounded-full border border-white/20 bg-rose-500"></span>
         <span class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest">Saídas</span>
       </div>
     </div>
@@ -59,42 +59,36 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-24 text-center">
         <!-- Entrada -->
         <div class="space-y-1">
-          <p class="text-neutral-500 text-[12px] font-medium uppercase tracking-wider">Entrada</p>
-          <p class="text-[36px] font-medium uppercase text-emerald-400">
-            <span class="text-xs opacity-50 mr-1">R$</span>{{ numberOnly(totalIn) }}
+          <p class="text-neutral-500 text-[11px] font-semibold uppercase tracking-widest">Entrada</p>
+          <p class="text-[32px] font-semibold text-emerald-400 tracking-tight">
+            <span class="text-sm opacity-40 mr-1">R$</span>{{ numberOnly(totalIn) }}
           </p>
         </div>
 
         <!-- Saida -->
         <div class="space-y-1">
-          <p class="text-neutral-500 text-[18px] font-medium uppercase tracking-wider">Saída</p>
-          <p class="text-[36px] font-medium uppercase text-rose-400">
-            <span class="text-xs opacity-50 mr-1">R$</span>{{ numberOnly(totalOut) }}
+          <p class="text-neutral-500 text-[11px] font-semibold uppercase tracking-widest">Saída</p>
+          <p class="text-[32px] font-semibold text-rose-400 tracking-tight">
+            <span class="text-sm opacity-40 mr-1">R$</span>{{ numberOnly(totalOut) }}
           </p>
         </div>
 
         <!-- Balanço -->
         <div class="space-y-1">
           <div class="flex items-center justify-center gap-2">
-            <p class="text-neutral-500 text-[18px] font-medium uppercase tracking-wider">Balanço</p>
+            <p class="text-neutral-500 text-[11px] font-semibold uppercase tracking-widest">Balanço</p>
             <div 
-              :class="isUp ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
-              class="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
+              :class="isUp ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'"
+              class="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold"
             >
               <span>{{ percent }}%</span>
-              <svg v-if="isUp" class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
-                <path d="M12 19V5M5 12l7-7 7 7" />
-              </svg>
-              <svg v-else class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
-                <path d="M12 5v14M5 12l7 7 7-7" />
-              </svg>
             </div>
           </div>
           <p 
-            class="text-[36px] font-medium uppercase"
+            class="text-[32px] font-semibold tracking-tight"
             :class="isUp ? 'text-emerald-400' : 'text-rose-400'"
           >
-            <span class="text-xs opacity-50 mr-1">R$</span>{{ numberOnly(balance) }}
+            <span class="text-sm opacity-40 mr-1">R$</span>{{ numberOnly(balance) }}
           </p>
         </div>
       </div>

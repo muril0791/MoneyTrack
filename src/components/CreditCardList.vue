@@ -1,122 +1,120 @@
 <template>
-  <div class="w-full max-w-3xl">
-    <div
-      class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
-    >
-      <div
-        class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
-      >
-        <h2 class="text-lg md:text-xl font-semibold tracking-tight">
-          Resumo de Cartões de Crédito
-        </h2>
+  <div class="w-full max-w-3xl mx-auto font-sans">
+    <div class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-8 py-6 border-b border-[#2a2a2a]">
+        <div class="space-y-1">
+          <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Resumo Financeiro</h2>
+          <h3 class="text-xl font-semibold text-white">Faturas e Limites</h3>
+        </div>
         <button
-          class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
           @click="$emit('close')"
+          class="text-neutral-500 hover:text-white transition-colors"
         >
-          ✕
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
-      <div class="p-6 grid gap-6">
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
-          <label for="cardFilter" class="text-sm text-neutral-300"
-            >Filtrar por cartão:</label
-          >
+      <div class="p-8 space-y-8">
+        <!-- Filter Section -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#151515] p-4 rounded-2xl border border-[#2a2a2a]">
+          <div class="space-y-1">
+            <p class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Filtrar por cartão</p>
+            <p class="text-sm text-neutral-300">Escolha um cartão para detalhar</p>
+          </div>
           <select
-            id="cardFilter"
             v-model="selectedCardId"
-            @change="applyFilter"
-            class="w-full md:w-1/2 bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 text-neutral-200 outline-none transition"
+            class="bg-[#1b1b1b] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all appearance-none cursor-pointer min-w-[200px]"
           >
-            <option value="todos">Todos</option>
+            <option value="todos">Todos os Cartões</option>
             <option v-for="card in creditCards" :key="card.id" :value="card.id">
               {{ card.name }}
             </option>
           </select>
         </div>
 
+        <!-- Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div
-            class="bg-[#151515] border border-[#2a2a2a] rounded-xl p-4 text-center"
-          >
-            <p class="text-sm text-neutral-400">Total Usado</p>
-            <p class="text-lg font-semibold text-red-400 mt-1">
-              {{ formatCurrency(totalUsed) }}
+          <div class="bg-[#151515] border border-[#2a2a2a] rounded-2xl p-5 relative overflow-hidden group">
+            <p class="text-[10px] uppercase tracking-[0.15em] text-neutral-500 font-bold mb-1">Total Usado</p>
+            <p class="text-2xl font-semibold text-rose-400 tracking-tight">
+              <span class="text-xs opacity-50 mr-1">R$</span>{{ totalUsed.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
+            <div class="absolute bottom-0 left-0 h-1 bg-rose-500/20 w-full"></div>
           </div>
-          <div
-            class="bg-[#151515] border border-[#2a2a2a] rounded-xl p-4 text-center"
-          >
-            <p class="text-sm text-neutral-400">Limite Disponível</p>
-            <p class="text-lg font-semibold text-emerald-400 mt-1">
-              {{ formatCurrency(totalAvailable) }}
+          
+          <div class="bg-[#151515] border border-[#2a2a2a] rounded-2xl p-5 relative overflow-hidden group">
+            <p class="text-[10px] uppercase tracking-[0.15em] text-neutral-500 font-bold mb-1">Limite Disponível</p>
+            <p class="text-2xl font-semibold text-emerald-400 tracking-tight">
+              <span class="text-xs opacity-50 mr-1">R$</span>{{ totalAvailable.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
+            <div class="absolute bottom-0 left-0 h-1 bg-emerald-500/20 w-full"></div>
           </div>
-          <div
-            class="bg-[#151515] border border-[#2a2a2a] rounded-xl p-4 text-center"
-          >
-            <p class="text-sm text-neutral-400">Próximo Vencimento</p>
-            <p class="text-lg font-semibold text-neutral-300 mt-1">
-              {{ formatCurrency(totalNextDue) }}
+
+          <div class="bg-[#151515] border border-[#2a2a2a] rounded-2xl p-5 relative overflow-hidden group">
+            <p class="text-[10px] uppercase tracking-[0.15em] text-neutral-500 font-bold mb-1">Próxima Fatura</p>
+            <p class="text-2xl font-semibold text-neutral-200 tracking-tight">
+              <span class="text-xs opacity-50 mr-1">R$</span>{{ totalNextDue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
             </p>
+            <div class="absolute bottom-0 left-0 h-1 bg-neutral-500/20 w-full"></div>
           </div>
         </div>
-        <div class="grid gap-3">
-          <h3 class="text-sm uppercase tracking-wider text-neutral-400">
-            Transações
-          </h3>
-          <div
-            v-if="filteredExpenses.length === 0"
-            class="text-sm text-neutral-400 bg-[#151515] border border-dashed border-[#2a2a2a] rounded-xl p-6 text-center"
-          >
-            Nenhuma transação encontrada.
+
+        <!-- Transactions List -->
+        <div class="space-y-4">
+          <h3 class="text-neutral-500 text-[11px] uppercase tracking-widest font-semibold ml-1">Lançamentos no Cartão</h3>
+
+          <div v-if="filteredExpenses.length === 0" class="text-center py-10 border border-dashed border-[#2a2a2a] rounded-2xl bg-[#151515]">
+            <p class="text-neutral-500 text-sm">Nenhuma transação encontrada.</p>
           </div>
-          <ul
-            v-else
-            class="divide-y divide-[#232323] rounded-xl overflow-hidden ring-1 ring-[#232323]"
-          >
-            <li
+
+          <div v-else class="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div
               v-for="(expense, index) in filteredExpenses"
               :key="index"
-              class="bg-[#161616] p-4 flex flex-col sm:flex-row sm:justify-between gap-2"
+              class="flex items-center justify-between bg-[#151515] border border-[#2a2a2a] rounded-2xl p-4 hover:bg-[#191919] transition-all"
             >
-              <div class="min-w-0">
-                <p class="text-[15px] font-medium">
-                  Valor:
-                  <span class="text-neutral-200">{{
-                    formatCurrency(expense.valor)
-                  }}</span>
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <p class="text-[14px] font-semibold text-white uppercase tracking-wide">{{ getCreditCardName(expense.creditCardId) }}</p>
+                    <span v-if="expense.parcelas" class="text-[9px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded uppercase font-bold">
+                      {{ expense.parcelas }}x
+                    </span>
+                  </div>
+                  <p class="text-[10px] text-neutral-500 uppercase tracking-widest">
+                    Compra em {{ formatDataShort(expense.data) }} • Venc. {{ computePaymentDateShort(expense) }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <p class="text-[15px] font-bold text-rose-400 tracking-tight">
+                  <span class="text-[10px] opacity-60 mr-0.5">R$</span>{{ expense.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}
                 </p>
-                <p class="text-sm text-neutral-400">
-                  Data: {{ formatData(expense.data) }}
-                </p>
-                <p class="text-sm text-neutral-400">
-                  Pagamento: {{ computePaymentDate(expense) }}
-                </p>
-                <p v-if="expense.parcelas" class="text-sm text-neutral-400">
-                  Parcelas: {{ expense.parcelas }}
+                <p class="text-[9px] text-neutral-600 uppercase font-bold tracking-tighter">
+                  Limite rest.: {{ formatCurrency(computeAvailableLimit(expense)) }}
                 </p>
               </div>
-              <div class="text-right sm:text-left">
-                <p class="text-sm text-neutral-400">
-                  Limite disponível:
-                  <span class="text-emerald-400">{{
-                    formatCurrency(computeAvailableLimit(expense))
-                  }}</span>
-                </p>
-              </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
+
+      <!-- Footer -->
+      <div class="px-8 py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-end">
         <button
-          class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
           @click="$emit('close')"
+          class="text-[12px] uppercase tracking-widest font-bold text-neutral-500 hover:text-white transition-all"
         >
-          Fechar
+          Fechar Resumo
         </button>
       </div>
     </div>
@@ -134,7 +132,6 @@ export default {
   },
   setup(props) {
     const selectedCardId = ref("todos");
-    const applyFilter = () => {};
 
     const clampDay = (y, m, d) => {
       const last = new Date(y, m + 1, 0).getDate();
@@ -157,6 +154,8 @@ export default {
       return clampDay(y, dueMonth, Number(card.dueDay));
     };
 
+    const getCreditCardName = (id) => props.creditCards.find(c => c.id === id)?.name || "Cartão";
+
     const filteredExpenses = computed(() => {
       let filtered = props.expenses.filter(
         (expense) =>
@@ -172,22 +171,18 @@ export default {
       return filtered;
     });
 
-    const computePaymentDate = (expense) => {
+    const computePaymentDateShort = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return "";
-      const purchase = new Date(expense.data);
+      const purchase = new Date(expense.data + "T00:00:00");
       const first = dueDateFrom(purchase, card);
-      return first.toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      });
+      return first.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
     };
 
     const outstandingValue = (expense) => {
       const card = props.creditCards.find((c) => c.id === expense.creditCardId);
       if (!card) return 0;
-      const purchase = new Date(expense.data);
+      const purchase = new Date(expense.data + "T00:00:00");
       const firstDue = dueDateFrom(purchase, card);
       const n = Math.max(1, Number(expense.parcelas || 1));
       const parcela = Number(expense.valor) / n;
@@ -227,8 +222,8 @@ export default {
         return 0;
       }
       return props.creditCards.reduce((acc, card) => {
-        const used = filteredExpenses.value
-          .filter((exp) => exp.creditCardId === card.id)
+        const used = props.expenses
+          .filter(e => e.tipo === "saida" && e.tipoTransacao === "cartao-credito" && e.creditCardId === card.id)
           .reduce((s, e) => s + outstandingValue(e), 0);
         return acc + (card.limit - used);
       }, 0);
@@ -241,25 +236,38 @@ export default {
         style: "currency",
         currency: "BRL",
       }).format(Number(v || 0));
-    const formatData = (s) =>
-      new Date(s).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      });
+
+    const formatDataShort = (s) =>
+      new Date(s + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
     return {
       selectedCardId,
-      applyFilter,
       filteredExpenses,
       totalUsed,
       totalAvailable,
       totalNextDue,
       formatCurrency,
-      formatData,
-      computePaymentDate,
+      formatDataShort,
+      computePaymentDateShort,
       computeAvailableLimit,
+      getCreditCardName
     };
   },
 };
 </script>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+</style>

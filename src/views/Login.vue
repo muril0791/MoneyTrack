@@ -45,6 +45,12 @@
             </div>
           </div>
 
+          <div class="flex justify-end -mt-2">
+            <router-link to="/forgot-password" class="text-xs text-emerald-400 hover:text-emerald-300 transition">
+              Esqueci minha senha
+            </router-link>
+          </div>
+
           <p v-if="error" class="text-sm text-red-400 -mb-2">{{ error }}</p>
 
           <button

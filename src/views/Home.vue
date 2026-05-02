@@ -10,12 +10,12 @@
 
     <main class="mx-auto w-full px-4 md:px-8 py-3 md:py-4">
       <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4">
-        <div class="space-y-6 min-w-0">
+        <div class="space-y-4 min-w-0">
           <section
             class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
           >
             <div class="flex items-center justify-between gap-3">
-              <h3 class="text-neutral-300">Transações</h3>
+              <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Lançamentos</h3>
               <button
                 class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-3 md:px-4 py-2 rounded-xl"
                 @click="openNewTransaction"
@@ -29,7 +29,7 @@
             class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] p-4 md:p-5"
           >
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-neutral-300">Cartões</h3>
+              <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Meus Cartões</h3>
               <button
                 class="text-emerald-400 text-xs"
                 @click="openCreditCardsModal"
@@ -92,7 +92,7 @@
            
             @open-expense-detail="openExpenseDetail" />
           <div v-if="showExpenseDetailModal"
-            class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4"
             @click.self="closeExpenseDetail">
             <div class="w-full max-w-xl" @click.stop>
               <EditExpense :expense="selectedExpense" @close="closeExpenseDetail" />
@@ -105,7 +105,7 @@
 
     <div
       v-if="showModal"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-4"
+      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
       @click.self="closeFormModal"
     >
       <div class="w-full max-w-3xl max-h-[90vh] overflow-y-auto" @click.stop>
@@ -122,7 +122,7 @@
 
     <div
       v-if="showCategoriesModal"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-4"
+      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
       @click.self="closeCategoriesModal"
     >
       <div class="p-3 md:p-4 w-full max-w-xl max-h-[90vh] overflow-y-auto">
@@ -135,7 +135,7 @@
 
     <div
       v-if="showCreditCardsModal"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-4"
+      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
       @click.self="closeCreditCardsModal"
     >
       <div class="p-3 md:p-4 w-full max-w-xl max-h-[90vh] overflow-y-auto">
@@ -149,7 +149,7 @@
 
     <div
       v-if="showCreditCardsRegistrationModal"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-4"
+      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
       @click.self="closeCreditCardsRegistrationModal"
     >
       <div class="p-3 md:p-4 w-full max-w-xl max-h-[90vh] overflow-y-auto">
