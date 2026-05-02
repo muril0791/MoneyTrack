@@ -1,291 +1,236 @@
 <template>
-  <div class="text-white">
-    <section
-      v-if="currentStep === 0"
-      class="space-y-4 bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden p-6"
+  <div class="text-white font-sans w-full">
+    <!-- Close Button (Absolute) -->
+    <button 
+      @click="$emit('close')" 
+      class="absolute top-6 right-8 text-neutral-500 hover:text-white transition-colors z-10"
     >
-      <h2 class="text-2xl font-semibold tracking-tight">Transações</h2>
-      <p class="text-sm text-neutral-400 -mt-2">
-        Escolha um tipo para continuar
-      </p>
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
+    </button>
 
-      <div class="grid gap-4 sm:grid-cols-2">
-        <button
-          type="button"
-          aria-label="Selecionar Entrada"
-          @click="selectType('entrada')"
-          class="group relative w-full overflow-hidden rounded-2xl bg-[#151515] ring-1 ring-[#262626] px-5 py-4 text-left shadow-lg transition hover:bg-[#191919] hover:ring-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-        >
-          <div class="flex items-center gap-4">
-            <span
-              class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30 text-emerald-400"
-            >
-              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
-                <path d="M12 4l6 6h-4v8h-4v-8H6l6-6z" />
-              </svg>
-            </span>
-            <div>
-              <div class="font-semibold text-[15px]">Entrada</div>
-              <div class="text-sm text-neutral-400 mt-0.5">
-                Salário, transferências…
-              </div>
-            </div>
-          </div>
-          <span
-            class="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
-          />
-        </button>
-
-        <button
-          type="button"
-          aria-label="Selecionar Saída"
-          @click="selectType('saida')"
-          class="group relative w-full overflow-hidden rounded-2xl bg-[#151515] ring-1 ring-[#262626] px-5 py-4 text-left shadow-lg transition hover:bg-[#191919] hover:ring-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50"
-        >
-          <div class="flex items-center gap-4">
-            <span
-              class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/10 ring-1 ring-rose-500/30 text-rose-400"
-            >
-              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
-                <path d="M12 20l-6-6h4V6h4v8h4l-6 6z" />
-              </svg>
-            </span>
-            <div>
-              <div class="font-semibold text-[15px]">Saída</div>
-              <div class="text-sm text-neutral-400 mt-0.5">
-                Compras, pagamentos…
-              </div>
-            </div>
-          </div>
-          <span
-            class="pointer-events-none absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
-          />
-        </button>
-      </div>
-    </section>
-
-    <section
-      v-else-if="currentStep === 1"
-      class="border border-[#2a2a2a] bg-[#1b1b1b] rounded-2xl shadow-xl"
-    >
-      <div
-        class="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a]"
+    <transition name="fade-slide" mode="out-in">
+      <!-- Step 0: Type Selection -->
+      <section
+        v-if="currentStep === 0"
+        key="step0"
+        class="flex flex-col space-y-10 bg-[#1b1b1b] rounded-[32px] shadow-2xl ring-1 ring-[#2a2a2a] px-10 py-10"
       >
-        <h3 class="font-semibold tracking-tight">Preencha os dados</h3>
-        <span
-          class="px-2 py-1 rounded-full border border-[#2a2a2a] bg-[#232323] text-xs"
-        >
-          {{ form.tipo === "entrada" ? "Entrada" : "Saída" }}
-        </span>
-      </div>
-
-      <div class="grid gap-4 p-4 sm:grid-cols-2">
-        <div class="space-y-1">
-          <label class="text-sm text-neutral-300">Valor</label>
-          <input
-            v-model.number="form.valor"
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            placeholder="0,00"
-            :disabled="submitting"
-            class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
-          />
+        <div class="space-y-2 text-center">
+          <h2 class="text-emerald-500 text-[11px] uppercase tracking-[0.4em] font-bold">Nova Transação</h2>
+          <h3 class="text-3xl font-semibold tracking-tight text-white">O que vamos registrar?</h3>
         </div>
 
-        <div class="space-y-1">
-          <label class="text-sm text-neutral-300">Tipo de Transação</label>
-          <select
-            v-model="form.tipoTransacao"
-            required
-            :disabled="submitting"
-            class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
+        <div class="grid grid-cols-2 gap-6 w-full mx-auto">
+          <!-- Card Entrada -->
+          <button
+            type="button"
+            @click="selectType('entrada')"
+            class="group flex items-center gap-6 rounded-[28px] bg-[#151515] ring-1 ring-white/5 p-8 text-left transition-all duration-300 hover:ring-emerald-500/50 hover:bg-[#181818] hover:scale-[1.03] active:scale-95 shadow-2xl"
           >
-            <option disabled value="">Selecione</option>
-            <template v-if="form.tipo === 'entrada'">
-              <option value="dinheiro">Dinheiro</option>
-              <option value="deposito">Depósito</option>
-              <option value="pix">Pix</option>
-              <option value="transferencia">Transferência</option>
-            </template>
-            <template v-else>
-              <option value="dinheiro">Dinheiro</option>
-              <option value="pix">Pix</option>
-              <option value="cartao-debito">Cartão de Débito</option>
-              <option value="cartao-credito">Cartão de Crédito</option>
-            </template>
-          </select>
+            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </div>
+            <div>
+              <div class="font-bold text-[20px] uppercase tracking-widest text-white group-hover:text-emerald-400 transition-colors">Entrada</div>
+              <div class="text-[13px] text-neutral-500 mt-1 leading-relaxed">Salário, Pix ou rendas.</div>
+            </div>
+          </button>
+
+          <!-- Card Saída -->
+          <button
+            type="button"
+            @click="selectType('saida')"
+            class="group flex items-center gap-6 rounded-[28px] bg-[#151515] ring-1 ring-white/5 p-8 text-left transition-all duration-300 hover:ring-rose-500/50 hover:bg-[#181818] hover:scale-[1.03] active:scale-95 shadow-2xl"
+          >
+            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.1)]">
+              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
+            </div>
+            <div>
+              <div class="font-bold text-[20px] uppercase tracking-widest text-white group-hover:text-rose-400 transition-colors">Saída</div>
+              <div class="text-[13px] text-neutral-500 mt-1 leading-relaxed">Compras, lazer ou contas.</div>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 1: Form Details -->
+      <section
+        v-else-if="currentStep === 1"
+        key="step1"
+        class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden"
+      >
+        <div class="px-8 pt-8 pb-4 flex items-center justify-between">
+          <div class="space-y-1">
+            <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Dados do Lançamento</h2>
+            <h3 class="text-xl font-semibold text-white">Preencha os detalhes</h3>
+          </div>
+          <span :class="form.tipo === 'entrada' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-rose-500/10 text-rose-400 ring-rose-500/20'" 
+                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ring-1">
+            {{ form.tipo === "entrada" ? "Entrada" : "Saída" }}
+          </span>
         </div>
 
-        <template
-          v-if="
-            form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'
-          "
-        >
-          <div class="space-y-1">
-            <label class="text-sm text-neutral-300">Cartão de Crédito</label>
-            <select
-              v-model="form.creditCardId"
-              required
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-            >
-              <option disabled value="">Selecione</option>
-              <option
-                v-for="card in creditCards"
-                :key="card.id"
-                :value="card.id"
+        <div class="p-8 pt-4 space-y-6">
+          <div class="grid gap-6 sm:grid-cols-2">
+            <!-- Amount Input -->
+            <div class="space-y-2 sm:col-span-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Valor</label>
+              <div class="relative group">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-medium">R$</span>
+                <input
+                  v-model.number="form.valor"
+                  type="number"
+                  step="0.01"
+                  required
+                  placeholder="0,00"
+                  class="w-full bg-[#151515] border border-[#2a2a2a] rounded-2xl pl-12 pr-4 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
+                />
+              </div>
+            </div>
+
+            <!-- Transaction Type -->
+            <div class="space-y-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Método</label>
+              <select
+                v-model="form.tipoTransacao"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all appearance-none cursor-pointer"
               >
-                {{ card.name }}
-              </option>
-            </select>
+                <option disabled value="">Selecione</option>
+                <template v-if="form.tipo === 'entrada'">
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="deposito">Depósito</option>
+                  <option value="pix">Pix</option>
+                  <option value="transferencia">Transferência</option>
+                </template>
+                <template v-else>
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="pix">Pix</option>
+                  <option value="cartao-debito">Cartão de Débito</option>
+                  <option value="cartao-credito">Cartão de Crédito</option>
+                </template>
+              </select>
+            </div>
+
+            <!-- Date -->
+            <div class="space-y-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Data</label>
+              <input
+                v-model="form.data"
+                type="date"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all color-scheme-dark"
+              />
+            </div>
+
+            <!-- Credit Card (Conditional) -->
+            <template v-if="form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'">
+              <div class="space-y-2">
+                <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Cartão</label>
+                <select v-model="form.creditCardId" class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all">
+                  <option disabled value="">Selecione</option>
+                  <option v-for="card in creditCards" :key="card.id" :value="card.id">{{ card.name }}</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Parcelas</label>
+                <input v-model.number="form.parcelas" type="number" min="1" placeholder="1" class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all" />
+              </div>
+            </template>
+
+            <!-- Category -->
+            <div class="space-y-2 sm:col-span-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Categoria</label>
+              <select
+                v-model="form.categoria"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all appearance-none cursor-pointer"
+              >
+                <option disabled value="">Selecione uma categoria</option>
+                <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+                <option value="adicionar" class="text-emerald-400">+ Adicionar nova categoria</option>
+              </select>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-2 sm:col-span-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Descrição (Opcional)</label>
+              <input
+                v-model="form.descricao"
+                type="text"
+                placeholder="Ex: Almoço de domingo"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+              />
+            </div>
           </div>
 
-          <div class="space-y-1">
-            <label class="text-sm text-neutral-300">Número de Parcelas</label>
-            <input
-              v-model.number="form.parcelas"
-              type="number"
-              min="2"
-              placeholder="ex.: 3"
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
-            />
-            <small class="text-neutral-400 text-xs"
-              >Deixe vazio ou 1 para compra à vista.</small
+          <!-- Actions -->
+          <div class="flex gap-3 pt-4">
+            <button
+              @click="goBackToStep0"
+              class="flex-1 px-6 py-4 rounded-2xl border border-[#2a2a2a] text-neutral-400 font-semibold hover:bg-white/5 hover:text-white transition-all"
             >
+              Voltar
+            </button>
+            <button
+              @click="nextStep"
+              class="flex-[2] px-6 py-4 rounded-2xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 transition-all"
+            >
+              Revisar Lançamento
+            </button>
           </div>
-        </template>
-
-        <div class="space-y-1">
-          <label class="text-sm text-neutral-300">Data</label>
-          <input
-            v-model="form.data"
-            type="date"
-            required
-            :disabled="submitting"
-            class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-          />
         </div>
+      </section>
 
-        <div class="space-y-1">
-          <label class="text-sm text-neutral-300">Categoria</label>
-          <select
-            v-model="form.categoria"
-            required
-            :disabled="submitting"
-            class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-          >
-            <option disabled value="">Selecione</option>
-            <option
-              v-for="cat in filteredCategories"
-              :key="cat.id"
-              :value="cat.id"
-            >
-              {{ cat.name }}
-            </option>
-            <option value="adicionar">[Adicionar categoria]</option>
-          </select>
-        </div>
-
-        <div class="space-y-1 sm:col-span-2">
-          <label class="text-sm text-neutral-300">Descrição</label>
-          <input
-            v-model="form.descricao"
-            type="text"
-            placeholder="Opcional"
-            maxlength="140"
-            :disabled="submitting"
-            class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
-          />
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 px-4 py-3">
-        <button
-          type="button"
-          :disabled="submitting"
-          class="px-4 py-2 rounded-lg border border-[#2a2a2a] bg-[#222] text-neutral-300 hover:bg-[#262626] hover:text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
-          @click="goBackToStep0"
-        >
-          Voltar
-        </button>
-        <button
-          type="button"
-          :disabled="submitting"
-          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
-          @click="nextStep"
-        >
-          Próximo
-        </button>
-      </div>
-    </section>
-
-    <section
-      v-else-if="currentStep === 2"
-      class="border border-[#2a2a2a] bg-[#1b1b1b] rounded-2xl shadow-xl"
-    >
-      <div
-        class="flex items-center justify-between px-4 py-3 border-b border-[#2a2a2a]"
+      <!-- Step 2: Review -->
+      <section
+        v-else-if="currentStep === 2"
+        key="step2"
+        class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden"
       >
-        <h3 class="font-semibold tracking-tight">Revisão final</h3>
-        <span
-          class="px-2 py-1 rounded-full border border-[#2a2a2a] bg-[#232323] text-xs"
-        >
-          {{ form.tipo === "entrada" ? "Entrada" : "Saída" }}
-        </span>
-      </div>
+        <div class="px-8 pt-8 pb-4">
+          <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Tudo pronto!</h2>
+          <h3 class="text-xl font-semibold text-white">Revise as informações</h3>
+        </div>
 
-      <div class="p-4 space-y-2">
-        <ItemRow label="Tipo" :text="labelTipo" />
-        <ItemRow label="Valor" :text="money(form.valor)" />
-        <ItemRow label="Transação" :text="labelTransacao" />
-        <template
-          v-if="
-            form.tipo === 'saida' && form.tipoTransacao === 'cartao-credito'
-          "
-        >
-          <ItemRow
-            label="Cartão"
-            :text="getCreditCardName(form.creditCardId) || '—'"
-          />
-          <ItemRow
-            v-if="form.parcelas"
-            label="Parcelas"
-            :text="`${form.parcelas}x`"
-          />
-          <ItemRow
-            v-if="form.dataPrimeiraParcela"
-            label="1ª Parcela"
-            :text="brDate(form.dataPrimeiraParcela)"
-          />
-        </template>
-        <ItemRow label="Data" :text="brDate(form.data)" />
-        <ItemRow label="Categoria" :text="selectedCategoryName || '—'" />
-        <ItemRow label="Descrição" :text="form.descricao || '—'" />
-      </div>
+        <div class="p-8 space-y-4">
+          <div class="bg-[#151515] rounded-2xl p-6 space-y-4 border border-[#2a2a2a]">
+            <ItemRow label="Tipo" :text="labelTipo" />
+            <ItemRow label="Valor" :text="money(form.valor)" class="text-xl font-bold text-emerald-400" />
+            <ItemRow label="Método" :text="labelTransacao" />
+            <ItemRow label="Categoria" :text="selectedCategoryName" />
+            <ItemRow label="Data" :text="brDate(form.data)" />
+            <ItemRow v-if="form.descricao" label="Descrição" :text="form.descricao" />
+          </div>
 
-      <div class="flex items-center justify-end gap-2 px-4 py-3">
-        <button
-          type="button"
-          :disabled="submitting"
-          class="px-4 py-2 rounded-lg border border-[#2a2a2a] bg-[#222] text-neutral-300 hover:bg-[#262626] hover:text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
-          @click="prevStep"
-        >
-          Voltar
-        </button>
-        <button
-          type="button"
-          :disabled="submitting"
-          class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-[#2a2a2a] text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
-          @click="handleSubmit"
-        >
-          <span v-if="!submitting">Confirmar</span>
-          <span v-else>Salvando…</span>
-        </button>
-      </div>
-    </section>
+          <div class="flex gap-3 pt-4">
+            <button
+              @click="prevStep"
+              class="flex-1 px-6 py-4 rounded-2xl border border-[#2a2a2a] text-neutral-400 font-semibold hover:bg-white/5 transition-all"
+            >
+              Ajustar
+            </button>
+            <button
+              @click="handleSubmit"
+              :disabled="submitting"
+              class="flex-[2] px-6 py-4 rounded-2xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50"
+            >
+              <span v-if="!submitting">Confirmar e Salvar</span>
+              <span v-else class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Salvando...
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </transition>
   </div>
 </template>
 
@@ -554,4 +499,24 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Custom styles for date input icon in dark mode */
+.color-scheme-dark {
+  color-scheme: dark;
+}
+</style>

@@ -1,53 +1,35 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Content Security Policy — Hardened for Production -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com data:;
+      img-src 'self' data: https:;
+      connect-src 'self' 
+        http://localhost:3000 
+        http://localhost:3001 
+        https://moneytrack-api.muriloferreira.dev 
+        https://moneytrack-dev-api.muriloferreira.dev 
+        ws://localhost:*;
+      frame-src 'none';
+      object-src 'none';
+    ">
 
-<head>
-  <meta charset="UTF-8" />
-
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    base-uri 'self';
-    object-src 'none';
-    connect-src
-      'self'
-      http://localhost:3000
-      https://moneytrack-api.muriloferreira.dev/
-      ws://localhost:*;
-    img-src 'self' data: https:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
-    script-src-attr 'none';
-    style-src
-      'self'
-      'unsafe-inline'
-      https://fonts.googleapis.com;
-    font-src
-      'self'
-      https://fonts.gstatic.com
-      data:;
-    frame-src 'self';
-    frame-ancestors 'none';
-    form-action 'self';
-  " />
-
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Teko:wght@300..700&display=swap"
-    rel="stylesheet" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-    rel="stylesheet">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aurora</title>
-</head>
-
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
-</body>
-
+    <title>MoneyTrack — Gestão Financeira Inteligente</title>
+    
+    <!-- Meta Tags para SEO -->
+    <meta name="description" content="Assuma o controle total das suas finanças com MoneyTrack. Dashboard inteligente, controle de cartões de crédito e categorias personalizadas." />
+    <meta name="theme-color" content="#10b981" />
+  </head>
+  <body class="bg-[#0f0f0f] antialiased">
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

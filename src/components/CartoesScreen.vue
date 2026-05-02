@@ -1,176 +1,158 @@
 <template>
-  <div
-    class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
-  >
-    <div
-      class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
-    >
-      <h2 class="text-lg md:text-xl font-semibold tracking-tight">
-        Cartões de crédito
-      </h2>
-      <button
-        class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
-        @click="$emit('close')"
-        aria-label="Fechar modal"
-      >
-        ✕
-      </button>
-    </div>
-
-    <div class="p-6 grid gap-6">
-      <form @submit.prevent="handleSubmit" class="grid gap-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="col-span-1 md:col-span-2">
-            <label for="cardName" class="block text-sm text-neutral-300 mb-1"
-              >Nome do cartão</label
-            >
-            <input
-              id="cardName"
-              v-model="cardForm.name"
-              type="text"
-              required
-              placeholder="Ex.: Nubank, Inter, Santander..."
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
-            />
-          </div>
-
-          <div>
-            <label for="cardLimit" class="block text-sm text-neutral-300 mb-1"
-              >Limite (R$)</label
-            >
-            <input
-              id="cardLimit"
-              v-model.number="cardForm.limit"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-              placeholder="0,00"
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none [appearance:textfield] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-            />
-          </div>
-
-          <div>
-            <label for="closingDay" class="block text-sm text-neutral-300 mb-1"
-              >Dia de fechamento</label
-            >
-            <input
-              id="closingDay"
-              v-model.number="cardForm.closingDay"
-              type="number"
-              min="1"
-              max="31"
-              required
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none [appearance:textfield] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-            />
-          </div>
-
-          <div>
-            <label for="dueDay" class="block text-sm text-neutral-300 mb-1"
-              >Dia de vencimento</label
-            >
-            <input
-              id="dueDay"
-              v-model.number="cardForm.dueDay"
-              type="number"
-              min="1"
-              max="31"
-              required
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none [appearance:textfield] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-            />
-          </div>
+  <div class="w-full max-w-xl mx-auto font-sans">
+    <div class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-8 py-6 border-b border-[#2a2a2a]">
+        <div class="space-y-1">
+          <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Configurações</h2>
+          <h3 class="text-xl font-semibold text-white">Cartões de Crédito</h3>
         </div>
-
-        <div class="flex gap-3 pt-1">
-          <button
-            type="submit"
-            :disabled="submitting"
-            class="flex-1 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <span v-if="!submitting">{{
-              isEditing ? "Atualizar" : "Adicionar"
-            }}</span>
-            <span v-else>Salvando…</span>
-          </button>
-
-          <button
-            v-if="isEditing"
-            type="button"
-            @click="cancelEdit"
-            :disabled="submitting"
-            class="px-4 py-3 rounded-lg bg-[#262626] hover:bg-[#2f2f2f] text-neutral-200 font-medium transition disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-
-      <div class="grid gap-3">
-        <h3 class="text-sm uppercase tracking-wider text-neutral-400">
-          Cartões cadastrados
-        </h3>
-
-        <div
-          v-if="creditCards.length === 0"
-          class="text-sm text-neutral-400 bg-[#151515] border border-dashed border-[#2a2a2a] rounded-xl p-6 text-center"
+        <button
+          @click="$emit('close')"
+          class="text-neutral-500 hover:text-white transition-colors"
         >
-          Nenhum cartão cadastrado ainda.
-        </div>
-
-        <ul
-          v-else
-          class="divide-y divide-[#232323] rounded-xl overflow-hidden ring-1 ring-[#232323]"
-        >
-          <li
-            v-for="card in creditCards"
-            :key="card.id"
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 bg-[#161616] px-4 py-3"
-          >
-            <div class="min-w-0">
-              <p class="font-medium truncate">{{ card.name }}</p>
-              <p class="text-sm text-neutral-400">
-                Limite:
-                <span class="text-neutral-200">{{
-                  formatCurrency(card.limit)
-                }}</span>
-                • Fechamento:
-                <span class="text-neutral-200">{{ card.closingDay }}</span> •
-                Venc.: <span class="text-neutral-200">{{ card.dueDay }}</span>
-              </p>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-              <button
-                class="px-3 py-2 rounded-md bg-[#232323] hover:bg-[#2b2b2b] text-sm font-medium transition"
-                :disabled="submitting"
-                @click="editCard(card)"
-              >
-                Editar
-              </button>
-              <button
-                class="px-3 py-2 rounded-md bg-[#2a1313] hover:bg-[#341616] text-sm font-medium text-red-300 transition"
-                :disabled="submitting"
-                @click="deleteCard(card.id)"
-              >
-                Excluir
-              </button>
-            </div>
-          </li>
-        </ul>
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
       </div>
-    </div>
 
-    <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
-      <button
-        class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
-        @click="$emit('close')"
-      >
-        Fechar
-      </button>
+      <div class="p-8 space-y-8">
+        <!-- Form Section -->
+        <form @submit.prevent="handleSubmit" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2 space-y-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Nome do Cartão</label>
+              <input
+                v-model="cardForm.name"
+                type="text"
+                required
+                placeholder="Ex: Nubank, Inter, Santander..."
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Limite (R$)</label>
+              <input
+                v-model.number="cardForm.limit"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                placeholder="0,00"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1 text-center block">Fechamento</label>
+                <input
+                  v-model.number="cardForm.closingDay"
+                  type="number"
+                  min="1"
+                  max="31"
+                  required
+                  placeholder="Dia"
+                  class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] text-center outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1 text-center block">Vencimento</label>
+                <input
+                  v-model.number="cardForm.dueDay"
+                  type="number"
+                  min="1"
+                  max="31"
+                  required
+                  placeholder="Dia"
+                  class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] text-center outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="submit"
+              :disabled="submitting"
+              class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl py-3.5 transition shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+            >
+              <span v-if="!submitting">{{ isEditing ? "Atualizar Cartão" : "Adicionar Cartão" }}</span>
+              <span v-else>Salvando...</span>
+            </button>
+            <button
+              v-if="isEditing"
+              @click="cancelEdit"
+              type="button"
+              class="px-6 py-3.5 rounded-xl border border-[#2a2a2a] text-neutral-400 font-semibold hover:bg-white/5 transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        <!-- List Section -->
+        <div class="space-y-4">
+          <h3 class="text-neutral-500 text-[11px] uppercase tracking-widest font-semibold ml-1">Cartões Cadastrados</h3>
+
+          <div v-if="creditCards.length === 0" class="text-center py-10 border border-dashed border-[#2a2a2a] rounded-2xl bg-[#151515]">
+            <p class="text-neutral-500 text-sm">Nenhum cartão cadastrado.</p>
+          </div>
+
+          <div v-else class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            <div
+              v-for="card in creditCards"
+              :key="card.id"
+              class="flex items-center justify-between bg-[#151515] border border-[#2a2a2a] rounded-2xl p-4 hover:ring-1 hover:ring-emerald-500/30 transition-all"
+            >
+              <div class="flex items-center gap-4">
+                <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-neutral-800 text-emerald-400 ring-1 ring-white/5">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" />
+                  </svg>
+                </span>
+                <div>
+                  <p class="text-[14px] font-semibold text-white uppercase tracking-wide">{{ card.name }}</p>
+                  <p class="text-[10px] text-neutral-500 uppercase tracking-widest">
+                    Limite: <span class="text-neutral-300">{{ formatCurrency(card.limit) }}</span> • Venc: {{ card.dueDay }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button
+                  @click="editCard(card)"
+                  class="p-2 rounded-lg hover:bg-white/5 text-neutral-500 hover:text-emerald-400 transition-all"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </button>
+                <button
+                  @click="deleteCard(card.id)"
+                  class="p-2 rounded-lg hover:bg-white/5 text-neutral-500 hover:text-rose-400 transition-all"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-8 py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-end">
+        <button
+          @click="$emit('close')"
+          class="text-[12px] uppercase tracking-widest font-bold text-neutral-500 hover:text-white transition-all"
+        >
+          Fechar
+        </button>
+      </div>
     </div>
   </div>
 </template>

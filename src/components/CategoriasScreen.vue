@@ -1,151 +1,131 @@
 <template>
-  <div class="w-full max-w-xl">
-    <div
-      class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] overflow-hidden"
-    >
-      <div
-        class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]"
-      >
-        <h2 class="text-lg md:text-xl font-semibold tracking-tight">
-          Categorias
-        </h2>
+  <div class="w-full max-w-xl mx-auto font-sans">
+    <div class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-8 py-6 border-b border-[#2a2a2a]">
+        <div class="space-y-1">
+          <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Configurações</h2>
+          <h3 class="text-xl font-semibold text-white">Categorias</h3>
+        </div>
         <button
-          class="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
           @click="$emit('close')"
-          aria-label="Fechar modal"
+          class="text-neutral-500 hover:text-white transition-colors"
         >
-          ✕
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
-      <div class="p-6 grid gap-6">
-        <form
-          @submit.prevent="handleSubmit"
-          class="grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
-          <div class="md:col-span-2">
-            <label
-              for="categoryName"
-              class="block text-sm text-neutral-300 mb-1"
-              >Nome</label
-            >
-            <input
-              id="categoryName"
-              v-model="categoryForm.name"
-              type="text"
-              required
-              :disabled="submitting"
-              placeholder="Ex.: Salário, Moradia, Mercado…"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 placeholder:text-neutral-500 transition"
-            />
+      <div class="p-8 space-y-8">
+        <!-- Form Section -->
+        <form @submit.prevent="handleSubmit" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2 space-y-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Nome da Categoria</label>
+              <input
+                v-model="categoryForm.name"
+                type="text"
+                required
+                :disabled="submitting"
+                placeholder="Ex: Supermercado, Aluguel..."
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all placeholder:text-neutral-700"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[11px] uppercase tracking-widest text-neutral-500 font-bold ml-1">Tipo</label>
+              <select
+                v-model="categoryForm.type"
+                required
+                :disabled="submitting"
+                class="w-full bg-[#151515] border border-[#2a2a2a] rounded-xl px-4 py-3 text-[14px] outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all appearance-none cursor-pointer"
+              >
+                <option disabled value="">Selecione</option>
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label
-              for="categoryType"
-              class="block text-sm text-neutral-300 mb-1"
-              >Tipo</label
-            >
-            <select
-              id="categoryType"
-              v-model="categoryForm.type"
-              required
-              :disabled="submitting"
-              class="w-full bg-[#151515] border border-[#2a2a2a] rounded-lg px-4 py-3 text-[15px] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition"
-            >
-              <option disabled value="">Selecione</option>
-              <option value="entrada">Entrada</option>
-              <option value="saida">Saída</option>
-            </select>
-          </div>
-
-          <div class="md:col-span-3 flex gap-3">
+          <div class="flex gap-3">
             <button
               type="submit"
               :disabled="submitting"
-              class="flex-1 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10 disabled:opacity-60 disabled:cursor-not-allowed"
+              class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl py-3.5 transition shadow-lg shadow-emerald-500/20 disabled:opacity-50"
             >
-              <span v-if="!submitting">{{
-                isEditing ? "Atualizar" : "Adicionar"
-              }}</span>
-              <span v-else>Salvando…</span>
+              <span v-if="!submitting">{{ isEditing ? "Atualizar Categoria" : "Adicionar Categoria" }}</span>
+              <span v-else>Salvando...</span>
             </button>
-
             <button
               v-if="isEditing"
-              type="button"
               @click="cancelEdit"
-              :disabled="submitting"
-              class="px-4 py-3 rounded-lg bg-[#262626] hover:bg-[#2f2f2f] text-neutral-200 font-medium transition disabled:opacity-60 disabled:cursor-not-allowed"
+              type="button"
+              class="px-6 py-3.5 rounded-xl border border-[#2a2a2a] text-neutral-400 font-semibold hover:bg-white/5 transition-all"
             >
               Cancelar
             </button>
           </div>
         </form>
 
-        <div class="grid gap-3">
-          <h3 class="text-sm uppercase tracking-wider text-neutral-400">
-            Categorias cadastradas
-          </h3>
+        <!-- List Section -->
+        <div class="space-y-4">
+          <h3 class="text-neutral-500 text-[11px] uppercase tracking-widest font-semibold ml-1">Categorias Atuais</h3>
 
-          <div
-            v-if="categories.length === 0"
-            class="text-sm text-neutral-400 bg-[#151515] border border-dashed border-[#2a2a2a] rounded-xl p-6 text-center"
-          >
-            Nenhuma categoria cadastrada ainda.
+          <div v-if="categories.length === 0" class="text-center py-10 border border-dashed border-[#2a2a2a] rounded-2xl bg-[#151515]">
+            <p class="text-neutral-500 text-sm">Nenhuma categoria cadastrada.</p>
           </div>
 
-          <ul
-            v-else
-            class="divide-y divide-[#232323] rounded-xl overflow-hidden ring-1 ring-[#232323]"
-          >
-            <li
+          <div v-else class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            <div
               v-for="cat in categories"
               :key="cat.id"
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 bg-[#161616] px-4 py-3"
+              class="flex items-center justify-between bg-[#151515] border border-[#2a2a2a] rounded-2xl p-4 hover:ring-1 hover:ring-emerald-500/30 transition-all"
             >
-              <div class="min-w-0">
-                <p class="font-medium truncate">{{ cat.name }}</p>
-                <p class="text-sm text-neutral-400">
-                  Tipo:
-                  <span
-                    :class="
-                      cat.type === 'entrada'
-                        ? 'text-emerald-400'
-                        : 'text-red-400'
-                    "
-                    class="font-medium"
-                  >
-                    {{ cat.type }}
-                  </span>
-                </p>
+              <div class="flex items-center gap-4">
+                <span :class="cat.type === 'entrada' ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'" 
+                      class="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold ring-1 ring-white/5 uppercase">
+                  {{ cat.name.charAt(0) }}
+                </span>
+                <div>
+                  <p class="text-[14px] font-semibold text-white uppercase tracking-wide">{{ cat.name }}</p>
+                  <p :class="cat.type === 'entrada' ? 'text-emerald-500/70' : 'text-rose-500/70'" 
+                     class="text-[10px] uppercase tracking-[0.1em] font-bold">
+                    {{ cat.type === 'entrada' ? 'Entrada' : 'Saída' }}
+                  </p>
+                </div>
               </div>
 
-              <div class="flex items-center gap-2 shrink-0">
+              <div class="flex gap-2">
                 <button
-                  class="px-3 py-2 rounded-md bg-[#232323] hover:bg-[#2b2b2b] text-sm font-medium transition"
-                  :disabled="submitting"
                   @click="editCategory(cat)"
+                  class="p-2 rounded-lg hover:bg-white/5 text-neutral-500 hover:text-emerald-400 transition-all"
+                  title="Editar"
                 >
-                  Editar
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
                 </button>
                 <button
-                  class="px-3 py-2 rounded-md bg-[#2a1313] hover:bg-[#341616] text-sm font-medium text-red-300 transition"
-                  :disabled="submitting"
                   @click="deleteCategory(cat.id)"
+                  class="p-2 rounded-lg hover:bg-white/5 text-neutral-500 hover:text-rose-400 transition-all"
+                  title="Excluir"
                 >
-                  Excluir
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  </svg>
                 </button>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="px-6 py-4 border-t border-[#2a2a2a] flex justify-end">
+      <!-- Footer (Optional or spacer) -->
+      <div class="px-8 py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-end">
         <button
-          class="px-4 py-2 rounded-lg bg-[#232323] hover:bg-[#2b2b2b] transition"
           @click="$emit('close')"
+          class="text-[12px] uppercase tracking-widest font-bold text-neutral-500 hover:text-white transition-all"
         >
           Fechar
         </button>

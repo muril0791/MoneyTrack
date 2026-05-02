@@ -7,6 +7,8 @@ const routes = [
   { path: '/', name: 'Home', component: AppMain, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
+  { path: '/forgot-password', name: 'ForgotPassword', component: () => import('@/views/ForgotPassword.vue') },
+  { path: '/reset-password', name: 'ResetPassword', component: () => import('@/views/ResetPassword.vue') },
 ]
 
 const router = createRouter({
