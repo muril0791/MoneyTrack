@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-screen overflow-hidden bg-[#0f0f0f] text-white font-sans antialiased flex flex-col"
+    class="min-h-screen lg:h-screen lg:overflow-hidden bg-[#0f0f0f] text-white font-sans antialiased flex flex-col"
   >
     <TopBar
       @open-credit-cards="openCreditCardsRegistrationModal"
@@ -9,10 +9,10 @@
       @open-fixed-bills="showFixedBillsModal = true"
     />
 
-    <main class="flex-1 overflow-hidden mx-auto w-full px-4 md:px-8 py-3 md:py-4">
+    <main class="flex-1 lg:overflow-hidden mx-auto w-full px-4 md:px-8 py-3 md:py-4">
       <div class="h-full grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4">
         <!-- Sidebar Column -->
-        <div class="h-full overflow-hidden space-y-4 min-w-0">
+        <div class="h-auto lg:h-full lg:overflow-y-auto custom-scrollbar space-y-4 min-w-0">
           <section
             class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5"
           >
@@ -62,8 +62,7 @@
           </section>
           <ObjectivesCard :goals="goals" @open-new-goal="openNewGoalModal" @add-value="openAddValueModal" @edit-goal="openEditGoalModal" @delete-goal="handleDeleteGoal" class="px-4 py-5" />
         </div>
-
-        <div class="h-full overflow-hidden space-y-4 min-w-0">
+        <div class="h-auto lg:h-full lg:overflow-y-auto custom-scrollbar space-y-4 min-w-0">
           <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
             <SummaryCard :expenses="filteredExpenses" :filter="activeFilter" />
             <section
@@ -400,6 +399,14 @@ export default {
 </script>
 
 <style>
+/* Reset global scroll only on Desktop */
+@media (min-width: 1024px) {
+  html, body {
+    overflow: hidden !important;
+    height: 100%;
+  }
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;

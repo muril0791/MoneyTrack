@@ -23,11 +23,11 @@
                 class="group cursor-pointer hover:bg-white/[0.02] transition-colors"
                 @click="emit('open-expense-detail', e)"
               >
-                <td class="py-5 px-6">
+                <td class="py-4 px-4">
                   <span class="text-neutral-100 font-medium text-[13px] uppercase tracking-wider">{{ e.descricao || "—" }}</span>
                 </td>
                 
-                <td class="py-5 px-6">
+                <td class="py-4 px-4">
                   <span
                     :class="getCategoryColor(e.categoria)"
                     class="inline-flex items-center justify-center min-w-[80px] rounded-full px-3 py-1 text-[10px] font-bold text-white shadow-sm uppercase tracking-wider"
@@ -36,7 +36,7 @@
                   </span>
                 </td>
 
-                <td class="py-5 px-6">
+                <td class="py-4 px-4">
                   <span
                     :class="[
                       'inline-flex items-center justify-center min-w-[80px] rounded-full px-3 py-1 text-[10px] font-bold ring-1 uppercase tracking-wider',
@@ -49,17 +49,17 @@
                   </span>
                 </td>
 
-                <td class="py-5 px-6">
+                <td class="py-4 px-4">
                   <span :class="['font-medium text-[16px] uppercase tracking-tight', e.tipo === 'entrada' ? 'text-emerald-400' : 'text-rose-400']">
                     {{ money(e.valor) }}
                   </span>
                 </td>
 
-                <td class="py-5 px-6">
+                <td class="py-4 px-4">
                   <span class="text-neutral-500 text-[12px] font-medium uppercase tracking-wider">{{ dateBR(e.data) }}</span>
                 </td>
 
-                <td class="py-5 px-6 text-right">
+                <td class="py-4 px-4 text-right">
                   <span class="text-neutral-300 font-medium text-[14px] uppercase tracking-tight">{{ money(e.runningBalance) }}</span>
                 </td>
               </tr>
