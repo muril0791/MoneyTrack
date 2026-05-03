@@ -123,10 +123,10 @@
     <!-- Mobile Dropdown -->
     <transition name="fade-slide">
       <div v-if="dropdownOpenMobile" class="md:hidden mt-4 rounded-3xl bg-[#1b1b1b] ring-1 ring-white/10 p-4 space-y-2 shadow-2xl relative z-[70]">
-        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="$emit('open-credit-cards-list')">Faturas</button>
-        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="$emit('open-fixed-bills')">Recorrentes</button>
-        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="openCreditCards">Cartões</button>
-        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="openCategories">Categorias</button>
+        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-credit-cards-list')">Faturas</button>
+        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-fixed-bills')">Recorrentes</button>
+        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-credit-cards')">Cartões</button>
+        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-categories')">Categorias</button>
         <button class="w-full text-left px-4 py-3 rounded-xl bg-rose-500/10 text-rose-500 mt-4 font-bold" @click="logout">Logout</button>
       </div>
     </transition>
@@ -225,6 +225,13 @@ const openCategories = () => { emit("open-categories"); dropdownOpen.value = fal
 const handleNoteClick = (note) => {
   emit("open-fixed-bills");
   showNotifications.value = false;
+};
+
+const handleMobileNav = (action) => {
+  if (action === 'open-credit-cards') openCreditCards();
+  else if (action === 'open-categories') openCategories();
+  else emit(action);
+  dropdownOpenMobile.value = false;
 };
 
 const logout = async () => {
