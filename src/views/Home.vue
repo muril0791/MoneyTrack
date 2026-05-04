@@ -64,6 +64,7 @@
             </div>
           </section>
           <ObjectivesCard :goals="goals" @open-new-goal="openNewGoalModal" @add-value="openAddValueModal" @edit-goal="openEditGoalModal" @delete-goal="handleDeleteGoal" class="px-4 py-5" />
+          <UpcomingBillsCard :bills="fixedBills" @open-all="showFixedBillsModal = true" @pay="handleQuickPay" />
         </div>
         <div class="h-auto lg:h-full lg:overflow-hidden space-y-4 min-w-0 flex flex-col pb-4">
           <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4 shrink-0">
@@ -204,6 +205,7 @@ import CreateGoalModal from "@/components/CreateGoalModal.vue";
 import AddValueGoalModal from "@/components/AddValueGoalModal.vue";
 import FixedBillsModal from "@/components/FixedBillsModal.vue";
 import AllTransactions from "@/components/AllTransactions.vue";
+import UpcomingBillsCard from "@/components/UpcomingBillsCard.vue";
 
 export default {
   name: "Home",
@@ -222,6 +224,7 @@ export default {
     AddValueGoalModal,
     FixedBillsModal,
     AllTransactions,
+    UpcomingBillsCard,
   },
   setup() {
     const store = useMainStore();
@@ -235,6 +238,8 @@ export default {
     const expenses = computed(() => store.expenses);
     const categories = computed(() => store.categories);
     const creditCards = computed(() => store.creditCards);
+    const fixedBills = computed(() => store.fixedBills);
+    const goals = computed(() => store.goals);
     const showModal = ref(false);
     const showCategoriesModal = ref(false);
     const showCreditCardsModal = ref(false);
@@ -249,8 +254,6 @@ export default {
     const editingExpense = ref(null);
     const activeFilter = ref({ mode: 'month', currentDate: new Date(), selectedDate: new Date() });
     
-    const goals = computed(() => store.goals);
-
     const filteredExpenses = computed(() => {
       const { mode, currentDate, selectedDate } = activeFilter.value;
       if (mode === 'all') return store.expenses;
@@ -387,6 +390,16 @@ export default {
       showAddValueGoalModal.value = false;
       selectedGoal.value = null;
     };
+    const handleQuickPay = (bill) => {
+      store.showConfirm({
+        title: "Confirmar Pagamento?",
+        message: `Deseja marcar "${bill.title}" no valor de R$ ${bill.amount.toLocaleString('pt-BR')} como pago?`,
+        onConfirm: async () => {
+          await store.payFixedBill(bill.id);
+        }
+      });
+    };
+
     return {
       expenses,
       categories,
@@ -431,7 +444,9 @@ export default {
       showFixedBillsModal,
       showAllTransactions,
       openAllTransactions,
-      closeAllTransactions
+      closeAllTransactions,
+      fixedBills,
+      handleQuickPay
     };
   },
 };
