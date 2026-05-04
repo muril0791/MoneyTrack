@@ -2,9 +2,13 @@
   <div class="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center p-4">
     <div class="w-full max-w-md">
       <div class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] p-6 md:p-8">
-        <div class="mb-6 text-center">
-          <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Bem-vindo de volta</h1>
-          <p class="text-sm text-neutral-400 mt-1">Acesse sua conta para continuar</p>
+        <!-- Logo/Header -->
+        <div class="flex flex-col items-center mb-10">
+          <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-4 ring-1 ring-white/10 overflow-hidden shadow-2xl">
+             <img src="/logo.png" alt="Logo" class="w-full h-full object-cover scale-110" />
+          </div>
+          <h1 class="text-3xl font-black text-white tracking-tight">Track<span class="text-emerald-500">Finances</span></h1>
+          <p class="text-neutral-500 text-sm mt-2 font-medium uppercase tracking-widest">Sua gestão inteligente</p>
         </div>
        
         <form @submit.prevent="handleLogin" class="space-y-4">
@@ -45,13 +49,25 @@
             </div>
           </div>
 
-          <div class="flex justify-end -mt-2">
-            <router-link to="/forgot-password" class="text-xs text-emerald-400 hover:text-emerald-300 transition">
-              Esqueci minha senha
-            </router-link>
+          <div class="flex items-center justify-between py-1">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <div class="relative flex items-center justify-center">
+                <input 
+                  v-model="remember" 
+                  type="checkbox" 
+                  class="peer appearance-none w-5 h-5 bg-[#151515] border border-[#2a2a2a] rounded-lg checked:bg-emerald-500 checked:border-emerald-500 transition-all outline-none"
+                />
+                <svg class="absolute w-3.5 h-3.5 text-black opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+              <span class="text-sm text-neutral-400 group-hover:text-neutral-300 transition-colors">Manter-me conectado</span>
+            </label>
+
+            <router-link to="/forgot-password" class="text-sm text-emerald-500 hover:text-emerald-400 font-medium">Esqueceu a senha?</router-link>
           </div>
 
-          <p v-if="error" class="text-sm text-red-400 -mb-2">{{ error }}</p>
+          <p v-if="error" class="text-sm text-red-400">{{ error }}</p>
 
           <button
             type="submit"
@@ -67,10 +83,6 @@
           </router-link>
         </div>
       </div>
-
-      <div class="text-center mt-6 text-xs text-neutral-500">
-        Aurora •
-      </div>
     </div>
   </div>
 </template>
@@ -84,6 +96,7 @@ import authService from "@/services/authService";
 const router = useRouter();
 const store = useMainStore();
 const credentials = ref({ email: "", password: "" });
+const remember = ref(true);
 const error = ref("");
 const show = ref(false);
 
@@ -92,7 +105,7 @@ async function handleLogin() {
   const { email, password } = credentials.value;
 
   try {
-    const user = await authService.signIn({ email, password });
+    const user = await authService.signIn({ email, password, remember: remember.value });
     store.setUser(user);
     router.push({ name: "Home" });
   } catch (err) {

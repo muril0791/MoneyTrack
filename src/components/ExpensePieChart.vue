@@ -79,10 +79,17 @@ export default {
       if (!cv.value || !wrap.value) return;
 
       const { dpr } = measure();
+      const baseColors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#22d3ee", "#14b8a6", "#f97316", "#84cc16", "#eab308", "#e11d48"];
       const { labels, values } = getData();
       const total = values.reduce((a, b) => a + b, 0);
       const dataArray = total === 0 ? [1] : values;
-      const colors = total === 0 ? ["#444"] : generateColors(values.length);
+      
+      const colors = total === 0 ? ["#444"] : labels.map(label => {
+        const cat = props.categories.find(c => c.name === label);
+        if (!cat) return "#555";
+        const idx = props.categories.findIndex(c => String(c.id) === String(cat.id));
+        return baseColors[idx % baseColors.length];
+      });
 
       currentLabels.value = labels;
       currentColors.value = colors;

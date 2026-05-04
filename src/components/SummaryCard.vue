@@ -115,22 +115,86 @@ export default {
   name: "SummaryCard",
   props: {
     expenses: { type: Array, required: true },
+    creditCards: { type: Array, default: () => [] },
     filter: { type: Object, default: () => ({ mode: 'month', currentDate: new Date() }) }
   },
   setup(props) {
     const cv = ref(null);
     let chart = null;
 
+    const clampDay = (y, m, d) => {
+      const last = new Date(y, m + 1, 0).getDate();
+      return new Date(y, m, Math.min(d, last));
+    };
+
+    const nextClosingAfter = (purchase, closingDay) => {
+      const y = purchase.getFullYear();
+      const m = purchase.getMonth();
+      const closeThis = clampDay(y, m, closingDay);
+      if (purchase.getDate() >= closeThis.getDate())
+        return clampDay(y, m + 1, closingDay);
+      return closeThis;
+    };
+
+    const dueDateFrom = (purchase, card) => {
+      const closing = nextClosingAfter(purchase, Number(card.closingDay));
+      const y = closing.getFullYear();
+      const m = closing.getMonth();
+      const dueMonth = Number(card.dueDay) > Number(card.closingDay) ? m : m + 1;
+      return clampDay(y, dueMonth, Number(card.dueDay));
+    };
+
+    const isSameMonth = (d1, d2) => 
+      d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
+
     const totalIn = computed(() => {
+      const { mode, currentDate } = props.filter;
       return props.expenses
-        .filter((e) => e.tipo === "entrada")
+        .filter((e) => {
+          if (e.tipo !== "entrada") return false;
+          if (mode === 'all') return true;
+          const [y, m, d] = e.data.split('-').map(Number);
+          const expDate = new Date(y, m - 1, d);
+          return isSameMonth(expDate, currentDate);
+        })
         .reduce((sum, e) => sum + (Number(e.valor) || 0), 0);
     });
 
     const totalOut = computed(() => {
-      return props.expenses
-        .filter((e) => e.tipo === "saida")
-        .reduce((sum, e) => sum + (Number(e.valor) || 0), 0);
+      const { mode, currentDate } = props.filter;
+      let total = 0;
+
+      props.expenses.forEach((e) => {
+        if (e.tipo !== "saida") return;
+        
+        if (e.tipoTransacao === "cartao-credito" && e.creditCardId) {
+          const card = props.creditCards?.find(c => String(c.id) === String(e.creditCardId));
+          if (card) {
+            const [y, m, d] = e.data.split('-').map(Number);
+            const purchase = new Date(y, m - 1, d);
+            const n = Math.max(1, Number(e.parcelas || 1));
+            const parcela = Number(e.valor || 0) / n;
+            const firstPay = dueDateFrom(purchase, card);
+
+            for (let i = 0; i < n; i++) {
+              const payDate = new Date(firstPay.getFullYear(), firstPay.getMonth() + i, firstPay.getDate());
+              if (mode === 'all' || isSameMonth(payDate, currentDate)) {
+                total += parcela;
+              }
+            }
+            return;
+          }
+        }
+        
+        // Regular expense
+        const [y, m, d] = e.data.split('-').map(Number);
+        const expDate = new Date(y, m - 1, d);
+        if (mode === 'all' || isSameMonth(expDate, currentDate)) {
+          total += Number(e.valor || 0);
+        }
+      });
+
+      return total;
     });
 
     const balance = computed(() => totalIn.value - totalOut.value);
@@ -165,12 +229,71 @@ export default {
         
         props.expenses.forEach(e => {
           if (!e.data) return;
-          // Use split with regex to handle both - and /
-          const parts = e.data.split(/[-/]/);
-          const eDay = parseInt(parts[2]);
-          if (!dailyData[eDay]) dailyData[eDay] = { in: 0, out: 0 };
-          if (e.tipo === 'entrada') dailyData[eDay].in += Number(e.valor || 0);
-          else dailyData[eDay].out += Number(e.valor || 0);
+          
+          if (e.tipo === 'entrada') {
+            const [y, m, d] = e.data.split('-').map(Number);
+            const expDate = new Date(y, m - 1, d);
+            
+            if (mode === 'month' || mode === 'day') {
+              if (isSameMonth(expDate, currentDate)) {
+                if (!dailyData[d]) dailyData[d] = { in: 0, out: 0 };
+                dailyData[d].in += Number(e.valor || 0);
+              }
+            } else {
+              if (y === currentDate.getFullYear()) {
+                if (!monthlyData[m]) monthlyData[m] = { in: 0, out: 0 };
+                monthlyData[m].in += Number(e.valor || 0);
+              }
+            }
+            return;
+          }
+
+          // Handling Saida (including Credit Card)
+          if (e.tipoTransacao === "cartao-credito" && e.creditCardId) {
+            const card = props.creditCards?.find(c => String(c.id) === String(e.creditCardId));
+            if (card) {
+              const [y, m, d] = e.data.split('-').map(Number);
+              const purchase = new Date(y, m - 1, d);
+              const n = Math.max(1, Number(e.parcelas || 1));
+              const parcela = Number(e.valor || 0) / n;
+              const firstPay = dueDateFrom(purchase, card);
+
+              for (let i = 0; i < n; i++) {
+                const payDate = new Date(firstPay.getFullYear(), firstPay.getMonth() + i, firstPay.getDate());
+                const pY = payDate.getFullYear();
+                const pM = payDate.getMonth() + 1;
+                const pD = payDate.getDate();
+
+                if (mode === 'month' || mode === 'day') {
+                  if (isSameMonth(payDate, currentDate)) {
+                    if (!dailyData[pD]) dailyData[pD] = { in: 0, out: 0 };
+                    dailyData[pD].out += parcela;
+                  }
+                } else {
+                  if (pY === currentDate.getFullYear()) {
+                    if (!monthlyData[pM]) monthlyData[pM] = { in: 0, out: 0 };
+                    monthlyData[pM].out += parcela;
+                  }
+                }
+              }
+              return;
+            }
+          }
+
+          // Regular expense
+          const [y, m, d] = e.data.split('-').map(Number);
+          const expDate = new Date(y, m - 1, d);
+          if (mode === 'month' || mode === 'day') {
+            if (isSameMonth(expDate, currentDate)) {
+              if (!dailyData[d]) dailyData[d] = { in: 0, out: 0 };
+              dailyData[d].out += Number(e.valor || 0);
+            }
+          } else {
+            if (y === currentDate.getFullYear()) {
+              if (!monthlyData[m]) monthlyData[m] = { in: 0, out: 0 };
+              monthlyData[m].out += Number(e.valor || 0);
+            }
+          }
         });
 
         for (let i = 1; i <= daysInMonth; i++) {
@@ -180,15 +303,7 @@ export default {
         }
       } else {
         const year = currentDate.getFullYear();
-        props.expenses.forEach(e => {
-          if (!e.data) return;
-          const parts = e.data.split(/[-/]/);
-          const eMonth = parseInt(parts[1]);
-          if (!monthlyData[eMonth]) monthlyData[eMonth] = { in: 0, out: 0 };
-          if (e.tipo === 'entrada') monthlyData[eMonth].in += Number(e.valor || 0);
-          else monthlyData[eMonth].out += Number(e.valor || 0);
-        });
-
+        // (expenses loop already done above)
         for (let i = 1; i <= 12; i++) {
           dataIn.push(monthlyData[i]?.in || 0);
           dataOut.push(monthlyData[i]?.out || 0);

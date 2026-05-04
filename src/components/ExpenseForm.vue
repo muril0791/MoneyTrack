@@ -166,6 +166,11 @@
             </div>
           </div>
 
+          <!-- Error Feedback -->
+          <div v-if="error" class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3 rounded-xl text-xs font-bold text-center mt-4">
+            {{ error }}
+          </div>
+
           <!-- Actions -->
           <div class="flex gap-3 pt-4">
             <button
@@ -205,6 +210,11 @@
             <ItemRow v-if="form.descricao" label="Descrição" :text="form.descricao" />
           </div>
 
+          <!-- Error Feedback -->
+          <div v-if="error" class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3 rounded-xl text-xs font-bold text-center mt-4">
+            {{ error }}
+          </div>
+
           <div class="flex gap-3 pt-4">
             <button
               @click="prevStep"
@@ -235,6 +245,7 @@
 
 <script>
 import { ref, reactive, computed, watch, h } from "vue";
+import { useMainStore } from "@/stores/store";
 
 const ItemRow = (props) =>
   h(
@@ -257,15 +268,17 @@ ItemRow.props = { label: String, text: [String, Number] };
 export default {
   name: "ExpenseForm",
   components: { ItemRow },
-  emits: ["add-expense", "close", "open-categories"],
+  emits: ["close", "open-categories"],
   props: {
     editingExpense: { type: Object, default: null },
     categories: { type: Array, default: () => [] },
     creditCards: { type: Array, default: () => [] },
   },
   setup(props, { emit }) {
+    const store = useMainStore();
     const currentStep = ref(0);
     const submitting = ref(false);
+    const error = ref("");
 
     const form = reactive({
       tipo: "",
@@ -335,42 +348,60 @@ export default {
     };
 
     const nextStep = () => {
+      error.value = "";
       if (currentStep.value !== 1) return;
+      
       const tipo = form.tipo === "entrada" ? "entrada" : "saida";
       let tipoTransacao = form.tipoTransacao;
-      const allowEntrada = ["dinheiro", "deposito", "pix", "transferencia"];
-      const allowSaida = ["dinheiro", "pix", "cartao-debito", "cartao-credito"];
-      if (tipo === "entrada" && !allowEntrada.includes(tipoTransacao))
-        tipoTransacao = "";
-      if (tipo === "saida" && !allowSaida.includes(tipoTransacao))
-        tipoTransacao = "";
       const valor = Math.max(0, Number(form.valor || 0));
-      const descricao = String(form.descricao || "")
-        .slice(0, 140)
-        .trim();
       const dataStr = form.data;
-      const validDate =
-        !!dataStr && !Number.isNaN(new Date(dataStr + "T00:00:00").getTime());
-      let parcelaInt = form.parcelas ? Math.floor(Number(form.parcelas)) : null;
-      if (!parcelaInt || parcelaInt < 2) parcelaInt = null;
-      let categoria = form.categoria;
+      const categoria = form.categoria;
+
+      if (!valor || valor <= 0) {
+        error.value = "O valor deve ser maior que zero.";
+        return;
+      }
+      if (!tipoTransacao) {
+        error.value = "Selecione o método de transação.";
+        return;
+      }
+      if (!dataStr) {
+        error.value = "Selecione uma data válida.";
+        return;
+      }
+      if (!categoria) {
+        error.value = "Selecione uma categoria.";
+        return;
+      }
+
       const catOk = props.categories.some(
         (c) => c.id === categoria && c.type === tipo
       );
-
-      if (!tipo || !valor || !tipoTransacao || !validDate || !catOk) return;
-
-      if (tipo === "saida" && tipoTransacao === "cartao-credito") {
-        if (!form.creditCardId) return;
-        computeFirstPaymentDate();
+      if (!catOk) {
+        error.value = "Categoria inválida para este tipo de transação.";
+        return;
       }
 
+      if (tipo === "saida" && tipoTransacao === "cartao-credito" && !form.creditCardId) {
+        error.value = "Selecione um cartão de crédito.";
+        return;
+      }
+
+      // Sync form values
       form.tipo = tipo;
       form.tipoTransacao = tipoTransacao;
       form.valor = valor;
-      form.descricao = descricao;
+      form.descricao = String(form.descricao || "").slice(0, 140).trim();
+      
+      let parcelaInt = form.parcelas ? Math.floor(Number(form.parcelas)) : null;
+      if (!parcelaInt || parcelaInt < 2) parcelaInt = null;
       form.parcelas = parcelaInt;
-      if (!parcelaInt) form.dataPrimeiraParcela = "";
+
+      if (tipo === "saida" && tipoTransacao === "cartao-credito") {
+        computeFirstPaymentDate();
+      } else {
+        form.dataPrimeiraParcela = "";
+      }
 
       currentStep.value = 2;
     };
@@ -393,66 +424,45 @@ export default {
       });
       currentStep.value = 0;
       submitting.value = false;
+      error.value = "";
     };
 
     const handleSubmit = async () => {
       if (submitting.value) return;
+      error.value = "";
+
       const payloadBase = {
-        tipo: form.tipo === "entrada" ? "entrada" : "saida",
+        tipo: form.tipo,
         tipoTransacao: form.tipoTransacao,
-        valor: Math.max(0, Number(form.valor || 0)),
+        valor: form.valor,
         data: form.data,
         categoria: form.categoria,
-        descricao: String(form.descricao || "")
-          .slice(0, 140)
-          .trim(),
+        descricao: form.descricao,
       };
 
-      if (
-        !payloadBase.tipo ||
-        !payloadBase.tipoTransacao ||
-        !payloadBase.valor ||
-        !payloadBase.data ||
-        !payloadBase.categoria
-      )
-        return;
-      const validCat = props.categories.some(
-        (c) => c.id === payloadBase.categoria && c.type === payloadBase.tipo
-      );
-      if (!validCat) return;
-
-      const isCredit =
-        payloadBase.tipo === "saida" &&
-        payloadBase.tipoTransacao === "cartao-credito";
       let payload = { ...payloadBase };
 
-      if (isCredit) {
-        const parcelas = form.parcelas
-          ? Math.max(2, Math.floor(Number(form.parcelas)))
-          : null;
-        if (parcelas) {
-          const finalDate = form.dataPrimeiraParcela || form.data;
-          payload = {
-            ...payload,
-            parcelas,
-            data: finalDate,
-            creditCardId: form.creditCardId || "",
-          };
-          if (!payload.creditCardId) return;
-        } else {
-          payload = { ...payload, creditCardId: form.creditCardId || "" };
-          if (!payload.creditCardId) return;
+      if (form.tipo === "saida" && form.tipoTransacao === "cartao-credito") {
+        payload.creditCardId = form.creditCardId;
+        payload.parcelas = form.parcelas;
+        if (form.parcelas && form.parcelas > 1) {
+          payload.data = form.dataPrimeiraParcela || form.data;
         }
       }
 
       submitting.value = true;
       try {
         if (props.editingExpense?.id) {
-          payload.id = props.editingExpense.id;
+          await store.updateExpense({ ...payload, id: props.editingExpense.id });
+        } else {
+          await store.addExpense(payload);
         }
-        emit("add-expense", { ...payload });
+        
         emit("close");
         goBackToStep0();
+      } catch (err) {
+        error.value = "Ocorreu um erro ao salvar. Verifique sua conexão.";
+        console.error("Erro no form:", err);
       } finally {
         submitting.value = false;
       }
@@ -498,7 +508,9 @@ export default {
     return {
       currentStep,
       submitting,
+      error,
       form,
+      valorDisplay,
       selectType,
       nextStep,
       prevStep,

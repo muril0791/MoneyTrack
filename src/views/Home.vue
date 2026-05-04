@@ -17,7 +17,10 @@
             class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5"
           >
             <div class="flex items-center justify-between gap-3">
-              <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Lançamentos</h3>
+              <div class="flex flex-col">
+                <h3 class="text-neutral-500 text-[13px] uppercase tracking-widest font-medium">Lançamentos</h3>
+                <button @click="openAllTransactions" class="text-emerald-400 text-[10px] uppercase font-bold tracking-widest mt-1 hover:text-emerald-300 transition-colors text-left">Visualizar todos</button>
+              </div>
               <button class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-3 md:px-4 py-2 rounded-xl" @click="openNewTransaction">
                 Adicionar <span class="text-lg leading-none">+</span>
               </button>
@@ -62,9 +65,9 @@
           </section>
           <ObjectivesCard :goals="goals" @open-new-goal="openNewGoalModal" @add-value="openAddValueModal" @edit-goal="openEditGoalModal" @delete-goal="handleDeleteGoal" class="px-4 py-5" />
         </div>
-        <div class="h-auto lg:h-full lg:overflow-y-auto custom-scrollbar space-y-4 min-w-0">
-          <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
-            <SummaryCard :expenses="filteredExpenses" :filter="activeFilter" />
+        <div class="h-auto lg:h-full lg:overflow-hidden space-y-4 min-w-0 flex flex-col pb-4">
+          <div class="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4 shrink-0">
+            <SummaryCard :expenses="filteredExpenses" :creditCards="creditCards" :filter="activeFilter" />
             <section
               class="bg-[#1b1b1b] rounded-2xl ring-1 ring-[#2a2a2a] px-4 py-5"
             >
@@ -76,7 +79,7 @@
             </section>
           </div>
 
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1 min-h-0 flex flex-col">
             <TransactionsAndChart
               :expenses="filteredExpenses"
               :categories="categories"
@@ -104,7 +107,6 @@
           :editingExpense="editingExpense"
           :categories="categories"
           :creditCards="creditCards"
-          @add-expense="handleAddExpense"
           @close="closeFormModal"
           @open-categories="openCategoriesModal"
         />
@@ -126,16 +128,13 @@
 
     <div
       v-if="showCreditCardsModal"
-      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
-      @click.self="closeCreditCardsModal"
+      class="fixed inset-0 z-[100] bg-[#1b1b1b] flex flex-col"
     >
-      <div class="p-3 md:p-4 w-full max-w-xl max-h-[90vh] overflow-y-auto">
-        <CreditCardList
-          :creditCards="creditCards"
-          :expenses="expenses"
-          @close="closeCreditCardsModal"
-        />
-      </div>
+      <CreditCardList
+        :creditCards="creditCards"
+        :expenses="expenses"
+        @close="closeCreditCardsModal"
+      />
     </div>
 
     <div
@@ -170,6 +169,20 @@
       v-if="showFixedBillsModal"
       @close="showFixedBillsModal = false"
     />
+
+    <!-- All Transactions Hub -->
+    <div
+      v-if="showAllTransactions"
+      class="fixed inset-0 z-[100] bg-[#0d0d0d] flex flex-col"
+    >
+      <AllTransactions
+        :expenses="expenses"
+        :categories="categories"
+        :creditCards="creditCards"
+        @edit="openExpenseDetail"
+        @close="closeAllTransactions"
+      />
+    </div>
   </div>
 </template>
 
@@ -189,6 +202,7 @@ import EditExpense from "@/components/EditExpense.vue";
 import CreateGoalModal from "@/components/CreateGoalModal.vue";
 import AddValueGoalModal from "@/components/AddValueGoalModal.vue";
 import FixedBillsModal from "@/components/FixedBillsModal.vue";
+import AllTransactions from "@/components/AllTransactions.vue";
 
 export default {
   name: "Home",
@@ -206,6 +220,7 @@ export default {
     CreateGoalModal,
     AddValueGoalModal,
     FixedBillsModal,
+    AllTransactions,
   },
   setup() {
     const store = useMainStore();
@@ -224,6 +239,7 @@ export default {
     const showCreditCardsModal = ref(false);
     const showCreditCardsRegistrationModal = ref(false);
     const showFixedBillsModal = ref(false);
+    const showAllTransactions = ref(false);
     const selectedCardToEdit = ref(null);
     const showNewGoalModal = ref(false);
     const showAddValueGoalModal = ref(false);
@@ -298,6 +314,9 @@ export default {
       showCreditCardsRegistrationModal.value = false;
       selectedCardToEdit.value = null;
     };
+
+    const openAllTransactions = () => (showAllTransactions.value = true);
+    const closeAllTransactions = () => (showAllTransactions.value = false);
 
     const openEditCard = (card) => {
       selectedCardToEdit.value = card;
@@ -392,7 +411,10 @@ export default {
       selectedCardToEdit,
       openEditCard,
       handleDeleteCard,
-      showFixedBillsModal
+      showFixedBillsModal,
+      showAllTransactions,
+      openAllTransactions,
+      closeAllTransactions
     };
   },
 };

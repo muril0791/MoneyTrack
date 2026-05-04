@@ -327,17 +327,43 @@ export default {
         creditLaunch: 0,
         creditPayment: 0,
       }));
+      
+      // We must summarize the whole list once, but filter by month in the process
       for (const e of this.expenses) {
         if (!e.data) continue;
         const [year, month, day] = e.data.split('-').map(Number);
-        if (year !== y) continue;
-        const m = month - 1;
-        const d = new Date(year, m, day);
-        const s = this.getDaySummaryByDate(d);
-        byMonth[m].entrada += s.entrada;
-        byMonth[m].saida += s.saida;
-        byMonth[m].creditLaunch += s.creditLaunch;
-        byMonth[m].creditPayment += s.creditPayment;
+        const purchase = new Date(year, month - 1, day);
+        
+        if (e.tipo === "entrada") {
+          if (year === y) byMonth[month - 1].entrada += Number(e.valor || 0);
+          continue;
+        }
+
+        if (e.tipo === "saida") {
+          if (e.tipoTransacao === "cartao-credito" && e.creditCardId) {
+            const card = this.creditCards?.find(c => String(c.id) === String(e.creditCardId));
+            if (card) {
+              const n = Math.max(1, Number(e.parcelas || 1));
+              const parcela = Number(e.valor || 0) / n;
+              const firstPay = this.dueDateFrom(purchase, card);
+
+              if (year === y) byMonth[month - 1].creditLaunch += Number(e.valor || 0);
+
+              for (let i = 0; i < n; i++) {
+                const pay = new Date(firstPay.getFullYear(), firstPay.getMonth() + i, firstPay.getDate());
+                if (pay.getFullYear() === y) {
+                  byMonth[pay.getMonth()].creditPayment += parcela;
+                  byMonth[pay.getMonth()].saida += parcela; // Add installment to monthly output
+                }
+              }
+              continue;
+            }
+          }
+          
+          if (year === y) {
+            byMonth[month - 1].saida += Number(e.valor || 0);
+          }
+        }
       }
       return byMonth;
     },
@@ -438,7 +464,7 @@ export default {
           expense.creditCardId
         ) {
           const card = this.creditCards?.find(
-            (c) => c.id === expense.creditCardId
+            (c) => String(c.id) === String(expense.creditCardId)
           );
           if (card) {
             const [pY, pM, pD] = expense.data.split('-').map(Number);
@@ -464,6 +490,7 @@ export default {
             continue;
           }
         }
+        // Fallback for regular saida OR if card was not found
         saida += Number(expense.valor || 0);
       }
       return { entrada, saida, creditLaunch, creditPayment };

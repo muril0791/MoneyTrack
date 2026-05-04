@@ -157,7 +157,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/stores/store';
 
 const store = useMainStore();

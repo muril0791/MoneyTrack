@@ -1,16 +1,20 @@
 import api from '@/api';
 
-export async function signUp({ email, password, username }) {
+const getStorage = (remember = true) => (remember ? localStorage : sessionStorage);
+
+export async function signUp({ email, password, username, remember = true }) {
   const { data } = await api.post('/auth/signup', { email, password, displayName: username });
-  localStorage.setItem('userToken', data.access_token);
-  localStorage.setItem('refreshToken', data.refresh_token);
+  const storage = getStorage(remember);
+  storage.setItem('userToken', data.access_token);
+  storage.setItem('refreshToken', data.refresh_token);
   return data.user;
 }
 
-export async function signIn({ email, password }) {
+export async function signIn({ email, password, remember = true }) {
   const { data } = await api.post('/auth/login', { email, password });
-  localStorage.setItem('userToken', data.access_token);
-  localStorage.setItem('refreshToken', data.refresh_token);
+  const storage = getStorage(remember);
+  storage.setItem('userToken', data.access_token);
+  storage.setItem('refreshToken', data.refresh_token);
   return data.user;
 }
 
@@ -23,13 +27,18 @@ export async function signOut() {
     localStorage.removeItem('userToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('userToken');
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('user');
   }
 }
 
 export async function updateProfile(payload) {
   const { data } = await api.patch('/auth/profile', payload);
-  localStorage.setItem('userToken', data.access_token);
-  localStorage.setItem('refreshToken', data.refresh_token);
+  // Profile update keeps whatever storage was being used
+  const storage = localStorage.getItem('userToken') ? localStorage : sessionStorage;
+  storage.setItem('userToken', data.access_token);
+  storage.setItem('refreshToken', data.refresh_token);
   return data.user;
 }
 

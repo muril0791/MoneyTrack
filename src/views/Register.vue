@@ -4,9 +4,13 @@
 
       <div class="bg-[#1b1b1b] rounded-2xl shadow-xl ring-1 ring-[#2a2a2a] p-6 md:p-8">
 
-        <div class="mb-6 text-center">
-          <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Criar conta</h1>
-          <p class="text-sm text-neutral-400 mt-1">Comece a organizar suas finanças</p>
+        <!-- Logo/Header -->
+        <div class="flex flex-col items-center mb-10">
+          <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-4 ring-1 ring-white/10 overflow-hidden shadow-2xl">
+             <img src="/logo.png" alt="Logo" class="w-full h-full object-cover scale-110" />
+          </div>
+          <h1 class="text-3xl font-black text-white tracking-tight">Track<span class="text-emerald-500">Finances</span></h1>
+          <p class="text-neutral-500 text-sm mt-2 font-medium uppercase tracking-widest">Sua gestão inteligente</p>
         </div>
 
 
@@ -68,10 +72,6 @@
             Faça login
           </router-link>
         </div>
-      </div>
-
-      <div class="text-center mt-6 text-xs text-neutral-500">
-        Aurora •
       </div>
     </div>
   </div>

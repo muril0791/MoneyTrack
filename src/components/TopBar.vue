@@ -6,10 +6,10 @@
       <div class="flex-1 flex items-center justify-between rounded-[24px] bg-[#1a1a1a]/80 backdrop-blur-xl ring-1 ring-white/5 px-4 py-2.5 shadow-2xl shadow-black/40">
         <div class="flex items-center gap-6">
           <div aria-label="Logo" class="select-none flex items-center gap-2 pl-2">
-            <div class="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <span class="text-black font-black text-xs">MT</span>
+            <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center overflow-hidden border border-white/5 shadow-lg shadow-emerald-500/10">
+              <img src="/logo.png" alt="Logo" class="w-full h-full object-cover scale-110" />
             </div>
-            <h1 class="text-white font-bold tracking-tight text-lg hidden sm:block">Money<span class="text-emerald-500">Track</span></h1>
+            <h1 class="text-white font-bold tracking-tight text-xl hidden sm:block">Track<span class="text-emerald-500">Finances</span></h1>
           </div>
 
           <nav class="hidden md:flex items-center gap-1">
@@ -209,7 +209,7 @@ const notifications = computed(() => {
 });
 
 onMounted(() => {
-  const token = localStorage.getItem("userToken");
+  const token = localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
   if (token && !store.user) {
     try {
       const payload = JSON.parse(window.atob(token.split('.')[1]));

@@ -4,9 +4,11 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
 });
 
+const getStorage = () => (localStorage.getItem("userToken") ? localStorage : sessionStorage);
+
 // Attach access token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("userToken");
+  const token = localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -41,7 +43,6 @@ api.interceptors.response.use(
       !originalRequest.url?.includes('/auth/')
     ) {
       if (isRefreshing) {
-        // Queue requests while a refresh is in progress
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -55,13 +56,16 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
+      const storage = getStorage();
 
       if (!refreshToken) {
-        // No refresh token — force logout
         localStorage.removeItem("userToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
+        sessionStorage.removeItem("userToken");
+        sessionStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("user");
         window.location.href = "/#/login";
         return Promise.reject(error);
       }
@@ -72,21 +76,21 @@ api.interceptors.response.use(
           { refresh_token: refreshToken },
         );
 
-        // Store new tokens
-        localStorage.setItem("userToken", data.access_token);
-        localStorage.setItem("refreshToken", data.refresh_token);
+        storage.setItem("userToken", data.access_token);
+        storage.setItem("refreshToken", data.refresh_token);
 
-        // Retry the original request with the new token
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
         processQueue(null, data.access_token);
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed — force logout
         processQueue(refreshError, null);
         localStorage.removeItem("userToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
+        sessionStorage.removeItem("userToken");
+        sessionStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("user");
         window.location.href = "/#/login";
         return Promise.reject(refreshError);
       } finally {

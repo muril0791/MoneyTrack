@@ -39,7 +39,7 @@ function normalizeFixedBill(row) {
 function normalizeCard(row) {
   if (!row) return row;
   return {
-    id: row.id,
+    id: row.id || row._id,
     name: row.name,
     limit: Number(row.limit ?? row["limit"] ?? 0),
     closingDay: row.closingDay ?? row.closing_day,
@@ -51,7 +51,7 @@ function normalizeCard(row) {
 function normalizeExpense(row) {
   if (!row) return row;
   return {
-    id: row.id,
+    id: row.id || row._id,
     tipo: row.tipo,
     tipoTransacao: row.tipoTransacao ?? row.tipo_transacao,
     parcelas: row.parcelas ?? null,
