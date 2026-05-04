@@ -80,9 +80,11 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useMainStore } from "@/stores/store";
 import authService from "@/services/authService";
 
 const router = useRouter();
+const store = useMainStore();
 const user = ref({
   username: "",
   email: "",
@@ -102,11 +104,12 @@ async function handleRegister() {
   }
 
   try {
-    await authService.signUp({
+    const userResp = await authService.signUp({
       email: user.value.email,
       password: user.value.password,
       username: user.value.username,
     });
+    store.setUser(userResp);
     router.push({ name: "Home" });
   } catch (err) {
     error.value = err.response?.data?.message || err.message || "Erro no cadastro.";

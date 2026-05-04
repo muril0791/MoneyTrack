@@ -2,7 +2,7 @@
   <div class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md flex items-center justify-center p-4" @click.self="$emit('close')">
     <div class="w-full max-w-2xl bg-[#1b1b1b] rounded-[32px] shadow-2xl ring-1 ring-white/5 overflow-hidden flex flex-col max-h-[90vh]" @click.stop>
       <!-- Header -->
-      <div class="p-8 border-b border-white/5 flex justify-between items-center bg-[#1b1b1b]/50 backdrop-blur-xl">
+      <div class="p-6 md:p-8 border-b border-white/5 flex justify-between items-center bg-[#1b1b1b]/50 backdrop-blur-xl shrink-0">
         <div class="space-y-1">
           <h2 class="text-emerald-500 text-[11px] uppercase tracking-[0.3em] font-bold">Gestão Mensal</h2>
           <h3 class="text-2xl font-semibold tracking-tight text-white">Contas Fixas</h3>
@@ -26,7 +26,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+      <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
         <!-- Form Section -->
         <transition name="fade-slide">
           <div v-if="showForm" class="space-y-6 mb-8 bg-[#151515] p-6 rounded-3xl border border-white/5">
@@ -149,7 +149,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="p-6 border-t border-white/5 flex justify-end bg-[#1b1b1b]/50">
+      <div class="p-4 md:p-6 border-t border-white/5 flex justify-end bg-[#1b1b1b]/50 shrink-0">
         <button @click="$emit('close')" class="text-xs uppercase tracking-widest font-bold text-neutral-500 hover:text-white transition-all">Fechar</button>
       </div>
     </div>

@@ -1,8 +1,8 @@
 <template>
   <div class="w-full max-w-lg mx-auto font-sans">
-    <div class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
+    <div class="w-full max-w-lg mx-auto font-sans max-h-[95vh] flex flex-col bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between px-8 py-6 border-b border-[#2a2a2a]">
+      <div class="flex items-center justify-between px-6 py-5 md:px-8 md:py-6 border-b border-[#2a2a2a] shrink-0">
         <div class="space-y-1">
           <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Gestão</h2>
           <h3 class="text-xl font-semibold text-white">Editar Lançamento</h3>
@@ -17,7 +17,7 @@
         </button>
       </div>
 
-      <div class="p-8 space-y-6">
+      <div class="p-6 md:p-8 space-y-6 overflow-y-auto custom-scrollbar">
         <!-- Status Badge -->
         <div class="flex justify-center">
           <span :class="expense.tipo === 'entrada' ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' : 'bg-rose-500/10 text-rose-400 ring-rose-500/20'" 
@@ -82,7 +82,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-8 py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-center">
+      <div class="px-6 py-4 md:px-8 md:py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-center shrink-0">
         <button
           @click="$emit('close')"
           class="text-[12px] uppercase tracking-widest font-bold text-neutral-500 hover:text-white transition-all"

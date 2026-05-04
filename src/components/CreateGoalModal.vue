@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md flex items-center justify-center p-4" @click.self="$emit('close')">
-    <div class="w-full max-w-xl bg-[#1b1b1b] rounded-[32px] shadow-2xl ring-1 ring-white/5 overflow-hidden" @click.stop>
-      <div class="p-8 space-y-8">
+    <div class="w-full max-w-xl bg-[#1b1b1b] rounded-[32px] shadow-2xl ring-1 ring-white/5 overflow-hidden max-h-[95vh] flex flex-col" @click.stop>
+      <div class="p-6 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
         <div class="space-y-2">
           <h2 class="text-emerald-500 text-[11px] uppercase tracking-[0.3em] font-bold text-center sm:text-left">
             {{ editingGoal ? 'Editar Planejamento' : 'Novo Planejamento' }}

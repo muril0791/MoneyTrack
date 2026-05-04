@@ -44,6 +44,9 @@
 
               <transition name="fade-slide">
                 <div v-if="dropdownOpen" class="absolute left-0 top-full mt-3 w-56 rounded-[20px] bg-[#1b1b1b] ring-1 ring-white/10 shadow-2xl p-2 z-50 backdrop-blur-2xl">
+                  <button class="w-full text-left px-4 py-2.5 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white transition text-sm font-medium" @click="openProfile">
+                    Meu Perfil
+                  </button>
                   <button class="w-full text-left px-4 py-2.5 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white transition text-sm font-medium" @click="openCreditCards">
                     Gerenciar Cartões
                   </button>
@@ -107,22 +110,37 @@
       </div>
 
       <!-- Right Section: User Profile Card -->
-      <div class="hidden lg:flex items-center gap-3 rounded-[24px] bg-[#1a1a1a]/80 backdrop-blur-xl ring-1 ring-white/5 pl-2.5 pr-5 py-2 shadow-2xl shadow-black/40">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-black font-black flex items-center justify-center shadow-lg shadow-emerald-500/20">
+      <div 
+        @click="openProfile"
+        class="hidden lg:flex items-center gap-3 rounded-[24px] bg-[#1a1a1a]/80 backdrop-blur-xl ring-1 ring-white/5 pl-2.5 pr-5 py-2 shadow-2xl shadow-black/40 cursor-pointer hover:bg-[#222] hover:ring-white/10 transition-all active:scale-95 group"
+      >
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-black font-black flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-all">
           {{ initials }}
         </div>
         <div class="leading-tight">
           <div class="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">Conta Ativa</div>
-          <div class="text-[15px] font-bold text-white truncate max-w-[140px] tracking-tight">
+          <div class="text-[15px] font-bold text-white truncate max-w-[140px] tracking-tight group-hover:text-emerald-400 transition-colors">
             {{ displayName }}
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Profile Modal -->
+    <ProfileModal 
+      v-if="profileOpen" 
+      :user="store.user" 
+      @close="profileOpen = false" 
+      @updated="handleProfileUpdated"
+    />
+
     <!-- Mobile Dropdown -->
     <transition name="fade-slide">
       <div v-if="dropdownOpenMobile" class="md:hidden mt-4 rounded-3xl bg-[#1b1b1b] ring-1 ring-white/10 p-4 space-y-2 shadow-2xl relative z-[70]">
+        <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium border-b border-white/5 pb-4 mb-2" @click="openProfile">
+           <div class="text-[10px] text-neutral-500 uppercase font-bold tracking-widest mb-1">Meu Perfil</div>
+           <div class="text-lg font-bold">{{ displayName }}</div>
+        </button>
         <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-credit-cards-list')">Faturas</button>
         <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-fixed-bills')">Recorrentes</button>
         <button class="w-full text-left px-4 py-3 rounded-xl text-white hover:bg-white/5 transition font-medium" @click="handleMobileNav('open-credit-cards')">Cartões</button>
@@ -138,6 +156,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import authService from "@/services/authService";
 import { useMainStore } from "@/stores/store";
+import ProfileModal from "./ProfileModal.vue";
 
 const router = useRouter();
 const store = useMainStore();
@@ -146,9 +165,9 @@ const emit = defineEmits(["open-credit-cards", "open-categories", "open-credit-c
 const dropdownOpen = ref(false);
 const dropdownOpenMobile = ref(false);
 const showNotifications = ref(false);
-const userMeta = ref({ display_name: "", email: "" });
+const profileOpen = ref(false);
 
-const displayName = computed(() => userMeta.value.display_name || (userMeta.value.email?.split("@")[0] ?? "Usuário"));
+const displayName = computed(() => store.user?.displayName || (store.user?.email?.split("@")[0] ?? "Usuário"));
 const initials = computed(() => {
   const name = displayName.value.trim();
   const parts = name.split(/\s+/);
@@ -191,13 +210,14 @@ const notifications = computed(() => {
 
 onMounted(() => {
   const token = localStorage.getItem("userToken");
-  if (token) {
+  if (token && !store.user) {
     try {
       const payload = JSON.parse(window.atob(token.split('.')[1]));
-      userMeta.value = {
-        display_name: payload.displayName || "",
+      store.setUser({
+        id: payload.sub,
+        displayName: payload.displayName || "",
         email: payload.email || "",
-      };
+      });
     } catch (e) {}
   }
   
@@ -209,8 +229,10 @@ onUnmounted(() => {
 });
 
 const onDocumentClick = (e) => {
-  if (!e.target.closest('.relative')) {
+  // Check if click was outside the header area
+  if (!e.target.closest('header')) {
     dropdownOpen.value = false;
+    dropdownOpenMobile.value = false;
     showNotifications.value = false;
   }
 };
@@ -221,6 +243,11 @@ const toggleNotifications = () => showNotifications.value = !showNotifications.v
 
 const openCreditCards = () => { emit("open-credit-cards"); dropdownOpen.value = false; };
 const openCategories = () => { emit("open-categories"); dropdownOpen.value = false; };
+const openProfile = () => { profileOpen.value = true; dropdownOpen.value = false; dropdownOpenMobile.value = false; };
+
+const handleProfileUpdated = () => {
+  // Option for extra logic after update
+};
 
 const handleNoteClick = (note) => {
   emit("open-fixed-bills");

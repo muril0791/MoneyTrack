@@ -78,9 +78,11 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useMainStore } from "@/stores/store";
 import authService from "@/services/authService";
 
 const router = useRouter();
+const store = useMainStore();
 const credentials = ref({ email: "", password: "" });
 const error = ref("");
 const show = ref(false);
@@ -90,7 +92,8 @@ async function handleLogin() {
   const { email, password } = credentials.value;
 
   try {
-    await authService.signIn({ email, password });
+    const user = await authService.signIn({ email, password });
+    store.setUser(user);
     router.push({ name: "Home" });
   } catch (err) {
     error.value = err.response?.data?.message || err.message || "Não foi possível entrar.";
