@@ -325,9 +325,17 @@ export default {
     };
 
     const handleDeleteCard = async (cardId) => {
-      if (confirm('Tem certeza que deseja excluir este cartão? Todas as transações vinculadas a ele ficarão sem cartão.')) {
-        await store.removeCreditCard(cardId);
+      store.showConfirm({
+      title: "Excluir Cartão?",
+      message: "Tem certeza que deseja excluir este cartão? Todas as transações vinculadas a ele ficarão sem cartão.",
+      onConfirm: async () => {
+        try {
+          await store.removeCreditCard(cardId);
+        } catch (err) {
+          console.error(err);
+        }
       }
+    });
     };
 
     const handleCreateGoal = async (goalData) => {
@@ -356,9 +364,17 @@ export default {
     };
 
     const handleDeleteGoal = async (goalId) => {
-      if (confirm('Tem certeza que deseja excluir esta meta?')) {
-        await store.removeGoal(goalId);
+      store.showConfirm({
+      title: "Remover Meta?",
+      message: "Tem certeza que deseja excluir esta meta?",
+      onConfirm: async () => {
+        try {
+          await store.removeGoal(goalId);
+        } catch (err) {
+          console.error(err);
+        }
       }
+    });
     };
 
     const openAddValueModal = (goal) => {

@@ -131,18 +131,22 @@ export default {
       }
     },
     async deleteExpense() {
-      if (!confirm("Deseja realmente excluir esta transação?")) return;
-      
-      this.loading = true;
-      try {
-        const store = useMainStore();
-        await store.removeExpense(this.expense.id);
-        this.$emit("close");
-      } catch (err) {
-        console.error("Erro ao excluir:", err);
-      } finally {
-        this.loading = false;
-      }
+      const store = useMainStore();
+      store.showConfirm({
+        title: "Excluir Transação?",
+        message: "Deseja realmente excluir esta transação? Esta ação não pode ser desfeita.",
+        onConfirm: async () => {
+          this.loading = true;
+          try {
+            await store.removeExpense(this.expense.id);
+            this.$emit("close");
+          } catch (err) {
+            console.error("Erro ao excluir:", err);
+          } finally {
+            this.loading = false;
+          }
+        }
+      });
     },
   },
 };

@@ -249,15 +249,19 @@ export default {
     };
 
     const deleteCard = async (cardId) => {
-      if (submitting.value) return;
-      if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
-      submitting.value = true;
-      try {
-        await store.removeCreditCard(cardId);
-        if (editingId.value === cardId) resetForm();
-      } finally {
-        submitting.value = false;
-      }
+      store.showConfirm({
+        title: "Excluir Cartão?",
+        message: "Tem certeza que deseja excluir este cartão? Esta ação é definitiva.",
+        onConfirm: async () => {
+          submitting.value = true;
+          try {
+            await store.removeCreditCard(cardId);
+            if (editingId.value === cardId) resetForm();
+          } finally {
+            submitting.value = false;
+          }
+        }
+      });
     };
 
     const cancelEdit = () => resetForm();

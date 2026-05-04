@@ -231,9 +231,13 @@ const cancelEdit = () => {
 };
 
 const deleteBill = async (id) => {
-  if (confirm('Deseja realmente excluir esta conta fixa?')) {
-    await store.removeFixedBill(id);
-  }
+  store.showConfirm({
+    title: "Excluir Conta?",
+    message: "Deseja realmente excluir esta conta fixa? Ela não aparecerá mais nos próximos meses.",
+    onConfirm: async () => {
+      await store.removeFixedBill(id);
+    }
+  });
 };
 
 const confirmPayment = async (bill) => {
@@ -244,9 +248,13 @@ const confirmPayment = async (bill) => {
       await store.payFixedBill(bill.id);
     }
   } else {
-    if (confirm(`Confirmar pagamento de R$ ${bill.amount.toLocaleString('pt-BR')} para ${bill.title}?`)) {
-      await store.payFixedBill(bill.id);
-    }
+    store.showConfirm({
+      title: "Confirmar Pagamento?",
+      message: `Confirmar pagamento de R$ ${bill.amount.toLocaleString('pt-BR')} para ${bill.title}?`,
+      onConfirm: async () => {
+        await store.payFixedBill(bill.id);
+      }
+    });
   }
 };
 </script>

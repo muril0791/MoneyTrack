@@ -355,9 +355,13 @@ export default {
     };
 
     const deleteTransaction = async (id) => {
-      if (confirm("Deseja realmente excluir este lançamento?")) {
-        await store.removeExpense(id);
-      }
+      store.showConfirm({
+        title: "Excluir Lançamento?",
+        message: "Deseja realmente excluir este lançamento? Esta ação não pode ser desfeita.",
+        onConfirm: async () => {
+          await store.removeExpense(id);
+        }
+      });
     };
 
     const exportToCSV = () => {

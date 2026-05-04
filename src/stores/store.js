@@ -73,9 +73,35 @@ export const useMainStore = defineStore("main", {
     fixedBills: [],
     user: null,
     toasts: [],
+    confirmDialog: {
+      show: false,
+      title: "",
+      message: "",
+      onConfirm: null,
+    },
   }),
 
   actions: {
+    showConfirm({ title, message, onConfirm }) {
+      this.confirmDialog = {
+        show: true,
+        title,
+        message,
+        onConfirm,
+      };
+    },
+
+    closeConfirm() {
+      this.confirmDialog.show = false;
+    },
+
+    handleConfirm() {
+      if (this.confirmDialog.onConfirm) {
+        this.confirmDialog.onConfirm();
+      }
+      this.closeConfirm();
+    },
+
     addToast(message, type = "success") {
       const id = Date.now();
       this.toasts.push({ id, message, type });
