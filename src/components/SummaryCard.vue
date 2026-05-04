@@ -12,8 +12,8 @@
 
         <div class="flex items-center gap-4">
           <div class="flex items-baseline gap-2">
-            <span class="text-neutral-600 text-2xl font-light">R$</span>
-            <span class="text-7xl md:text-8xl font-semibold text-white tracking-[-0.05em]">
+            <span class="text-neutral-600 text-xl md:text-2xl font-light">R$</span>
+            <span class="text-5xl md:text-8xl font-semibold text-white tracking-[-0.05em]">
               {{ formatCurrency(balance) }}
             </span>
           </div>
@@ -40,7 +40,7 @@
     </div>
 
     <!-- Legend -->
-    <div class="px-4 mt-2 flex justify-end gap-6">
+    <div class="px-4 mt-2 flex justify-center lg:justify-end gap-4 md:gap-6">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full border border-white/20 bg-emerald-500"></span>
         <span class="text-neutral-500 text-[10px] uppercase font-bold tracking-widest">Entradas</span>
@@ -56,20 +56,20 @@
 
     <!-- Bottom Section: Details -->
     <div class="w-full px-4 pb-6 mt-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-24 text-center">
+      <div class="grid grid-cols-3 gap-4 md:gap-24 text-center">
         <!-- Entrada -->
         <div class="space-y-1">
           <p class="text-neutral-500 text-[11px] font-semibold uppercase tracking-widest">Entrada</p>
-          <p class="text-[32px] font-semibold text-emerald-400 tracking-tight">
-            <span class="text-sm opacity-40 mr-1">R$</span>{{ numberOnly(totalIn) }}
+          <p class="text-xl md:text-[32px] font-semibold text-emerald-400 tracking-tight">
+            <span class="text-[10px] md:text-sm opacity-40 mr-0.5">R$</span>{{ numberOnly(totalIn) }}
           </p>
         </div>
 
         <!-- Saida -->
         <div class="space-y-1">
           <p class="text-neutral-500 text-[11px] font-semibold uppercase tracking-widest">Saída</p>
-          <p class="text-[32px] font-semibold text-rose-400 tracking-tight">
-            <span class="text-sm opacity-40 mr-1">R$</span>{{ numberOnly(totalOut) }}
+          <p class="text-xl md:text-[32px] font-semibold text-rose-400 tracking-tight">
+            <span class="text-[10px] md:text-sm opacity-40 mr-0.5">R$</span>{{ numberOnly(totalOut) }}
           </p>
         </div>
 
@@ -85,10 +85,10 @@
             </div>
           </div>
           <p 
-            class="text-[32px] font-semibold tracking-tight"
+            class="text-xl md:text-[32px] font-semibold tracking-tight"
             :class="isUp ? 'text-emerald-400' : 'text-rose-400'"
           >
-            <span class="text-sm opacity-40 mr-1">R$</span>{{ numberOnly(balance) }}
+            <span class="text-[10px] md:text-sm opacity-40 mr-0.5">R$</span>{{ numberOnly(balance) }}
           </p>
         </div>
       </div>

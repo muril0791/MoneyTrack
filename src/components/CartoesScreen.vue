@@ -1,8 +1,8 @@
 <template>
   <div class="w-full max-w-xl mx-auto font-sans">
-    <div class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
+    <div class="w-full max-w-xl mx-auto font-sans max-h-[95vh] flex flex-col bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between px-8 py-6 border-b border-[#2a2a2a]">
+      <div class="flex items-center justify-between px-6 py-5 md:px-8 md:py-6 border-b border-[#2a2a2a] shrink-0">
         <div class="space-y-1">
           <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Configurações</h2>
           <h3 class="text-xl font-semibold text-white">Cartões de Crédito</h3>
@@ -17,7 +17,7 @@
         </button>
       </div>
 
-      <div class="p-8 space-y-8">
+      <div class="p-6 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
         <!-- Form Section -->
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -143,7 +143,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-8 py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-end">
+      <div class="px-6 py-4 md:px-8 md:py-4 border-t border-[#2a2a2a] bg-[#151515]/50 flex justify-end shrink-0">
         <button
           @click="$emit('close')"
           class="text-[12px] uppercase tracking-widest font-bold text-neutral-500 hover:text-white transition-all"

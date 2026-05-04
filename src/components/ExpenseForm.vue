@@ -15,27 +15,27 @@
       <section
         v-if="currentStep === 0"
         key="step0"
-        class="flex flex-col space-y-10 bg-[#1b1b1b] rounded-[32px] shadow-2xl ring-1 ring-[#2a2a2a] px-10 py-10"
+        class="flex flex-col space-y-10 bg-[#1b1b1b] rounded-[32px] shadow-2xl ring-1 ring-[#2a2a2a] px-6 py-8 md:px-10 md:py-10 max-h-[90vh] overflow-y-auto custom-scrollbar"
       >
         <div class="space-y-2 text-center">
           <h2 class="text-emerald-500 text-[11px] uppercase tracking-[0.4em] font-bold">Nova Transação</h2>
           <h3 class="text-3xl font-semibold tracking-tight text-white">O que vamos registrar?</h3>
         </div>
 
-        <div class="grid grid-cols-2 gap-6 w-full mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 w-full mx-auto">
           <!-- Card Entrada -->
           <button
             type="button"
             @click="selectType('entrada')"
-            class="group flex items-center gap-6 rounded-[28px] bg-[#151515] ring-1 ring-white/5 p-8 text-left transition-all duration-300 hover:ring-emerald-500/50 hover:bg-[#181818] hover:scale-[1.03] active:scale-95 shadow-2xl"
+            class="group flex items-center gap-4 md:gap-6 rounded-[28px] bg-[#151515] ring-1 ring-white/5 p-5 md:p-8 text-left transition-all duration-300 hover:ring-emerald-500/50 hover:bg-[#181818] hover:scale-[1.03] active:scale-95 shadow-2xl"
           >
-            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+            <div class="flex h-12 w-12 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
               <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 19V5M5 12l7-7 7 7" />
               </svg>
             </div>
             <div>
-              <div class="font-bold text-[20px] uppercase tracking-widest text-white group-hover:text-emerald-400 transition-colors">Entrada</div>
+              <div class="font-bold text-[18px] md:text-[20px] uppercase tracking-widest text-white group-hover:text-emerald-400 transition-colors">Entrada</div>
               <div class="text-[13px] text-neutral-500 mt-1 leading-relaxed">Salário, Pix ou rendas.</div>
             </div>
           </button>
@@ -44,15 +44,15 @@
           <button
             type="button"
             @click="selectType('saida')"
-            class="group flex items-center gap-6 rounded-[28px] bg-[#151515] ring-1 ring-white/5 p-8 text-left transition-all duration-300 hover:ring-rose-500/50 hover:bg-[#181818] hover:scale-[1.03] active:scale-95 shadow-2xl"
+            class="group flex items-center gap-4 md:gap-6 rounded-[28px] bg-[#151515] ring-1 ring-white/5 p-5 md:p-8 text-left transition-all duration-300 hover:ring-rose-500/50 hover:bg-[#181818] hover:scale-[1.03] active:scale-95 shadow-2xl"
           >
-            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.1)]">
+            <div class="flex h-12 w-12 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.1)]">
               <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 5v14M5 12l7 7 7-7" />
               </svg>
             </div>
             <div>
-              <div class="font-bold text-[20px] uppercase tracking-widest text-white group-hover:text-rose-400 transition-colors">Saída</div>
+              <div class="font-bold text-[18px] md:text-[20px] uppercase tracking-widest text-white group-hover:text-rose-400 transition-colors">Saída</div>
               <div class="text-[13px] text-neutral-500 mt-1 leading-relaxed">Compras, lazer ou contas.</div>
             </div>
           </button>
@@ -63,9 +63,9 @@
       <section
         v-else-if="currentStep === 1"
         key="step1"
-        class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden"
+        class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden max-h-[90vh] flex flex-col"
       >
-        <div class="px-8 pt-8 pb-4 flex items-center justify-between">
+        <div class="px-6 md:px-8 pt-8 pb-4 flex items-center justify-between shrink-0">
           <div class="space-y-1">
             <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Dados do Lançamento</h2>
             <h3 class="text-xl font-semibold text-white">Preencha os detalhes</h3>
@@ -76,7 +76,7 @@
           </span>
         </div>
 
-        <div class="p-8 pt-4 space-y-6">
+        <div class="p-6 md:p-8 pt-4 space-y-6 overflow-y-auto custom-scrollbar">
           <div class="grid gap-6 sm:grid-cols-2">
             <!-- Amount Input -->
             <div class="space-y-2 sm:col-span-2">
@@ -188,14 +188,14 @@
       <section
         v-else-if="currentStep === 2"
         key="step2"
-        class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden"
+        class="bg-[#1b1b1b] rounded-3xl shadow-2xl ring-1 ring-[#2a2a2a] overflow-hidden max-h-[90vh] flex flex-col"
       >
-        <div class="px-8 pt-8 pb-4">
+        <div class="px-6 md:px-8 pt-8 pb-4 shrink-0">
           <h2 class="text-neutral-500 text-[11px] uppercase tracking-[0.2em] font-semibold">Tudo pronto!</h2>
           <h3 class="text-xl font-semibold text-white">Revise as informações</h3>
         </div>
 
-        <div class="p-8 space-y-4">
+        <div class="p-6 md:p-8 space-y-4 overflow-y-auto custom-scrollbar">
           <div class="bg-[#151515] rounded-2xl p-6 space-y-4 border border-[#2a2a2a]">
             <ItemRow label="Tipo" :text="labelTipo" />
             <ItemRow label="Valor" :text="money(form.valor)" class="text-xl font-bold text-emerald-400" />

@@ -209,8 +209,10 @@ onUnmounted(() => {
 });
 
 const onDocumentClick = (e) => {
-  if (!e.target.closest('.relative')) {
+  // Check if click was outside the header area
+  if (!e.target.closest('header')) {
     dropdownOpen.value = false;
+    dropdownOpenMobile.value = false;
     showNotifications.value = false;
   }
 };
