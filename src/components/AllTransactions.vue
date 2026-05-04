@@ -381,6 +381,7 @@ export default {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      store.addToast("Relatório exportado com sucesso!");
     };
 
     return {

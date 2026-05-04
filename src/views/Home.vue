@@ -134,12 +134,13 @@
         :creditCards="creditCards"
         :expenses="expenses"
         @close="closeCreditCardsModal"
+        @open-registration="openCreditCardsRegistrationModal"
       />
     </div>
 
     <div
       v-if="showCreditCardsRegistrationModal"
-      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
+      class="fixed inset-0 z-[110] bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-4"
       @click.self="closeCreditCardsRegistrationModal"
     >
       <div class="p-3 md:p-4 w-full max-w-xl max-h-[90vh] overflow-y-auto">

@@ -57,8 +57,6 @@
             </div>
           </div>
 
-          <p v-if="error" class="text-sm text-red-400 -mb-2">{{ error }}</p>
-
           <button type="submit"
             class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10">
             Cadastrar
@@ -91,15 +89,12 @@ const user = ref({
   password: "",
   confirmPassword: "",
 });
-const error = ref("");
 const showPass = ref(false);
 const showConfirm = ref(false);
 
 async function handleRegister() {
-  error.value = "";
-
   if (user.value.password !== user.value.confirmPassword) {
-    error.value = "As senhas não conferem.";
+    store.addToast("As senhas não conferem.", "error");
     return;
   }
 
@@ -110,9 +105,11 @@ async function handleRegister() {
       username: user.value.username,
     });
     store.setUser(userResp);
+    store.addToast("Conta criada com sucesso! Bem-vindo.");
     router.push({ name: "Home" });
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || "Erro no cadastro.";
+    const msg = err.response?.data?.message || err.message || "Erro no cadastro.";
+    store.addToast(msg, "error");
   }
 }
 </script>

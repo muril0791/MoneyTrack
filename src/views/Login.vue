@@ -67,8 +67,6 @@
             <router-link to="/forgot-password" class="text-sm text-emerald-500 hover:text-emerald-400 font-medium">Esqueceu a senha?</router-link>
           </div>
 
-          <p v-if="error" class="text-sm text-red-400">{{ error }}</p>
-
           <button
             type="submit"
             class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-lg py-3 transition shadow-md shadow-emerald-500/10">
@@ -97,19 +95,19 @@ const router = useRouter();
 const store = useMainStore();
 const credentials = ref({ email: "", password: "" });
 const remember = ref(true);
-const error = ref("");
 const show = ref(false);
 
 async function handleLogin() {
-  error.value = "";
   const { email, password } = credentials.value;
 
   try {
     const user = await authService.signIn({ email, password, remember: remember.value });
     store.setUser(user);
+    store.addToast("Bem-vindo de volta!");
     router.push({ name: "Home" });
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || "Não foi possível entrar.";
+    const msg = err.response?.data?.message || err.message || "Não foi possível entrar.";
+    store.addToast(msg, "error");
   }
 }
 </script>

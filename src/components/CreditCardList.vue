@@ -18,6 +18,16 @@
 
           <div class="space-y-4 overflow-y-auto no-scrollbar max-h-[50vh]">
             <button
+              @click="$emit('open-registration')"
+              class="w-full flex flex-col items-center justify-center p-5 rounded-[22px] border-2 border-dashed border-white/5 text-neutral-500 hover:border-emerald-500/50 hover:text-emerald-500 transition-all duration-300 bg-black/20 group"
+            >
+              <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mb-2 group-hover:bg-emerald-500/10 transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-widest">Novo Cartão</span>
+            </button>
+
+            <button
               @click="selectedCardId = 'todos'"
               :class="selectedCardId === 'todos' ? 'border-emerald-500/40 bg-emerald-500/10 text-white' : 'bg-[#121212] border-white/5 text-neutral-400 hover:bg-[#151515]'"
               class="w-full group relative overflow-hidden flex flex-col p-5 rounded-[22px] border transition-all duration-300"

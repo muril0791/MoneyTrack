@@ -166,11 +166,6 @@
             </div>
           </div>
 
-          <!-- Error Feedback -->
-          <div v-if="error" class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3 rounded-xl text-xs font-bold text-center mt-4">
-            {{ error }}
-          </div>
-
           <!-- Actions -->
           <div class="flex gap-3 pt-4">
             <button
@@ -208,11 +203,6 @@
             <ItemRow label="Categoria" :text="selectedCategoryName" />
             <ItemRow label="Data" :text="brDate(form.data)" />
             <ItemRow v-if="form.descricao" label="Descrição" :text="form.descricao" />
-          </div>
-
-          <!-- Error Feedback -->
-          <div v-if="error" class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3 rounded-xl text-xs font-bold text-center mt-4">
-            {{ error }}
           </div>
 
           <div class="flex gap-3 pt-4">
@@ -278,7 +268,6 @@ export default {
     const store = useMainStore();
     const currentStep = ref(0);
     const submitting = ref(false);
-    const error = ref("");
 
     const form = reactive({
       tipo: "",
@@ -358,19 +347,19 @@ export default {
       const categoria = form.categoria;
 
       if (!valor || valor <= 0) {
-        error.value = "O valor deve ser maior que zero.";
+        store.addToast("O valor deve ser maior que zero.", "error");
         return;
       }
       if (!tipoTransacao) {
-        error.value = "Selecione o método de transação.";
+        store.addToast("Selecione o método de transação.", "error");
         return;
       }
       if (!dataStr) {
-        error.value = "Selecione uma data válida.";
+        store.addToast("Selecione uma data válida.", "error");
         return;
       }
       if (!categoria) {
-        error.value = "Selecione uma categoria.";
+        store.addToast("Selecione uma categoria.", "error");
         return;
       }
 
@@ -378,12 +367,12 @@ export default {
         (c) => c.id === categoria && c.type === tipo
       );
       if (!catOk) {
-        error.value = "Categoria inválida para este tipo de transação.";
+        store.addToast("Categoria inválida para este tipo.", "error");
         return;
       }
 
       if (tipo === "saida" && tipoTransacao === "cartao-credito" && !form.creditCardId) {
-        error.value = "Selecione um cartão de crédito.";
+        store.addToast("Selecione um cartão de crédito.", "error");
         return;
       }
 
@@ -429,7 +418,6 @@ export default {
 
     const handleSubmit = async () => {
       if (submitting.value) return;
-      error.value = "";
 
       const payloadBase = {
         tipo: form.tipo,
@@ -461,7 +449,7 @@ export default {
         emit("close");
         goBackToStep0();
       } catch (err) {
-        error.value = "Ocorreu um erro ao salvar. Verifique sua conexão.";
+        store.addToast("Ocorreu um erro ao salvar. Verifique sua conexão.", "error");
         console.error("Erro no form:", err);
       } finally {
         submitting.value = false;

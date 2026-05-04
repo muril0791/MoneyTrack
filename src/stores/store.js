@@ -72,9 +72,22 @@ export const useMainStore = defineStore("main", {
     goals: [],
     fixedBills: [],
     user: null,
+    toasts: [],
   }),
 
   actions: {
+    addToast(message, type = "success") {
+      const id = Date.now();
+      this.toasts.push({ id, message, type });
+      setTimeout(() => {
+        this.removeToast(id);
+      }, 3000);
+    },
+
+    removeToast(id) {
+      this.toasts = this.toasts.filter((t) => t.id !== id);
+    },
+
     reset() {
       this.expenses = [];
       this.categories = [];
@@ -82,6 +95,7 @@ export const useMainStore = defineStore("main", {
       this.goals = [];
       this.fixedBills = [];
       this.user = null;
+      this.toasts = [];
     },
 
     setUser(user) {
@@ -93,6 +107,7 @@ export const useMainStore = defineStore("main", {
         const list = await expenseService.listExpenses();
         this.expenses = (list || []).map(normalizeExpense);
       } catch (error) {
+        this.addToast("Erro ao carregar lançamentos", "error");
         if (import.meta.env.DEV) console.error("Erro ao buscar Expenses:", error);
       }
     },
@@ -101,7 +116,9 @@ export const useMainStore = defineStore("main", {
       try {
         const created = await expenseService.createExpense(expense);
         this.expenses.unshift(normalizeExpense(created));
+        this.addToast("Lançamento adicionado com sucesso!");
       } catch (error) {
+        this.addToast("Erro ao adicionar lançamento", "error");
         if (import.meta.env.DEV) console.error("Erro ao adicionar Expense:", error);
       }
     },
@@ -112,7 +129,9 @@ export const useMainStore = defineStore("main", {
         const norm = normalizeExpense(updated);
         const index = this.expenses.findIndex((e) => e.id === expense.id);
         if (index !== -1) this.expenses[index] = norm;
+        this.addToast("Lançamento atualizado com sucesso!");
       } catch (error) {
+        this.addToast("Erro ao atualizar lançamento", "error");
         if (import.meta.env.DEV) console.error("Erro ao atualizar Expense:", error);
       }
     },
@@ -121,7 +140,9 @@ export const useMainStore = defineStore("main", {
       try {
         await expenseService.removeExpense(expenseId);
         this.expenses = this.expenses.filter((e) => e.id !== expenseId);
+        this.addToast("Lançamento removido com sucesso!");
       } catch (error) {
+        this.addToast("Erro ao remover lançamento", "error");
         if (import.meta.env.DEV) console.error("Erro ao remover Expense:", error);
       }
     },
@@ -131,6 +152,7 @@ export const useMainStore = defineStore("main", {
         const list = await categoryService.listCategories();
         this.categories = list || [];
       } catch (error) {
+        this.addToast("Erro ao carregar categorias", "error");
         if (import.meta.env.DEV) console.error("Erro ao buscar Categories:", error);
       }
     },
@@ -139,7 +161,9 @@ export const useMainStore = defineStore("main", {
       try {
         const created = await categoryService.createCategory(category);
         this.categories.unshift(created);
+        this.addToast("Categoria criada com sucesso!");
       } catch (error) {
+        this.addToast("Erro ao criar categoria", "error");
         if (import.meta.env.DEV) console.error("Erro ao adicionar Category:", error);
       }
     },
@@ -149,7 +173,9 @@ export const useMainStore = defineStore("main", {
         const updated = await categoryService.updateCategory(category.id, category);
         const index = this.categories.findIndex((c) => c.id === category.id);
         if (index !== -1) this.categories[index] = updated;
+        this.addToast("Categoria atualizada!");
       } catch (error) {
+        this.addToast("Erro ao atualizar categoria", "error");
         if (import.meta.env.DEV) console.error("Erro ao atualizar Category:", error);
       }
     },
@@ -158,7 +184,9 @@ export const useMainStore = defineStore("main", {
       try {
         await categoryService.removeCategory(categoryId);
         this.categories = this.categories.filter((c) => c.id !== categoryId);
+        this.addToast("Categoria removida!");
       } catch (error) {
+        this.addToast("Erro ao remover categoria", "error");
         if (import.meta.env.DEV) console.error("Erro ao remover Category:", error);
       }
     },
@@ -168,6 +196,7 @@ export const useMainStore = defineStore("main", {
         const rows = await creditCardService.listCreditCards();
         this.creditCards = (rows || []).map(normalizeCard);
       } catch (error) {
+        this.addToast("Erro ao carregar cartões", "error");
         if (import.meta.env.DEV) console.error("Erro ao buscar Credit Cards:", error);
       }
     },
@@ -176,7 +205,9 @@ export const useMainStore = defineStore("main", {
       try {
         const created = await creditCardService.createCreditCard(card);
         this.creditCards.unshift(normalizeCard(created));
+        this.addToast("Cartão cadastrado!");
       } catch (error) {
+        this.addToast("Erro ao cadastrar cartão", "error");
         if (import.meta.env.DEV) console.error("Erro ao adicionar Credit Card:", error);
       }
     },
@@ -187,7 +218,9 @@ export const useMainStore = defineStore("main", {
         const norm = normalizeCard(updated);
         const index = this.creditCards.findIndex((c) => c.id === card.id);
         if (index !== -1) this.creditCards[index] = norm;
+        this.addToast("Cartão atualizado!");
       } catch (error) {
+        this.addToast("Erro ao atualizar cartão", "error");
         if (import.meta.env.DEV) console.error("Erro ao atualizar Credit Card:", error);
       }
     },
@@ -196,7 +229,9 @@ export const useMainStore = defineStore("main", {
       try {
         await creditCardService.removeCreditCard(cardId);
         this.creditCards = this.creditCards.filter((c) => c.id !== cardId);
+        this.addToast("Cartão removido!");
       } catch (error) {
+        this.addToast("Erro ao remover cartão", "error");
         if (import.meta.env.DEV) console.error("Erro ao remover Credit Card:", error);
       }
     },
@@ -206,6 +241,7 @@ export const useMainStore = defineStore("main", {
         const rows = await goalService.getAll();
         this.goals = (rows || []).map(normalizeGoal);
       } catch (error) {
+        this.addToast("Erro ao carregar metas", "error");
         if (import.meta.env.DEV) console.error("Erro ao buscar Goals:", error);
       }
     },
@@ -214,7 +250,9 @@ export const useMainStore = defineStore("main", {
       try {
         const created = await goalService.create(goal);
         this.goals.unshift(normalizeGoal(created));
+        this.addToast("Meta criada com sucesso!");
       } catch (error) {
+        this.addToast("Erro ao criar meta", "error");
         if (import.meta.env.DEV) console.error("Erro ao adicionar Goal:", error);
       }
     },
@@ -225,7 +263,9 @@ export const useMainStore = defineStore("main", {
         const norm = normalizeGoal(updated);
         const index = this.goals.findIndex((g) => g.id === goalId);
         if (index !== -1) this.goals[index] = norm;
+        this.addToast("Valor adicionado à meta!");
       } catch (error) {
+        this.addToast("Erro ao adicionar valor", "error");
         if (import.meta.env.DEV) console.error("Erro ao adicionar valor ao Goal:", error);
       }
     },
@@ -236,7 +276,9 @@ export const useMainStore = defineStore("main", {
         const norm = normalizeGoal(updated);
         const index = this.goals.findIndex((g) => g.id === goalId);
         if (index !== -1) this.goals[index] = norm;
+        this.addToast("Meta atualizada!");
       } catch (error) {
+        this.addToast("Erro ao atualizar meta", "error");
         if (import.meta.env.DEV) console.error("Erro ao atualizar Goal:", error);
       }
     },
@@ -245,7 +287,9 @@ export const useMainStore = defineStore("main", {
       try {
         await goalService.delete(goalId);
         this.goals = this.goals.filter((g) => g.id !== goalId);
+        this.addToast("Meta removida!");
       } catch (error) {
+        this.addToast("Erro ao remover meta", "error");
         if (import.meta.env.DEV) console.error("Erro ao remover Goal:", error);
       }
     },
@@ -255,6 +299,7 @@ export const useMainStore = defineStore("main", {
         const rows = await fixedBillService.getAll();
         this.fixedBills = rows.map(normalizeFixedBill);
       } catch (error) {
+        this.addToast("Erro ao carregar contas fixas", "error");
         if (import.meta.env.DEV) console.error("Erro ao buscar Fixed Bills:", error);
       }
     },
@@ -263,7 +308,9 @@ export const useMainStore = defineStore("main", {
       try {
         const created = await fixedBillService.create(bill);
         this.fixedBills.push(normalizeFixedBill(created));
+        this.addToast("Conta fixa cadastrada!");
       } catch (error) {
+        this.addToast("Erro ao cadastrar conta fixa", "error");
         if (import.meta.env.DEV) console.error("Erro ao adicionar Fixed Bill:", error);
       }
     },
@@ -274,7 +321,9 @@ export const useMainStore = defineStore("main", {
         const norm = normalizeFixedBill(updated);
         const index = this.fixedBills.findIndex((b) => b.id === id);
         if (index !== -1) this.fixedBills[index] = norm;
+        this.addToast("Conta fixa atualizada!");
       } catch (error) {
+        this.addToast("Erro ao atualizar conta fixa", "error");
         if (import.meta.env.DEV) console.error("Erro ao atualizar Fixed Bill:", error);
       }
     },
@@ -283,7 +332,9 @@ export const useMainStore = defineStore("main", {
       try {
         await fixedBillService.delete(id);
         this.fixedBills = this.fixedBills.filter((b) => b.id !== id);
+        this.addToast("Conta fixa removida!");
       } catch (error) {
+        this.addToast("Erro ao remover conta fixa", "error");
         if (import.meta.env.DEV) console.error("Erro ao remover Fixed Bill:", error);
       }
     },
@@ -294,7 +345,9 @@ export const useMainStore = defineStore("main", {
         const norm = normalizeFixedBill(updated);
         const index = this.fixedBills.findIndex((b) => b.id === id);
         if (index !== -1) this.fixedBills[index] = norm;
+        this.addToast("Pagamento registrado com sucesso!");
       } catch (error) {
+        this.addToast("Erro ao registrar pagamento", "error");
         if (import.meta.env.DEV) console.error("Erro ao pagar Fixed Bill:", error);
       }
     }
