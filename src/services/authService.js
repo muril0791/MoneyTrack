@@ -26,4 +26,11 @@ export async function signOut() {
   }
 }
 
-export default { signUp, signIn, signOut };
+export async function updateProfile(payload) {
+  const { data } = await api.patch('/auth/profile', payload);
+  localStorage.setItem('userToken', data.access_token);
+  localStorage.setItem('refreshToken', data.refresh_token);
+  return data.user;
+}
+
+export default { signUp, signIn, signOut, updateProfile };

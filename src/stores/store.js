@@ -71,6 +71,7 @@ export const useMainStore = defineStore("main", {
     creditCards: [],
     goals: [],
     fixedBills: [],
+    user: null,
   }),
 
   actions: {
@@ -79,6 +80,12 @@ export const useMainStore = defineStore("main", {
       this.categories = [];
       this.creditCards = [];
       this.goals = [];
+      this.fixedBills = [];
+      this.user = null;
+    },
+
+    setUser(user) {
+      this.user = user;
     },
 
     async fetchExpenses() {
